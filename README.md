@@ -5,10 +5,10 @@
     <img alt="npm" src="https://img.shields.io/npm/v/nestjs-ethers" />
   </a>
   <a href="https://travis-ci.com/github/jarcodallo/nestjs-ethers">
-    <img alt="Travis" src="https://api.travis-ci.com/jarcodallo/nestjs-ethers.svg?branch=develop" />
+    <img alt="Travis" src="https://api.travis-ci.com/jarcodallo/nestjs-ethers.svg?branch=main" />
   </a>
-  <a href='https://coveralls.io/github/jarcodallo/nestjs-ethers?branch=develop'>
-    <img src='https://coveralls.io/repos/github/jarcodallo/nestjs-ethers/badge.svg?branch=develop' alt='Coverage Status' />
+  <a href='https://coveralls.io/github/jarcodallo/nestjs-ethers?branch=main'>
+    <img src='https://coveralls.io/repos/github/jarcodallo/nestjs-ethers/badge.svg?branch=main' alt='Coverage Status' />
   </a>
   <a href="https://snyk.io/test/github/jarcodallo/nestjs-ethers">
     <img alt="Snyk Vulnerabilities for npm package" src="https://img.shields.io/snyk/vulnerabilities/npm/nestjs-ethers" />
