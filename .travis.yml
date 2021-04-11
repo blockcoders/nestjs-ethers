@@ -1,12 +1,12 @@
 language: node_js
 
 node_js:
+  - "15"
   - "14"
   - "12"
-  - "11"
   - "10"
 install:
-  - npm ci
+  - npm i
 
 script:
   - npm run lint:ci
