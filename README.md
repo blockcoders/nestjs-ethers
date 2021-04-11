@@ -34,7 +34,7 @@ Contributions welcome! See [Contributing](CONTRIBUTING.md).
 
 ## Author
 
-**Jose Ramirez (Y Prospect on [Twitter](https://twitter.com/jarcodallo))**
+**Jose Ramirez [Twitter](https://twitter.com/jarcodallo)**
 
 ## License
 
