@@ -1,0 +1,9 @@
+__tests__/
+.github/
+coverage/
+dist/*.tsbuildinfo
+dist/*.js.map
+src/
+.travis.yml
+CONTRIBUTING.md
+README.md
