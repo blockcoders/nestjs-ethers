@@ -1,27 +1,27 @@
-<h1 align="center">nestjs-ethers</h1>
+<h1 align="center">NestJS-Ethers</h1>
 
-<div align="center">
-  <a href="http://nestjs.com/" target="_blank">
-    <img src="https://nestjs.com/img/logo_text.svg" width="150" alt="Nest Logo" />
+<p align="center">
+  <a href="https://www.npmjs.com/package/nestjs-ethers">
+    <img alt="npm" src="https://img.shields.io/npm/v/nestjs-ethers" />
   </a>
-</div>
-
-<h3 align="center">NestJS npm Package Starter</h3>
-
-<div align="center">
-  <a href="https://nestjs.com" target="_blank">
-    <img src="https://img.shields.io/badge/built%20with-NestJs-red.svg" alt="Built with NestJS">
+  <a href="https://travis-ci.com/github/jarcodallo/nestjs-ethers">
+    <img alt="Travis" src="https://api.travis-ci.com/jarcodallo/nestjs-ethers.svg?branch=main" />
   </a>
-</div>
+  <a href='https://coveralls.io/github/jarcodallo/nestjs-ethers?branch=main'>
+    <img src='https://coveralls.io/repos/github/jarcodallo/nestjs-ethers/badge.svg?branch=main' alt='Coverage Status' />
+  </a>
+  <a href="https://snyk.io/test/github/jarcodallo/nestjs-ethers">
+    <img alt="Snyk Vulnerabilities for npm package" src="https://img.shields.io/snyk/vulnerabilities/npm/nestjs-ethers" />
+  </a>
+  <img alt="David" src="https://img.shields.io/david/jarcodallo/nestjs-ethers">
+  <img alt="Dependabot" src="https://badgen.net/dependabot/jarcodallo/nestjs-ethers/?icon=dependabot">
+  <img alt="Supported platforms: Express & Fastify" src="https://img.shields.io/badge/platforms-Express%20%26%20Fastify-green" />
+</p>
 
-### Installation
+## Install
 
-1. Clone the repo
-2. Run npm/yarn install
-
-```bash
-cd nestjs-package-starter
-npm install
+```sh
+npm i nestjs-ethers
 ```
 
 ## Change Log
@@ -34,8 +34,8 @@ Contributions welcome! See [Contributing](CONTRIBUTING.md).
 
 ## Author
 
-**John Biundo (Y Prospect on [Discord](https://discord.gg/G7Qnnhy))**
+**Jose Ramirez [Twitter](https://twitter.com/jarcodallo)**
 
 ## License
 
-Licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Licensed under the Apache 2.0 - see the [LICENSE](LICENSE) file for details.

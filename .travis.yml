@@ -1,0 +1,22 @@
+language: node_js
+
+node_js:
+  - "15"
+  - "14"
+  - "12"
+  - "10"
+install:
+  - npm i
+
+script:
+  - npm run lint:ci
+  - npm run build
+  - npm run test:cov
+
+after_deploy:
+  - npm run report
+  
+notifications:
+  email:
+    on_success: never
+    on_failure: always
