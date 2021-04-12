@@ -1,15 +1,15 @@
 import { Module, DynamicModule } from '@nestjs/common';
-import { Networkish } from '@ethersproject/providers';
+import { Network } from '@ethersproject/providers';
 import { EthersCoreModule } from './ethers-core.module';
 import {
   EthersModuleOptions,
   EthersModuleAsyncOptions,
-} from './interfaces/ethers-options.interface';
+} from './ethers.interface';
 
 @Module({})
 export class EthersModule {
   static forRoot(
-    network: Networkish = 'homestead',
+    network: Network | string = 'homestead',
     options: EthersModuleOptions = {},
   ): DynamicModule {
     return {

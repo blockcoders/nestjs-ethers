@@ -1,31 +1,28 @@
 import { ModuleMetadata } from '@nestjs/common/interfaces';
-import { Networkish } from '@ethersproject/providers';
+import { Network } from '@ethersproject/providers';
 
-interface InfuraProviderOptions {
+export interface InfuraProviderOptions {
   projectId: string;
   projectSecret: string;
 }
 
-interface PocketProviderOptions {
+export interface PocketProviderOptions {
   applicationId: string;
   applicationSecretKey: string;
 }
 
-interface DefaultProviderOptions {
+export interface EthersModuleOptions extends Record<string, any> {
+  network?: Network | string;
+  providerName?: string;
   alchemy?: string;
   etherscan?: string;
   infura?: InfuraProviderOptions | string;
   pocket?: PocketProviderOptions | string;
   quorum?: number;
 }
-
-export interface EthersModuleOptions extends Record<string, any> {
-  network?: Networkish;
-  options?: DefaultProviderOptions;
-}
-
 export interface EthersModuleAsyncOptions
   extends Pick<ModuleMetadata, 'imports' | 'providers'> {
+  providerName?: string;
   useFactory: (
     ...args: any[]
   ) => EthersModuleOptions | Promise<EthersModuleOptions>;
