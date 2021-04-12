@@ -13,7 +13,7 @@ script:
   - npm run build
   - npm run test:cov
 
-after_deploy:
+after_success:
   - npm run report
   
 notifications:
