@@ -37,12 +37,6 @@ export async function createDefaultProvider(
   } = options;
 
   if (!useDefaultProvider) {
-    /**
-     * If you decided to not use the DefaultProvider, you can controll what Providers to enabled
-     * FallbackProvider uses a quorum and connects to multiple Providers as backends,
-     * each configured with a priority and a weight.
-     * @see {@link https://docs.ethers.io/v5/api/providers/other/#FallbackProvider}
-     */
     const providers: Array<BaseProvider> = [];
 
     if (alchemy) {
@@ -91,6 +85,10 @@ export async function createDefaultProvider(
     }
 
     if (providers.length > 1) {
+      /**
+       * FallbackProvider with selected providers.
+       * @see {@link https://docs.ethers.io/v5/api/providers/other/#FallbackProvider}
+       */
       return new FallbackProvider(providers, quorum);
     }
 

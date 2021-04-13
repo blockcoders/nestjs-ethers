@@ -20,9 +20,9 @@ export interface EthersModuleOptions extends Record<string, any> {
   infura?: InfuraProviderOptions | string;
   pocket?: PocketProviderOptions | string;
   quorum?: number;
-  useCloudflareProvider?: boolean;
   useDefaultProvider?: boolean;
 }
+
 export interface EthersModuleAsyncOptions
   extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   providerName?: string;

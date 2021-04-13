@@ -34,7 +34,69 @@ import { EthersModule } from 'nestjs-ethers';
 class MyModule {}
 ```
 
-**NOTE:** *By default `EthersModule` will try to connect using [getDefaultProvider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider). It's the safest, easiest way to begin developing on Ethereum, and it is also robust enough for use in production. It creates a [FallbackProvider](https://docs.ethers.io/v5/api/providers/other/#FallbackProvider) connected to as many backend services as possible.* 
+**NOTE:** *By default `EthersModule` will try to connect using [getDefaultProvider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider). It's the safest, easiest way to begin developing on Ethereum. It creates a [FallbackProvider](https://docs.ethers.io/v5/api/providers/other/#FallbackProvider) connected to as many backend services as possible.* 
+
+### Configuration params
+
+`nestjs-ethers` can be configured with this options:
+
+```ts
+interface EthersModuleOptions {
+  /**
+   * Optional parameter that can be a Network object or the name of a common network as a string (e.g. "homestead")
+   * If no network is provided, homestead (i.e. mainnet) is used.
+   * The network may also be a URL to connect to, such as http://localhost:8545 or wss://example.com.
+   * @see {@link https://docs.ethers.io/v5/api/providers/types/#providers-Networkish}
+   */
+  network?: Network | string;
+
+  /**
+   * Optional parameter to name the module context,
+   */
+  providerName?: string;
+
+  /**
+   * Optional parameter for Alchemy API Token
+   * @see {@link https://alchemyapi.io}
+   */
+  alchemy?: string;
+
+  /**
+   * Optional parameter for Etherscan API Token
+   * @see {@link https://etherscan.io}
+   */
+  etherscan?: string;
+
+  /**
+   * Optional parameter for Cloudflare API Token
+   * @see {@link https://cloudflare-eth.com}
+   */
+  cloudflare?: string;
+
+  /**
+   * Optional parameter for Infura Project ID or InfuraProviderOptions(applicationId, applicationSecretKey)
+   * @see {@link https://infura.io}
+   */
+  infura?: InfuraProviderOptions | string;
+
+  /**
+   * Optional parameter for Pocket Network Application ID or PocketProviderOptions(projectId, projectSecret)
+   * @see {@link https://pokt.network}
+   */
+  pocket?: PocketProviderOptions | string;
+
+  /**
+   * Optional parameter the number of backends that must agree (default: 2 for mainnet, 1 for testnets)
+   */
+  quorum?: number;
+
+  /**
+   * Optional parameter if this option is false, EthersModule will try to connect with the credentials provided in options.
+   * If you define more than one provider, EthersModule will use the FallbackProvider to send multiple requests simultaneously.
+   */
+  useDefaultProvider?: boolean;
+}
+```
 
 ## Change Log
 
