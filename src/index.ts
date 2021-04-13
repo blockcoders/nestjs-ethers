@@ -11,3 +11,19 @@ export {
   BaseProvider as EthersBaseProvider,
   Network,
 } from '@ethersproject/providers';
+export { BigNumber, BigNumberish } from '@ethersproject/bignumber';
+export {
+  Block,
+  BlockTag,
+  BlockWithTransactions,
+  TransactionReceipt,
+  TransactionRequest,
+  TransactionResponse,
+} from '@ethersproject/abstract-provider';
+export {
+  commify,
+  formatUnits,
+  parseUnits,
+  formatEther,
+  parseEther,
+} from '@ethersproject/units';

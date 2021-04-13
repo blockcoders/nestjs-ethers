@@ -18,6 +18,8 @@
   <img alt="Supported platforms: Express & Fastify" src="https://img.shields.io/badge/platforms-Express%20%26%20Fastify-green" />
 </p>
 
+<p align="center">A complete Ethereum wallet implementation and utilities for NestJS based on [Ethers.js](https://github.com/ethers-io/ethers.js/)</p>
+
 ## Install
 
 ```sh

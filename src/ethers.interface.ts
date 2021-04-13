@@ -2,13 +2,13 @@ import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { Network } from '@ethersproject/providers';
 
 export interface InfuraProviderOptions {
-  projectId: string;
-  projectSecret: string;
+  projectId?: string;
+  projectSecret?: string;
 }
 
 export interface PocketProviderOptions {
-  applicationId: string;
-  applicationSecretKey: string;
+  applicationId?: string;
+  applicationSecretKey?: string;
 }
 
 export interface EthersModuleOptions extends Record<string, any> {
