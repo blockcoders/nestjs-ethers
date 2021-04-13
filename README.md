@@ -106,7 +106,7 @@ interface EthersModuleOptions {
 
 ### Synchronous configuration
 
-Use `EthersModule.forRoot` method with argument of [Params interface](#configuration-params):
+Use `EthersModule.forRoot` method with [Options interface](#configuration-params):
 
 ```ts
 import { EthersModule } from 'nestjs-ethers';
@@ -131,8 +131,86 @@ import { EthersModule } from 'nestjs-ethers';
       useDefaultProvider: true,
     })
   ],
+  ...
 })
 class MyModule {}
+```
+
+### Asynchronous configuration
+
+With `EthersModule.forRootAsync` you can, for example, import your `ConfigModule` and inject `ConfigService` to use it in `useFactory` method.
+
+`useFactory` should return object with [Options interface](#configuration-params) or undefined
+
+Here's an example:
+
+```ts
+import { EthersModule } from 'nestjs-ethers';
+
+@Injectable()
+class ConfigService {
+  public readonly infura = {
+    projectId: 'd71b3d93c2fcfa7cab4924e63298575a',
+    projectSecret: 'ed6baa9f7a09877998a24394a12bf3dc',
+  };
+}
+
+@Module({
+  providers: [ConfigService],
+  exports: [ConfigService]
+})
+class ConfigModule {}
+
+@Module({
+  imports: [
+    EthersModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
+        await somePromise();
+        return {
+          network: 'rinkeby',
+          infura: config.infura,
+          useDefaultProvider: false,
+        };
+      }
+    })
+  ],
+  ...
+})
+class TestModule {}
+```
+
+Or you can just pass `ConfigService` to `providers`, if you don't have any `ConfigModule`:
+
+```ts
+import { EthersModule } from 'nestjs-ethers';
+
+@Injectable()
+class ConfigService {
+  public readonly pocket: {
+    applicationId: '9b0afc55221c429104d04ef9',
+    applicationSecretKey: 'b5e6d6a55426712a42a93f39555973fc',
+  };
+}
+
+@Module({
+  imports: [
+    LoggerModule.forRootAsync({
+      providers: [ConfigService],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return {
+          network: 'rinkeby',
+          pocket: config.pocket,
+          useDefaultProvider: false,
+        };
+      }
+    })
+  ],
+  controllers: [TestController]
+})
+class TestModule {}
 ```
 
 ## Change Log
