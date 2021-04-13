@@ -43,9 +43,11 @@ class MyModule {}
 ```ts
 interface EthersModuleOptions {
   /**
-   * Optional parameter that can be a Network object or the name of a common network as a string (e.g. "homestead")
+   * Optional parameter for connection, can be a Network object
+   * or the name of a common network as a string (e.g. "homestead")
    * If no network is provided, homestead (i.e. mainnet) is used.
-   * The network may also be a URL to connect to, such as http://localhost:8545 or wss://example.com.
+   * The network may also be a URL to connect to,
+   * such as http://localhost:8545 or wss://example.com.
    * @see {@link https://docs.ethers.io/v5/api/providers/types/#providers-Networkish}
    */
   network?: Network | string;
@@ -74,25 +76,29 @@ interface EthersModuleOptions {
   cloudflare?: string;
 
   /**
-   * Optional parameter for Infura Project ID or InfuraProviderOptions(applicationId, applicationSecretKey)
+   * Optional parameter for Infura Project ID
+   * or InfuraProviderOptions(applicationId, applicationSecretKey)
    * @see {@link https://infura.io}
    */
   infura?: InfuraProviderOptions | string;
 
   /**
-   * Optional parameter for Pocket Network Application ID or PocketProviderOptions(projectId, projectSecret)
+   * Optional parameter for Pocket Network Application ID
+   * or PocketProviderOptions(projectId, projectSecret)
    * @see {@link https://pokt.network}
    */
   pocket?: PocketProviderOptions | string;
 
   /**
-   * Optional parameter the number of backends that must agree (default: 2 for mainnet, 1 for testnets)
+   * Optional parameter the number of backends that must agree
+   * (default: 2 for mainnet, 1 for testnets)
    */
   quorum?: number;
 
   /**
-   * Optional parameter if this option is false, EthersModule will try to connect with the credentials provided in options.
-   * If you define more than one provider, EthersModule will use the FallbackProvider to send multiple requests simultaneously.
+   * Optional parameter if this option is false, EthersModule will try to connect
+   * with the credentials provided in options. If you define more than one provider,
+   * EthersModule will use the FallbackProvider to send multiple requests simultaneously.
    */
   useDefaultProvider?: boolean;
 }
