@@ -18,6 +18,24 @@ Ethereum wallet implementation and utilities for NestJS based on [Ethers.js](htt
 npm i nestjs-ethers
 ```
 
+## Register module
+
+### Zero configuration
+
+Just import `EthersModule` to your module:
+
+```ts
+import { EthersModule } from 'nestjs-ethers';
+
+@Module({
+  imports: [EthersModule.forRoot()],
+  ...
+})
+class MyModule {}
+```
+
+**NOTE:** *By default `EthersModule` will try to connect using [getDefaultProvider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider). It's the safest, easiest way to begin developing on Ethereum, and it is also robust enough for use in production. It creates a [FallbackProvider](https://docs.ethers.io/v5/api/providers/other/#FallbackProvider) connected to as many backend services as possible.* 
+
 ## Change Log
 
 See [Changelog](CHANGELOG.md) for more information.
