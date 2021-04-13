@@ -1,15 +1,11 @@
 {
   "name": "nestjs-ethers",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-rc.5",
   "description": "The ethers.js library for NestJS",
   "author": "Jose Ramirez <jarcodallo@gmail.com>",
   "license": "Apache",
   "readmeFilename": "README.md",
   "main": "dist/index.js",
-  "files": [
-    "dist/**/*",
-    "*.md"
-  ],
   "engineStrict": false,
   "engines": {
     "node": "^10.24 || >=12.22 || >=14.16 || >=15.14"

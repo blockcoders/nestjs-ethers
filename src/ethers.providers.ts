@@ -3,7 +3,6 @@ import { Provider } from '@nestjs/common';
 import {
   BaseProvider,
   getDefaultProvider,
-  Network,
   FallbackProvider,
   AlchemyProvider,
   CloudflareProvider,
@@ -20,29 +19,24 @@ import { getEthersToken } from './ethers.utils';
 import {
   ETHERS_MODULE_OPTIONS,
   ETHERS_PROVIDER_NAME,
+  ETHERS_MAINNET_NAME,
 } from './ethers.constants';
 
-export async function createDefaultProvider(
-  network: Network | string = 'homestead',
+export async function createBaseProvider(
   options: EthersModuleOptions = {},
 ): Promise<BaseProvider> {
   const {
+    network = ETHERS_MAINNET_NAME,
     alchemy,
     etherscan,
     infura,
     pocket,
-    cloudflare,
+    cloudflare = false,
     quorum = 1,
     useDefaultProvider = true,
   } = options;
 
   if (!useDefaultProvider) {
-    /**
-     * If you decided to not use the DefaultProvider, you can controll what Providers to enabled
-     * FallbackProvider uses a quorum and connects to multiple Providers as backends,
-     * each configured with a priority and a weight.
-     * @see {@link https://docs.ethers.io/v5/api/providers/other/#FallbackProvider}
-     */
     const providers: Array<BaseProvider> = [];
 
     if (alchemy) {
@@ -81,8 +75,8 @@ export async function createDefaultProvider(
       providers.push(pocketProvider);
     }
 
-    if (cloudflare) {
-      const cloudflareProvider = new CloudflareProvider(network, cloudflare);
+    if (cloudflare && network === ETHERS_MAINNET_NAME) {
+      const cloudflareProvider = new CloudflareProvider(network);
 
       // wait until the node is up and running smoothly.
       await cloudflareProvider.ready;
@@ -91,6 +85,10 @@ export async function createDefaultProvider(
     }
 
     if (providers.length > 1) {
+      /**
+       * FallbackProvider with selected providers.
+       * @see {@link https://docs.ethers.io/v5/api/providers/other/#FallbackProvider}
+       */
       return new FallbackProvider(providers, quorum);
     }
 
@@ -114,15 +112,12 @@ export async function createDefaultProvider(
 }
 
 export function createEthersProvider(
-  network: Network | string,
   options: EthersModuleOptions = {},
 ): Provider {
   return {
     provide: getEthersToken(options?.providerName ?? ''),
     useFactory: async (): Promise<BaseProvider> => {
-      return await defer(() =>
-        createDefaultProvider(network, options),
-      ).toPromise();
+      return await defer(() => createBaseProvider(options)).toPromise();
     },
   };
 }
@@ -131,9 +126,7 @@ export function createEthersAsyncProvider(providerName = ''): Provider {
   return {
     provide: getEthersToken(providerName ?? ''),
     useFactory: async (options: EthersModuleOptions): Promise<BaseProvider> => {
-      return await defer(() =>
-        createDefaultProvider(options?.network, options),
-      ).toPromise();
+      return await defer(() => createBaseProvider(options)).toPromise();
     },
     inject: [ETHERS_MODULE_OPTIONS],
   };

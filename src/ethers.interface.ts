@@ -2,13 +2,13 @@ import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { Network } from '@ethersproject/providers';
 
 export interface InfuraProviderOptions {
-  projectId: string;
-  projectSecret: string;
+  projectId?: string;
+  projectSecret?: string;
 }
 
 export interface PocketProviderOptions {
-  applicationId: string;
-  applicationSecretKey: string;
+  applicationId?: string;
+  applicationSecretKey?: string;
 }
 
 export interface EthersModuleOptions extends Record<string, any> {
@@ -16,13 +16,13 @@ export interface EthersModuleOptions extends Record<string, any> {
   providerName?: string;
   alchemy?: string;
   etherscan?: string;
-  cloudflare?: string;
+  cloudflare?: boolean;
   infura?: InfuraProviderOptions | string;
   pocket?: PocketProviderOptions | string;
   quorum?: number;
-  useCloudflareProvider?: boolean;
   useDefaultProvider?: boolean;
 }
+
 export interface EthersModuleAsyncOptions
   extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   providerName?: string;

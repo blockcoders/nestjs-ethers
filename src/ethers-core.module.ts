@@ -6,7 +6,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { Network, BaseProvider } from '@ethersproject/providers';
+import { BaseProvider } from '@ethersproject/providers';
 import {
   EthersModuleOptions,
   EthersModuleAsyncOptions,
@@ -27,11 +27,8 @@ export class EthersCoreModule implements OnApplicationShutdown {
     private readonly moduleRef: ModuleRef,
   ) {}
 
-  static forRoot(
-    network: Network | string = 'homestead',
-    options: EthersModuleOptions = {},
-  ): DynamicModule {
-    const ethersProvider = createEthersProvider(network, options);
+  static forRoot(options: EthersModuleOptions = {}): DynamicModule {
+    const ethersProvider = createEthersProvider(options);
     const providerName = options?.providerName ?? '';
 
     return {

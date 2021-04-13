@@ -1,9 +1,13 @@
 __tests__/
 .github/
 coverage/
-dist/*.tsbuildinfo
-dist/*.js.map
+*.tsbuildinfo
+*.js.map
 src/
+.eslintrc.js
+.gitignore
+.prettierrc
 .travis.yml
-CONTRIBUTING.md
-README.md
+nest-cli.json
+tsconfig.build.json
+tsconfig.json
