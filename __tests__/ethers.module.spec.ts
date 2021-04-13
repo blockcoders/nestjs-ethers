@@ -108,7 +108,8 @@ describe('Ethers Module Initialization', () => {
           }
           @Module({
             imports: [
-              EthersModule.forRoot('rinkeby', {
+              EthersModule.forRoot({
+                network: 'rinkeby',
                 alchemy: RINKEBY_ALCHEMY_API_KEY,
                 useDefaultProvider: false,
               }),
@@ -158,7 +159,8 @@ describe('Ethers Module Initialization', () => {
           }
           @Module({
             imports: [
-              EthersModule.forRoot('rinkeby', {
+              EthersModule.forRoot({
+                network: 'rinkeby',
                 pocket: {
                   applicationId: RINKEBY_POKT_API_KEY,
                   applicationSecretKey: RINKEBY_POKT_SECRET_KEY,

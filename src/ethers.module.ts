@@ -1,5 +1,4 @@
 import { Module, DynamicModule } from '@nestjs/common';
-import { Network } from '@ethersproject/providers';
 import { EthersCoreModule } from './ethers-core.module';
 import {
   EthersModuleOptions,
@@ -8,13 +7,10 @@ import {
 
 @Module({})
 export class EthersModule {
-  static forRoot(
-    network: Network | string = 'homestead',
-    options: EthersModuleOptions = {},
-  ): DynamicModule {
+  static forRoot(options: EthersModuleOptions = {}): DynamicModule {
     return {
       module: EthersModule,
-      imports: [EthersCoreModule.forRoot(network, options)],
+      imports: [EthersCoreModule.forRoot(options)],
     };
   }
 

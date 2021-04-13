@@ -3,7 +3,6 @@ import { Provider } from '@nestjs/common';
 import {
   BaseProvider,
   getDefaultProvider,
-  Network,
   FallbackProvider,
   AlchemyProvider,
   CloudflareProvider,
@@ -22,11 +21,11 @@ import {
   ETHERS_PROVIDER_NAME,
 } from './ethers.constants';
 
-export async function createDefaultProvider(
-  network: Network | string = 'homestead',
+export async function createBaseProvider(
   options: EthersModuleOptions = {},
 ): Promise<BaseProvider> {
   const {
+    network = 'homestead',
     alchemy,
     etherscan,
     infura,
@@ -112,15 +111,12 @@ export async function createDefaultProvider(
 }
 
 export function createEthersProvider(
-  network: Network | string,
   options: EthersModuleOptions = {},
 ): Provider {
   return {
     provide: getEthersToken(options?.providerName ?? ''),
     useFactory: async (): Promise<BaseProvider> => {
-      return await defer(() =>
-        createDefaultProvider(network, options),
-      ).toPromise();
+      return await defer(() => createBaseProvider(options)).toPromise();
     },
   };
 }
@@ -129,9 +125,7 @@ export function createEthersAsyncProvider(providerName = ''): Provider {
   return {
     provide: getEthersToken(providerName ?? ''),
     useFactory: async (options: EthersModuleOptions): Promise<BaseProvider> => {
-      return await defer(() =>
-        createDefaultProvider(options?.network, options),
-      ).toPromise();
+      return await defer(() => createBaseProvider(options)).toPromise();
     },
     inject: [ETHERS_MODULE_OPTIONS],
   };

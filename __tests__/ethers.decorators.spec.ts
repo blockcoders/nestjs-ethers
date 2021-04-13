@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { Module, Controller, Get, Injectable } from '@nestjs/common';
 import * as request from 'supertest';
+import * as nock from 'nock';
 import {
   EthersModule,
   InjectEthersProvider,
@@ -11,6 +12,21 @@ import { platforms } from './utils/platforms';
 import { extraWait } from './utils/extraWait';
 
 describe('InjectEthersProvider', () => {
+  beforeEach(() => nock.cleanAll());
+
+  beforeAll(() => {
+    if (!nock.isActive()) {
+      nock.activate();
+    }
+
+    nock.disableNetConnect();
+    nock.enableNetConnect('127.0.0.1');
+  });
+
+  afterAll(() => {
+    nock.restore();
+  });
+
   for (const PlatformAdapter of platforms) {
     describe(PlatformAdapter.name, () => {
       it('should inject ethers provider in a service successfully', async () => {
