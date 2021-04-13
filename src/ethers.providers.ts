@@ -19,18 +19,19 @@ import { getEthersToken } from './ethers.utils';
 import {
   ETHERS_MODULE_OPTIONS,
   ETHERS_PROVIDER_NAME,
+  ETHERS_MAINNET_NAME,
 } from './ethers.constants';
 
 export async function createBaseProvider(
   options: EthersModuleOptions = {},
 ): Promise<BaseProvider> {
   const {
-    network = 'homestead',
+    network = ETHERS_MAINNET_NAME,
     alchemy,
     etherscan,
     infura,
     pocket,
-    cloudflare,
+    cloudflare = false,
     quorum = 1,
     useDefaultProvider = true,
   } = options;
@@ -74,8 +75,8 @@ export async function createBaseProvider(
       providers.push(pocketProvider);
     }
 
-    if (cloudflare) {
-      const cloudflareProvider = new CloudflareProvider(network, cloudflare);
+    if (cloudflare && network === ETHERS_MAINNET_NAME) {
+      const cloudflareProvider = new CloudflareProvider(network);
 
       // wait until the node is up and running smoothly.
       await cloudflareProvider.ready;

@@ -16,7 +16,7 @@ export interface EthersModuleOptions extends Record<string, any> {
   providerName?: string;
   alchemy?: string;
   etherscan?: string;
-  cloudflare?: string;
+  cloudflare?: boolean;
   infura?: InfuraProviderOptions | string;
   pocket?: PocketProviderOptions | string;
   quorum?: number;

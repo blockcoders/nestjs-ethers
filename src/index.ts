@@ -6,6 +6,7 @@ export {
   EthersModuleOptions,
   EthersModuleAsyncOptions,
 } from './ethers.interface';
+export { ETHERS_MAINNET_NAME } from './ethers.constants';
 export { getEthersToken } from './ethers.utils';
 export {
   BaseProvider as EthersBaseProvider,

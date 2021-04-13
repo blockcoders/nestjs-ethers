@@ -70,10 +70,10 @@ interface EthersModuleOptions {
   etherscan?: string;
 
   /**
-   * Optional parameter for Cloudflare API Token
+   * Optional parameter for use Cloudflare Provider
    * @see {@link https://cloudflare-eth.com}
    */
-  cloudflare?: string;
+  cloudflare?: boolean;
 
   /**
    * Optional parameter for Infura Project ID
@@ -118,7 +118,7 @@ import { EthersModule } from 'nestjs-ethers';
       providerName: 'MyModule',
       alchemy: '845ce4ed0120d68eb5740c9160f08f98',
       etherscan: 'e8cce313c1cfbd085f68be509451f1bab8',
-      cloudflare: 'd9f3e29f461338bc70e79961',
+      cloudflare: true,
       infura: {
         projectId: 'd71b3d93c2fcfa7cab4924e63298575a',
         projectSecret: 'ed6baa9f7a09877998a24394a12bf3dc',
