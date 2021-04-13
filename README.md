@@ -196,7 +196,7 @@ class ConfigService {
 
 @Module({
   imports: [
-    LoggerModule.forRootAsync({
+    EthersModule.forRootAsync({
       providers: [ConfigService],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
@@ -255,6 +255,23 @@ class ConfigModule {}
   ...
 })
 class TestModule {}
+```
+
+#### Testing a class that uses @InjectEthersProvider
+
+This package exposes a getEthersToken() function that returns a prepared injection token based on the provided context. 
+Using this token, you can easily provide a mock implementation of the `EthersBaseProvider` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
+
+```ts
+  const module: TestingModule = await Test.createTestingModule({
+    providers: [
+      MyService,
+      {
+        provide: getEthersToken(MyService.name),
+        useValue: mockProvider,
+      },
+    ],
+  }).compile();
 ```
 
 ## Change Log
