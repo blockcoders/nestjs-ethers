@@ -213,7 +213,7 @@ class ConfigService {
 class TestModule {}
 ```
 
-Or you can pass multiple `Providers`, if you want to use the FallbackProvider to send multiple requests simultaneously:
+Or you can pass multiple `Providers`, if you want to use the `FallbackProvider` to send multiple requests simultaneously:
 
 ```ts
 import { EthersModule } from 'nestjs-ethers';
