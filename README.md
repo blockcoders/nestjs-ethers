@@ -213,6 +213,50 @@ class ConfigService {
 class TestModule {}
 ```
 
+Or you can pass multiple `Providers`, if you want to use the FallbackProvider to send multiple requests simultaneously:
+
+```ts
+import { EthersModule } from 'nestjs-ethers';
+
+@Injectable()
+class ConfigService {
+  public readonly infura = {
+    projectId: 'd71b3d93c2fcfa7cab4924e63298575a',
+    projectSecret: 'ed6baa9f7a09877998a24394a12bf3dc',
+  };
+  public readonly pocket: {
+    applicationId: '9b0afc55221c429104d04ef9',
+    applicationSecretKey: 'b5e6d6a55426712a42a93f39555973fc',
+  };
+}
+
+@Module({
+  providers: [ConfigService],
+  exports: [ConfigService]
+})
+class ConfigModule {}
+
+@Module({
+  imports: [
+    EthersModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
+        await somePromise();
+        return {
+          network: 'rinkeby',
+          infura: config.infura,
+          pocket: config.pocket,
+          useDefaultProvider: false,
+        };
+      }
+    })
+  ],
+  ...
+})
+class TestModule {}
+```
+
 ## Change Log
 
 See [Changelog](CHANGELOG.md) for more information.
