@@ -109,12 +109,12 @@ interface EthersModuleOptions {
 Use `EthersModule.forRoot` method with [Options interface](#configuration-params):
 
 ```ts
-import { EthersModule } from 'nestjs-ethers';
+import { EthersModule, RINKEBY_NETWORK } from 'nestjs-ethers';
 
 @Module({
   imports: [
     EthersModule.forRoot({
-      network: 'rinkeby',
+      network: RINKEBY_NETWORK,
       providerName: 'MyModule',
       alchemy: '845ce4ed0120d68eb5740c9160f08f98',
       etherscan: 'e8cce313c1cfbd085f68be509451f1bab8',
@@ -145,7 +145,7 @@ With `EthersModule.forRootAsync` you can, for example, import your `ConfigModule
 Here's an example:
 
 ```ts
-import { EthersModule } from 'nestjs-ethers';
+import { EthersModule, RINKEBY_NETWORK } from 'nestjs-ethers';
 
 @Injectable()
 class ConfigService {
@@ -169,7 +169,7 @@ class ConfigModule {}
       useFactory: async (config: ConfigService) => {
         await somePromise();
         return {
-          network: 'rinkeby',
+          network: RINKEBY_NETWORK,
           infura: config.infura,
           useDefaultProvider: false,
         };
@@ -184,7 +184,7 @@ class TestModule {}
 Or you can just pass `ConfigService` to `providers`, if you don't have any `ConfigModule`:
 
 ```ts
-import { EthersModule } from 'nestjs-ethers';
+import { EthersModule, RINKEBY_NETWORK } from 'nestjs-ethers';
 
 @Injectable()
 class ConfigService {
@@ -201,7 +201,7 @@ class ConfigService {
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         return {
-          network: 'rinkeby',
+          network: RINKEBY_NETWORK,
           pocket: config.pocket,
           useDefaultProvider: false,
         };
@@ -216,7 +216,7 @@ class TestModule {}
 You can also pass multiple `ethersjs` configs, if you want to use the `FallbackProvider` to send multiple requests simultaneously:
 
 ```ts
-import { EthersModule } from 'nestjs-ethers';
+import { EthersModule, RINKEBY_NETWORK } from 'nestjs-ethers';
 
 @Injectable()
 class ConfigService {
@@ -244,7 +244,7 @@ class ConfigModule {}
       useFactory: async (config: ConfigService) => {
         await somePromise();
         return {
-          network: 'rinkeby',
+          network: RINKEBY_NETWORK,
           infura: config.infura,
           pocket: config.pocket,
           useDefaultProvider: false,

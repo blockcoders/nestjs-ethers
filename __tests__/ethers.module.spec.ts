@@ -7,7 +7,8 @@ import {
   EthersModule,
   InjectEthersProvider,
   EthersBaseProvider,
-  ETHERS_MAINNET_NAME,
+  MAINNET_NETWORK,
+  RINKEBY_NETWORK,
   Network,
 } from '../src';
 import { platforms } from './utils/platforms';
@@ -89,7 +90,7 @@ describe('Ethers Module Initialization', () => {
               expect(res.body.network).toBeDefined();
               expect(res.body.network).toHaveProperty(
                 'name',
-                ETHERS_MAINNET_NAME,
+                MAINNET_NETWORK.name,
               );
               expect(res.body.network).toHaveProperty('chainId', 1);
               expect(res.body.network).toHaveProperty('ensAddress');
@@ -119,7 +120,7 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: 'rinkeby',
+                network: RINKEBY_NETWORK,
                 alchemy: RINKEBY_ALCHEMY_API_KEY,
                 useDefaultProvider: false,
               }),
@@ -170,7 +171,7 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: 'rinkeby',
+                network: RINKEBY_NETWORK,
                 pocket: {
                   applicationId: RINKEBY_POKT_API_KEY,
                   applicationSecretKey: RINKEBY_POKT_SECRET_KEY,
@@ -242,7 +243,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: 'rinkeby',
+                    network: RINKEBY_NETWORK,
                     etherscan: config.etherscan,
                     useDefaultProvider: false,
                   };
@@ -308,7 +309,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: 'rinkeby',
+                    network: RINKEBY_NETWORK,
                     infura: config.infura,
                     useDefaultProvider: false,
                   };
@@ -468,7 +469,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: 'rinkeby',
+                    network: RINKEBY_NETWORK,
                     etherscan: config.etherscan,
                     infura: config.infura,
                     useDefaultProvider: false,

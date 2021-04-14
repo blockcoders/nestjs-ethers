@@ -1,6 +1,6 @@
 {
   "name": "nestjs-ethers",
-  "version": "0.1.0-rc.5",
+  "version": "0.1.0",
   "description": "The ethers.js library for NestJS",
   "author": "Jose Ramirez <jarcodallo@gmail.com>",
   "license": "Apache",
@@ -20,7 +20,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --verbose --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "report": "cat ./coverage/lcov.info | coveralls"
+    "report": "cat ./coverage/lcov.info | coveralls",
+    "prepublish": "npm run lint:ci && npm run test"
   },
   "keywords": [
     "ethers",
