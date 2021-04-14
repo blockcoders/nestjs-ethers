@@ -21,7 +21,7 @@
     "test:cov": "jest --verbose --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "report": "cat ./coverage/lcov.info | coveralls",
-    "prepublish": "npm run lint:ci && npm run test"
+    "prepublishOnly": "npm run lint:ci && npm run test"
   },
   "keywords": [
     "ethers",
@@ -58,7 +58,7 @@
     "@typescript-eslint/parser": "^4.19.0",
     "coveralls": "^3.1.0",
     "eslint": "^7.24.0",
-    "eslint-config-prettier": "^8.1.0",
+    "eslint-config-prettier": "^8.2.0",
     "eslint-plugin-prettier": "^3.3.1",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
