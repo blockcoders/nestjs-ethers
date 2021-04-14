@@ -6,7 +6,20 @@ export {
   EthersModuleOptions,
   EthersModuleAsyncOptions,
 } from './ethers.interface';
-export { ETHERS_MAINNET_NAME } from './ethers.constants';
+export {
+  HOMESTEAD_NETWORK,
+  MAINNET_NETWORK,
+  ROPSTEN_NETWORK,
+  CLASSIC_MORDOR_NETWORK,
+  UNSPECIFIED_NETWORK,
+  MORDEN_NETWORK,
+  RINKEBY_NETWORK,
+  KOVAN_NETWORK,
+  GOERLI_NETWORK,
+  CLASSIC_NETWORK,
+  CLASSIC_MORDEN_NETWORK,
+  CLASSIC_KOTTI_NETWORK,
+} from './ethers.constants';
 export { getEthersToken } from './ethers.utils';
 export {
   BaseProvider as EthersBaseProvider,

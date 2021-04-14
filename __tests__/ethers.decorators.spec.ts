@@ -7,7 +7,7 @@ import {
   InjectEthersProvider,
   EthersBaseProvider,
   Network,
-  ETHERS_MAINNET_NAME,
+  MAINNET_NETWORK,
 } from '../src';
 import { platforms } from './utils/platforms';
 import { extraWait } from './utils/extraWait';
@@ -76,7 +76,7 @@ describe('InjectEthersProvider', () => {
             expect(res.body.network).toBeDefined();
             expect(res.body.network).toHaveProperty(
               'name',
-              ETHERS_MAINNET_NAME,
+              MAINNET_NETWORK.name,
             );
             expect(res.body.network).toHaveProperty('chainId', 1);
             expect(res.body.network).toHaveProperty('ensAddress');
@@ -122,7 +122,7 @@ describe('InjectEthersProvider', () => {
             expect(res.body.network).toBeDefined();
             expect(res.body.network).toHaveProperty(
               'name',
-              ETHERS_MAINNET_NAME,
+              MAINNET_NETWORK.name,
             );
             expect(res.body.network).toHaveProperty('chainId', 1);
             expect(res.body.network).toHaveProperty('ensAddress');
