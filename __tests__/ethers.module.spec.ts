@@ -129,25 +129,29 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(
-            TestModule,
-            new PlatformAdapter(),
-            { logger: false },
-          );
-          const server = app.getHttpServer();
+          try {
+            const app = await NestFactory.create(
+              TestModule,
+              new PlatformAdapter(),
+              { logger: false },
+            );
+            const server = app.getHttpServer();
 
-          await app.init();
-          await extraWait(PlatformAdapter, app);
+            await app.init();
+            await extraWait(PlatformAdapter, app);
 
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined();
-              expect(res.body).toHaveProperty('gasPrice', '1000000000');
-            });
+            await request(server)
+              .get('/')
+              .expect(200)
+              .expect((res) => {
+                expect(res.body).toBeDefined();
+                expect(res.body).toHaveProperty('gasPrice', '1000000000');
+              });
 
-          await app.close();
+            await app.close();
+          } catch (error) {
+            console.error(error);
+          }
         });
 
         it('should work with pocket provider', async () => {

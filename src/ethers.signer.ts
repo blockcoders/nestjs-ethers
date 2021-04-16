@@ -27,11 +27,7 @@ export class EthersSigner {
   createRandomWallet(options?: RandomWalletSignerOptions): WalletSigner {
     const wallet = WalletSigner.createRandom(options) as WalletSigner;
 
-    if (this.provider) {
-      return wallet.connect(this.provider);
-    }
-
-    return wallet;
+    return wallet.connect(this.provider);
   }
 
   async createWalletfromEncryptedJson(
@@ -39,17 +35,13 @@ export class EthersSigner {
     password: BytesLike,
     progressCallback?: ProgressCallback,
   ): Promise<WalletSigner> {
-    const wallet = (await WalletSigner.fromEncryptedJson(
+    const wallet = await WalletSigner.fromEncryptedJson(
       jsonString,
       password,
       progressCallback,
-    )) as WalletSigner;
+    );
 
-    if (this.provider) {
-      return wallet.connect(this.provider);
-    }
-
-    return wallet;
+    return wallet.connect(this.provider);
   }
 
   createWalletfromMnemonic(
@@ -63,11 +55,7 @@ export class EthersSigner {
       wordlist,
     ) as WalletSigner;
 
-    if (this.provider) {
-      return wallet.connect(this.provider);
-    }
-
-    return wallet;
+    return wallet.connect(this.provider);
   }
 
   createVoidSigner(address: string): VoidSigner {
