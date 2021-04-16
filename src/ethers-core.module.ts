@@ -18,9 +18,10 @@ import {
   createProviderName,
 } from './ethers.providers';
 import { ETHERS_PROVIDER_NAME } from './ethers.constants';
+import { EthersSigner } from './ethers.signer';
 
 @Global()
-@Module({})
+@Module({ providers: [EthersSigner], exports: [EthersSigner] })
 export class EthersCoreModule implements OnApplicationShutdown {
   constructor(
     @Inject(ETHERS_PROVIDER_NAME) private readonly providerName: string,
@@ -33,8 +34,12 @@ export class EthersCoreModule implements OnApplicationShutdown {
 
     return {
       module: EthersCoreModule,
-      providers: [ethersProvider, createProviderName(providerName)],
-      exports: [ethersProvider],
+      providers: [
+        EthersSigner,
+        ethersProvider,
+        createProviderName(providerName),
+      ],
+      exports: [EthersSigner, ethersProvider],
     };
   }
 
@@ -47,12 +52,13 @@ export class EthersCoreModule implements OnApplicationShutdown {
       module: EthersCoreModule,
       imports: options.imports,
       providers: [
+        EthersSigner,
         asyncOptionsProvider,
         ethersProvider,
         createProviderName(providerName),
         ...(options.providers || []),
       ],
-      exports: [ethersProvider],
+      exports: [EthersSigner, ethersProvider],
     };
   }
 

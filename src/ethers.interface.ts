@@ -1,5 +1,9 @@
 import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { Network } from '@ethersproject/providers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Wordlist } from '@ethersproject/wordlists';
+
+export type WordlistLike = string | Wordlist;
 
 export interface InfuraProviderOptions {
   projectId?: string;
@@ -34,4 +38,10 @@ export interface EthersModuleAsyncOptions
 
 export interface EthersOptionsFactory {
   createEthersOptions(): Promise<EthersModuleOptions> | EthersModuleOptions;
+}
+
+export interface RandomWalletSignerOptions {
+  extraEntropy?: BytesLike;
+  locale: WordlistLike;
+  path: string;
 }
