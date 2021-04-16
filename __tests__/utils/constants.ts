@@ -44,3 +44,37 @@ export const PROVIDER_GET_BLOCK_NUMBER_RESPONSE = {
   id: 42,
   result: '0x802f1c',
 };
+export const ETHERS_ADDRESS = '0x012363d61bdc53d0290a0f25e9c89f8257550fb8';
+export const ETHERS_PRIVATE_KEY =
+  '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb';
+export const ETHERS_MNEMONIC =
+  'service basket parent alcohol fault similar survey twelve hockey cloud walk panel';
+export const ETHERS_JSON_WALLET_PASSWORD = 'password';
+export const ETHERS_JSON_WALLET = JSON.stringify({
+  address: '012363d61bdc53d0290a0f25e9c89f8257550fb8',
+  id: '5ba8719b-faf9-49ec-8bca-21522e3d56dc',
+  version: 3,
+  Crypto: {
+    cipher: 'aes-128-ctr',
+    cipherparams: { iv: 'bc0473d60284d2d6994bb6793e916d06' },
+    ciphertext:
+      'e73ed0b0c53bcaea4516a15faba3f6d76dbe71b9b46a460ed7e04a68e0867dd7',
+    kdf: 'scrypt',
+    kdfparams: {
+      salt: '97f0b6e17c392f76a726ceea02bac98f17265f1aa5cf8f9ad1c2b56025bc4714',
+      n: 131072,
+      dklen: 32,
+      p: 1,
+      r: 8,
+    },
+    mac: 'ff4f2db7e7588f8dd41374d7b98dfd7746b554c0099a6c0765be7b1c7913e1f3',
+  },
+  'x-ethers': {
+    client: 'ethers.js',
+    gethFilename:
+      'UTC--2018-01-27T01-52-22.0Z--012363d61bdc53d0290a0f25e9c89f8257550fb8',
+    mnemonicCounter: '70224accc00e35328a010a19fef51121',
+    mnemonicCiphertext: 'cf835e13e4f90b190052263dbd24b020',
+    version: '0.1',
+  },
+});

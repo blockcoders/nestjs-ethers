@@ -5,6 +5,8 @@ export {
   PocketProviderOptions,
   EthersModuleOptions,
   EthersModuleAsyncOptions,
+  RandomWalletSignerOptions,
+  WordlistLike,
 } from './ethers.interface';
 export {
   HOMESTEAD_NETWORK,
@@ -21,6 +23,7 @@ export {
   CLASSIC_KOTTI_NETWORK,
 } from './ethers.constants';
 export { getEthersToken } from './ethers.utils';
+export { EthersSigner } from './ethers.signer';
 export {
   BaseProvider as EthersBaseProvider,
   Network,
@@ -41,3 +44,12 @@ export {
   formatEther,
   parseEther,
 } from '@ethersproject/units';
+export { BytesLike } from '@ethersproject/bytes';
+export { SigningKey } from '@ethersproject/signing-key';
+export {
+  ExternallyOwnedAccount,
+  VoidSigner,
+} from '@ethersproject/abstract-signer';
+export { Wallet as WalletSigner } from '@ethersproject/wallet';
+export { ProgressCallback } from '@ethersproject/json-wallets';
+export { Wordlist } from '@ethersproject/wordlists';

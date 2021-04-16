@@ -13,7 +13,6 @@ import {
 import {
   EthersModuleOptions,
   EthersModuleAsyncOptions,
-  EthersOptionsFactory,
 } from './ethers.interface';
 import { getEthersToken } from './ethers.utils';
 import {
@@ -118,16 +117,16 @@ export function createEthersProvider(
   options: EthersModuleOptions = {},
 ): Provider {
   return {
-    provide: getEthersToken(options?.providerName ?? ''),
+    provide: getEthersToken(),
     useFactory: async (): Promise<BaseProvider> => {
       return await defer(() => createBaseProvider(options)).toPromise();
     },
   };
 }
 
-export function createEthersAsyncProvider(providerName = ''): Provider {
+export function createEthersAsyncProvider(): Provider {
   return {
-    provide: getEthersToken(providerName ?? ''),
+    provide: getEthersToken(),
     useFactory: async (options: EthersModuleOptions): Promise<BaseProvider> => {
       return await defer(() => createBaseProvider(options)).toPromise();
     },
@@ -138,25 +137,16 @@ export function createEthersAsyncProvider(providerName = ''): Provider {
 export function createAsyncOptionsProvider(
   options: EthersModuleAsyncOptions,
 ): Provider {
-  if (options.useFactory) {
-    return {
-      provide: ETHERS_MODULE_OPTIONS,
-      useFactory: options.useFactory,
-      inject: options.inject || [],
-    };
-  }
-
   return {
     provide: ETHERS_MODULE_OPTIONS,
-    useFactory: async (optionsFactory: EthersOptionsFactory) =>
-      await optionsFactory.createEthersOptions(),
-    inject: [],
+    useFactory: options.useFactory,
+    inject: options.inject || [],
   };
 }
 
-export function createProviderName(providerName = ''): Provider {
+export function createProviderName(): Provider {
   return {
     provide: ETHERS_PROVIDER_NAME,
-    useValue: getEthersToken(providerName),
+    useValue: getEthersToken(),
   };
 }
