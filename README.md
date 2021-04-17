@@ -251,9 +251,28 @@ class ConfigModule {}
 class TestModule {}
 ```
 
+## EthersBaseProvider
+
+`EthersBaseProvider` implements standard [Ether.js Provider](https://docs.ethers.io/v5/api/providers/provider/). So if you are familiar with it, you are ready to go.
+
+```ts
+import { InjectEthersProvider, EthersBaseProvider } from 'nestjs-ethers';
+
+@Injectable()
+export class TestService {
+  constructor(
+    @InjectEthersProvider()
+    private readonly ethersProvider: EthersBaseProvider,
+  ) {}
+  async someMethod(): Promise<Network> {
+    return this.ethersProvider.getNetwork();
+  }
+}
+```
+
 ## EthersSigner 
 
-`EthersSigner` implements methods to crete a [WalletSigner](https://docs.ethers.io/v5/api/signer/#Wallet) or [VoidSigner](https://docs.ethers.io/v5/api/signer/#VoidSigner). A `Signer` in ethers is an abstraction of an Ethereum Account, which can be used to sign messages and transactions and send signed transactions to the Ethereum Network. This service also will inject the `EthersProvider` into the wallet.
+`EthersSigner` implements methods to create a [WalletSigner](https://docs.ethers.io/v5/api/signer/#Wallet) or [VoidSigner](https://docs.ethers.io/v5/api/signer/#VoidSigner). A `Signer` in ethers is an abstraction of an Ethereum Account, which can be used to sign messages and transactions and send signed transactions to the Ethereum Network. This service will also inject the `EthersBaseProvider` into the wallet.
 
 Create a `Wallet` from a private key:
 
