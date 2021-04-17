@@ -73,6 +73,7 @@
     "typescript": "^4.2.4"
   },
   "jest": {
+    "testTimeout": 20000,
     "moduleFileExtensions": [
       "js",
       "json",
