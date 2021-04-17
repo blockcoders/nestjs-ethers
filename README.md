@@ -53,11 +53,6 @@ interface EthersModuleOptions {
   network?: Network | string;
 
   /**
-   * Optional parameter to name the module context,
-   */
-  providerName?: string;
-
-  /**
    * Optional parameter for Alchemy API Token
    * @see {@link https://alchemyapi.io}
    */
@@ -115,7 +110,6 @@ import { EthersModule, RINKEBY_NETWORK } from 'nestjs-ethers';
   imports: [
     EthersModule.forRoot({
       network: RINKEBY_NETWORK,
-      providerName: 'MyModule',
       alchemy: '845ce4ed0120d68eb5740c9160f08f98',
       etherscan: 'e8cce313c1cfbd085f68be509451f1bab8',
       cloudflare: true,
@@ -257,7 +251,145 @@ class ConfigModule {}
 class TestModule {}
 ```
 
-#### Testing a class that uses @InjectEthersProvider
+## EthersBaseProvider
+
+`EthersBaseProvider` implements standard [Ether.js Provider](https://docs.ethers.io/v5/api/providers/provider/). So if you are familiar with it, you are ready to go.
+
+```ts
+import { InjectEthersProvider, EthersBaseProvider } from 'nestjs-ethers';
+
+@Injectable()
+export class TestService {
+  constructor(
+    @InjectEthersProvider()
+    private readonly ethersProvider: EthersBaseProvider,
+  ) {}
+  async someMethod(): Promise<Network> {
+    return this.ethersProvider.getNetwork();
+  }
+}
+```
+
+## EthersSigner 
+
+`EthersSigner` implements methods to create a [WalletSigner](https://docs.ethers.io/v5/api/signer/#Wallet) or [VoidSigner](https://docs.ethers.io/v5/api/signer/#VoidSigner). A `Signer` in ethers is an abstraction of an Ethereum Account, which can be used to sign messages and transactions and send signed transactions to the Ethereum Network. This service will also inject the `EthersBaseProvider` into the wallet.
+
+Create a `Wallet` from a private key:
+
+```ts
+import { EthersSigner } from 'nestjs-ethers';
+
+@Injectable()
+export class TestService {
+  constructor(private readonly ethersSigner: EthersSigner) {}
+  async someMethod(): Promise<string> {
+    const wallet = this.ethersSigner.createWallet(
+      '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
+    );
+
+    return wallet.getAddress();
+  }
+}
+```
+
+Create a random `Wallet`:
+
+```ts
+import { EthersSigner } from 'nestjs-ethers';
+
+@Injectable()
+export class TestService {
+  constructor(private readonly ethersSigner: EthersSigner) {}
+  async someMethod(): Promise<string> {
+    const wallet = this.ethersSigner.createRandomWallet();
+
+    return wallet.getAddress();
+  }
+}
+```
+
+Create a `Wallet` from an encrypted JSON:
+
+```ts
+import { EthersSigner } from 'nestjs-ethers';
+
+@Injectable()
+export class TestService {
+  constructor(private readonly ethersSigner: EthersSigner) {}
+  async someMethod(): Promise<string> {
+    const wallet = this.ethersSigner.createWalletfromEncryptedJson(
+      {
+        address: '012363d61bdc53d0290a0f25e9c89f8257550fb8',
+        id: '5ba8719b-faf9-49ec-8bca-21522e3d56dc',
+        version: 3,
+        Crypto: {
+          cipher: 'aes-128-ctr',
+          cipherparams: { iv: 'bc0473d60284d2d6994bb6793e916d06' },
+          ciphertext:
+            'e73ed0b0c53bcaea4516a15faba3f6d76dbe71b9b46a460ed7e04a68e0867dd7',
+          kdf: 'scrypt',
+          kdfparams: {
+            salt: '97f0b6e17c392f76a726ceea02bac98f17265f1aa5cf8f9ad1c2b56025bc4714',
+            n: 131072,
+            dklen: 32,
+            p: 1,
+            r: 8,
+          },
+          mac: 'ff4f2db7e7588f8dd41374d7b98dfd7746b554c0099a6c0765be7b1c7913e1f3',
+        },
+        'x-ethers': {
+          client: 'ethers.js',
+          gethFilename: 'UTC--2018-01-27T01-52-22.0Z--012363d61bdc53d0290a0f25e9c89f8257550fb8',
+          mnemonicCounter: '70224accc00e35328a010a19fef51121',
+          mnemonicCiphertext: 'cf835e13e4f90b190052263dbd24b020',
+          version: '0.1',
+        },
+      },
+      'password'
+    );
+
+    return wallet.getAddress();
+  }
+}
+```
+
+Create a `Wallet` from a mnemonic:
+
+```ts
+import { EthersSigner } from 'nestjs-ethers';
+
+@Injectable()
+export class TestService {
+  constructor(private readonly ethersSigner: EthersSigner) {}
+  async someMethod(): Promise<string> {
+    const wallet = this.ethersSigner.createWalletfromMnemonic(
+      'service basket parent alcohol fault similar survey twelve hockey cloud walk panel'
+    );
+
+    return wallet.getAddress();
+  }
+}
+```
+
+Create a `VoidSigner` from an address:
+
+```ts
+import { EthersSigner } from 'nestjs-ethers';
+
+@Injectable()
+export class TestService {
+  constructor(private readonly ethersSigner: EthersSigner) {}
+  async someMethod(): Promise<string> {
+    const wallet = this.ethersSigner.createVoidSigner(
+      '0x012363d61bdc53d0290a0f25e9c89f8257550fb8'
+    );
+
+    return wallet.getAddress();
+  }
+}
+```
+
+## Testing a class that uses @InjectEthersProvider
 
 This package exposes a getEthersToken() function that returns a prepared injection token based on the provided context. 
 Using this token, you can easily provide a mock implementation of the `EthersBaseProvider` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
