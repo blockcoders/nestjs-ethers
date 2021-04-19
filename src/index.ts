@@ -24,6 +24,7 @@ export {
 } from './ethers.constants';
 export { getEthersToken } from './ethers.utils';
 export { EthersSigner } from './ethers.signer';
+export { SmartContract, EthersContract } from './ethers.contract';
 export {
   BaseProvider as EthersBaseProvider,
   Network,
@@ -53,3 +54,7 @@ export {
 export { Wallet as WalletSigner } from '@ethersproject/wallet';
 export { ProgressCallback } from '@ethersproject/json-wallets';
 export { Wordlist } from '@ethersproject/wordlists';
+export {
+  ContractInterface,
+  ContractFactory as SmartContractFactory,
+} from '@ethersproject/contracts';
