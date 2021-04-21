@@ -31,7 +31,7 @@ describe('EthersSigner', () => {
 
   for (const PlatformAdapter of platforms) {
     describe(PlatformAdapter.name, () => {
-      it('should create an instance of the SmartContract attached to a address with a provider injected', async () => {
+      it('should create an instance of the SmartContract attached to an address with a provider injected', async () => {
         @Injectable()
         class TestService {
           constructor(private readonly ethersContract: EthersContract) {}
