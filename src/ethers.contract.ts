@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { BaseProvider } from '@ethersproject/providers';
 import { InjectEthersProvider } from './ethers.decorators';
-import { Contract, ContractInterface } from '@ethersproject/contracts';
+import {
+  Contract,
+  ContractInterface as SmartContractInterface,
+} from '@ethersproject/contracts';
 import { Wallet as WalletSigner } from '@ethersproject/wallet';
 import { VoidSigner } from '@ethersproject/abstract-signer';
 
 export class SmartContract extends Contract {
   constructor(
     address: string,
-    abi: ContractInterface,
+    abi: SmartContractInterface,
     provider: BaseProvider,
     signer?: WalletSigner | VoidSigner,
   ) {
@@ -27,7 +30,7 @@ export class EthersContract {
 
   create(
     address: string,
-    abi: ContractInterface,
+    abi: SmartContractInterface,
     signer?: WalletSigner | VoidSigner,
   ): SmartContract {
     return new SmartContract(address, abi, this.provider, signer);

@@ -55,6 +55,6 @@ export { Wallet as WalletSigner } from '@ethersproject/wallet';
 export { ProgressCallback } from '@ethersproject/json-wallets';
 export { Wordlist } from '@ethersproject/wordlists';
 export {
-  ContractInterface,
+  ContractInterface as SmartContractInterface,
   ContractFactory as SmartContractFactory,
 } from '@ethersproject/contracts';

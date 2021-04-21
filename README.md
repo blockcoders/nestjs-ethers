@@ -391,7 +391,7 @@ export class TestService {
 
 ## EthersContract
 
-`EthersContract` implement a method for the creation of a [SmartContract](https://docs.ethers.io/v5/api/contract/) instance. This service will also inject the `EthersBaseProvider` into the contract.
+`EthersContract` implements a method for the creation of a [SmartContract](https://docs.ethers.io/v5/api/contract/) instance. This service will also inject the `EthersBaseProvider` into the contract.
 
 Create a `SmartContract` attached to an address:
 
