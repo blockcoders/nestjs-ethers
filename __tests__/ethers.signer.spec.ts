@@ -38,6 +38,10 @@ describe('EthersSigner', () => {
           async someMethod(): Promise<string> {
             const wallet = this.ethersSigner.createWallet(ETHERS_PRIVATE_KEY);
 
+            if (!wallet?.provider?.getNetwork()) {
+              throw new Error('No provider injected');
+            }
+
             return wallet.getAddress();
           }
         }
@@ -85,6 +89,10 @@ describe('EthersSigner', () => {
           constructor(private readonly ethersSigner: EthersSigner) {}
           async someMethod(): Promise<string> {
             const wallet = this.ethersSigner.createRandomWallet();
+
+            if (!wallet?.provider?.getNetwork()) {
+              throw new Error('No provider injected');
+            }
 
             return wallet.getAddress();
           }
@@ -137,6 +145,10 @@ describe('EthersSigner', () => {
               ETHERS_JSON_WALLET_PASSWORD,
             );
 
+            if (!wallet?.provider?.getNetwork()) {
+              throw new Error('No provider injected');
+            }
+
             return wallet.getAddress();
           }
         }
@@ -187,6 +199,10 @@ describe('EthersSigner', () => {
               ETHERS_MNEMONIC,
             );
 
+            if (!wallet?.provider?.getNetwork()) {
+              throw new Error('No provider injected');
+            }
+
             return wallet.getAddress();
           }
         }
@@ -234,6 +250,10 @@ describe('EthersSigner', () => {
           constructor(private readonly ethersSigner: EthersSigner) {}
           async someMethod(): Promise<string> {
             const wallet = this.ethersSigner.createVoidSigner(ETHERS_ADDRESS);
+
+            if (!wallet?.provider?.getNetwork()) {
+              throw new Error('No provider injected');
+            }
 
             return wallet.getAddress();
           }
