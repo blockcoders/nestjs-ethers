@@ -42,7 +42,7 @@
   "homepage": "https://github.com/jarcodallo/nestjs-ethers/blob/main/README.md",
   "bugs": "https://github.com/jarcodallo/nestjs-ethers/issues",
   "dependencies": {
-    "ethers": "5.1.4"
+    "ethers": "5.4.0"
   },
   "devDependencies": {
     "@nestjs/common": "^7.6.15",
