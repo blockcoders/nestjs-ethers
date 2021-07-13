@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "engineStrict": false,
   "engines": {
-    "node": "^10.24 || >=12.22 || >=14.17 || >=15.14"
+    "node": "^12.22 || >=14.17 || >=16.4"
   },
   "scripts": {
     "build": "rm -rf ./dist && tsc --p tsconfig.build.json",

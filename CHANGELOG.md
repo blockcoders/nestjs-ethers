@@ -2,7 +2,7 @@
 
 ## 0.3.1
 Published by **[jarcodallo](https://github.com/jarcodallo)** on **2021/07/13**
-
+- [#93](https://github.com/jarcodallo/nestjs-ethers/pull/93) Update dependencies
 
 ## 0.3.0
 Published by **[jarcodallo](https://github.com/jarcodallo)** on **2021/04/21**
