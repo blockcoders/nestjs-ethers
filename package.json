@@ -19,7 +19,6 @@
     "test": "jest --verbose",
     "test:watch": "jest --watch",
     "test:cov": "jest --verbose --coverage",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
     "report": "cat ./coverage/lcov.info | coveralls",
     "prepublishOnly": "npm run lint:ci && npm run test"
   },
