@@ -1,4 +1,4 @@
-import { defer } from 'rxjs';
+import { defer, lastValueFrom } from 'rxjs';
 import { Provider } from '@nestjs/common';
 import {
   BaseProvider,
@@ -119,7 +119,7 @@ export function createEthersProvider(
   return {
     provide: getEthersToken(),
     useFactory: async (): Promise<BaseProvider> => {
-      return await defer(() => createBaseProvider(options)).toPromise();
+      return await lastValueFrom(defer(() => createBaseProvider(options)));
     },
   };
 }
@@ -128,7 +128,7 @@ export function createEthersAsyncProvider(): Provider {
   return {
     provide: getEthersToken(),
     useFactory: async (options: EthersModuleOptions): Promise<BaseProvider> => {
-      return await defer(() => createBaseProvider(options)).toPromise();
+      return await lastValueFrom(defer(() => createBaseProvider(options)));
     },
     inject: [ETHERS_MODULE_OPTIONS],
   };
