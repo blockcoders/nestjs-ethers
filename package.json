@@ -19,7 +19,7 @@
     "test": "jest --verbose",
     "test:watch": "jest --watch",
     "test:cov": "jest --verbose --coverage",
-    "report": "cat ./coverage/lcov.info | coveralls",
+    "report": "coveralls < coverage/lcov.info",
     "prepublishOnly": "npm run lint:ci && npm run test"
   },
   "keywords": [

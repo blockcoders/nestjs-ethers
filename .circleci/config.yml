@@ -7,6 +7,7 @@ orbs:
   # Orbs reduce the amount of configuration required for common tasks. 
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/node
   node: circleci/node@4.1
+  coveralls: coveralls/coveralls@1.0.6
 
 jobs:
   test:
@@ -39,10 +40,9 @@ jobs:
       - run:
           name: Run Build
           command: npm run build
-      - run:
-          name: Upload Coveralls Data
-          command: npm run report
-          when: always # Uploads code coverage results, pass or fail
+      - coveralls/upload:
+          path_to_lcov: coverage/lcov.info
+          verbose: true
 
 workflows:
   test-workflow:
