@@ -45,7 +45,7 @@ jobs:
           when: always # Uploads code coverage results, pass or fail
 
 workflows:
-  orb-free-workflow:
+  test-workflow:
     jobs:
       - test:
           matrix:
