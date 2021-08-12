@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2
+Published by **[jarcodallo](https://github.com/jarcodallo)** on **2021/08/12**
+- [#111](https://github.com/jarcodallo/nestjs-ethers/pull/111) Update dependencies
+- [#110](https://github.com/jarcodallo/nestjs-ethers/pull/110) Remove Dependabot Badge
+
 ## 0.3.1
 Published by **[jarcodallo](https://github.com/jarcodallo)** on **2021/07/13**
 - [#93](https://github.com/jarcodallo/nestjs-ethers/pull/93) Update dependencies
