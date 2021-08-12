@@ -1,6 +1,6 @@
 {
   "name": "nestjs-ethers",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "The ethers.js library for NestJS",
   "author": "Jose Ramirez <jarcodallo@gmail.com>",
   "license": "Apache",
