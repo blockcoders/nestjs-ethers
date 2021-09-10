@@ -41,14 +41,14 @@ export class EthersCoreModule implements OnApplicationShutdown {
         EthersSigner,
         EthersContract,
         ethersProvider,
-        createProviderName(),
+        createProviderName(options.context),
       ],
       exports: [EthersSigner, EthersContract, ethersProvider],
     };
   }
 
   static forRootAsync(options: EthersModuleAsyncOptions): DynamicModule {
-    const ethersProvider = createEthersAsyncProvider();
+    const ethersProvider = createEthersAsyncProvider(options.context);
     const asyncOptionsProvider = createAsyncOptionsProvider(options);
 
     return {
@@ -59,7 +59,7 @@ export class EthersCoreModule implements OnApplicationShutdown {
         EthersContract,
         asyncOptionsProvider,
         ethersProvider,
-        createProviderName(),
+        createProviderName(options.context),
         ...(options.providers || []),
       ],
       exports: [EthersSigner, EthersContract, ethersProvider],

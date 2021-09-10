@@ -9,10 +9,13 @@ import {
   EtherscanProvider,
   InfuraProvider,
   PocketProvider,
+  JsonRpcProvider,
 } from '@ethersproject/providers';
+import { BscscanProvider } from '@ethers-ancillary/bsc';
 import {
   EthersModuleOptions,
   EthersModuleAsyncOptions,
+  CustomRpcProvider,
 } from './ethers.interface';
 import { getEthersToken } from './ethers.utils';
 import {
@@ -28,10 +31,13 @@ export async function createBaseProvider(
     network = MAINNET_NETWORK,
     alchemy,
     etherscan,
+    bsccsan,
     infura,
     pocket,
     cloudflare = false,
+    custom,
     quorum = 1,
+    waitUntilIsConnected = true,
     useDefaultProvider = true,
   } = options;
 
@@ -39,51 +45,49 @@ export async function createBaseProvider(
     const providers: Array<BaseProvider> = [];
 
     if (alchemy) {
-      const alchemyProvider = new AlchemyProvider(network, alchemy);
-
-      // wait until the node is up and running smoothly.
-      await alchemyProvider.ready;
-
-      providers.push(alchemyProvider);
+      providers.push(new AlchemyProvider(network, alchemy));
     }
 
     if (etherscan) {
-      const etherscanProvider = new EtherscanProvider(network, etherscan);
+      providers.push(new EtherscanProvider(network, etherscan));
+    }
 
-      // wait until the node is up and running smoothly.
-      await etherscanProvider.ready;
-
-      providers.push(etherscanProvider);
+    if (bsccsan) {
+      providers.push(new BscscanProvider(network, bsccsan));
     }
 
     if (infura) {
-      const infuraProvider = new InfuraProvider(network, infura);
-
-      // wait until the node is up and running smoothly.
-      await infuraProvider.ready;
-
-      providers.push(infuraProvider);
+      providers.push(new InfuraProvider(network, infura));
     }
 
     if (pocket) {
-      const pocketProvider = new PocketProvider(network, pocket);
-
-      // wait until the node is up and running smoothly.
-      await pocketProvider.ready;
-
-      providers.push(pocketProvider);
+      providers.push(new PocketProvider(network, pocket));
     }
 
     if (
       cloudflare &&
       (network === MAINNET_NETWORK || network === MAINNET_NETWORK.name)
     ) {
-      const cloudflareProvider = new CloudflareProvider(network);
+      providers.push(new CloudflareProvider(network));
+    }
 
+    if (custom) {
+      const customOptions: CustomRpcProvider[] = !Array.isArray(custom)
+        ? [custom]
+        : custom;
+
+      custom;
+
+      customOptions.forEach((customOption) => {
+        providers.push(
+          new JsonRpcProvider(customOption.url, customOption.network),
+        );
+      });
+    }
+
+    if (waitUntilIsConnected) {
       // wait until the node is up and running smoothly.
-      await cloudflareProvider.ready;
-
-      providers.push(cloudflareProvider);
+      await Promise.all(providers.map((provider) => provider.ready));
     }
 
     if (providers.length > 1) {
@@ -117,16 +121,16 @@ export function createEthersProvider(
   options: EthersModuleOptions = {},
 ): Provider {
   return {
-    provide: getEthersToken(),
+    provide: getEthersToken(options.context),
     useFactory: async (): Promise<BaseProvider> => {
       return await lastValueFrom(defer(() => createBaseProvider(options)));
     },
   };
 }
 
-export function createEthersAsyncProvider(): Provider {
+export function createEthersAsyncProvider(context?: string): Provider {
   return {
-    provide: getEthersToken(),
+    provide: getEthersToken(context),
     useFactory: async (options: EthersModuleOptions): Promise<BaseProvider> => {
       return await lastValueFrom(defer(() => createBaseProvider(options)));
     },
@@ -144,9 +148,9 @@ export function createAsyncOptionsProvider(
   };
 }
 
-export function createProviderName(): Provider {
+export function createProviderName(context?: string): Provider {
   return {
     provide: ETHERS_PROVIDER_NAME,
-    useValue: getEthersToken(),
+    useValue: getEthersToken(context),
   };
 }

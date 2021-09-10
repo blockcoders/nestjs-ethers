@@ -40,7 +40,8 @@
   "homepage": "https://github.com/jarcodallo/nestjs-ethers/blob/main/README.md",
   "bugs": "https://github.com/jarcodallo/nestjs-ethers/issues",
   "dependencies": {
-    "ethers": "^5.4.4"
+    "@ethers-ancillary/bsc": "0.0.2",
+    "ethers": "^5.4.6"
   },
   "devDependencies": {
     "@nestjs/common": "^8.0.6",

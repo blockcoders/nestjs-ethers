@@ -14,6 +14,7 @@ export const ROPSTEN_NETWORK: Network = {
   ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
   name: 'ropsten',
 };
+export const TESTNET_NETWORK: Network = ROPSTEN_NETWORK;
 export const CLASSIC_MORDOR_NETWORK: Network = {
   chainId: 63,
   name: 'classicMordor',
@@ -48,7 +49,34 @@ export const CLASSIC_MORDEN_NETWORK: Network = {
   chainId: 62,
   name: 'classicMorden',
 };
+export const CLASSIC_TESTNET_NETWORK: Network = CLASSIC_MORDEN_NETWORK;
 export const CLASSIC_KOTTI_NETWORK: Network = {
   chainId: 6,
   name: 'classicKotti',
+};
+export const XDAI_NETWORK: Network = {
+  chainId: 100,
+  name: 'xdai',
+};
+export const MATIC_NETWORK: Network = {
+  chainId: 137,
+  name: 'matic',
+};
+export const MUMBAI_NETWORK: Network = {
+  chainId: 80001,
+  name: 'maticmum',
+};
+/**
+ * @see {@link https://github.com/ethers-io/ancillary-bsc/blob/main/dist/bsc.esm.js#L8}
+ */
+export const BINANCE_NETWORK: Network = {
+  chainId: 56,
+  name: 'bsc-mainnet',
+};
+/**
+ * @see {@link https://github.com/ethers-io/ancillary-bsc/blob/main/dist/bsc.esm.js#L12}
+ */
+export const BINANCE_TESTNET_NETWORK: Network = {
+  chainId: 97,
+  name: 'bsc-testnet',
 };
