@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
-import { getEthersToken } from './ethers.utils';
+import { Inject } from '@nestjs/common'
+import { getEthersToken } from './ethers.utils'
 
-export const InjectEthersProvider = () => Inject(getEthersToken());
+export const InjectEthersProvider = () => Inject(getEthersToken())

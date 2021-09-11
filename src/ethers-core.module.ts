@@ -1,25 +1,16 @@
-import {
-  DynamicModule,
-  Global,
-  Module,
-  OnApplicationShutdown,
-  Inject,
-} from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
-import { BaseProvider } from '@ethersproject/providers';
-import {
-  EthersModuleOptions,
-  EthersModuleAsyncOptions,
-} from './ethers.interface';
+import { BaseProvider } from '@ethersproject/providers'
+import { DynamicModule, Global, Module, OnApplicationShutdown, Inject } from '@nestjs/common'
+import { ModuleRef } from '@nestjs/core'
+import { ETHERS_PROVIDER_NAME } from './ethers.constants'
+import { EthersContract } from './ethers.contract'
+import { EthersModuleOptions, EthersModuleAsyncOptions } from './ethers.interface'
 import {
   createEthersProvider,
   createEthersAsyncProvider,
   createAsyncOptionsProvider,
   createProviderName,
-} from './ethers.providers';
-import { ETHERS_PROVIDER_NAME } from './ethers.constants';
-import { EthersSigner } from './ethers.signer';
-import { EthersContract } from './ethers.contract';
+} from './ethers.providers'
+import { EthersSigner } from './ethers.signer'
 
 @Global()
 @Module({
@@ -33,23 +24,18 @@ export class EthersCoreModule implements OnApplicationShutdown {
   ) {}
 
   static forRoot(options: EthersModuleOptions = {}): DynamicModule {
-    const ethersProvider = createEthersProvider(options);
+    const ethersProvider = createEthersProvider(options)
 
     return {
       module: EthersCoreModule,
-      providers: [
-        EthersSigner,
-        EthersContract,
-        ethersProvider,
-        createProviderName(),
-      ],
+      providers: [EthersSigner, EthersContract, ethersProvider, createProviderName()],
       exports: [EthersSigner, EthersContract, ethersProvider],
-    };
+    }
   }
 
   static forRootAsync(options: EthersModuleAsyncOptions): DynamicModule {
-    const ethersProvider = createEthersAsyncProvider();
-    const asyncOptionsProvider = createAsyncOptionsProvider(options);
+    const ethersProvider = createEthersAsyncProvider()
+    const asyncOptionsProvider = createAsyncOptionsProvider(options)
 
     return {
       module: EthersCoreModule,
@@ -63,14 +49,14 @@ export class EthersCoreModule implements OnApplicationShutdown {
         ...(options.providers || []),
       ],
       exports: [EthersSigner, EthersContract, ethersProvider],
-    };
+    }
   }
 
   async onApplicationShutdown() {
-    const provider = this.moduleRef.get<BaseProvider>(this.providerName);
+    const provider = this.moduleRef.get<BaseProvider>(this.providerName)
 
     if (provider) {
-      provider.removeAllListeners();
+      provider.removeAllListeners()
     }
   }
 }
