@@ -6,12 +6,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectEthersProvider } from './ethers.decorators'
 
 export class SmartContract extends Contract {
-  constructor(
-    address: string,
-    abi: ContractInterface,
-    provider: BaseProvider,
-    signer?: Wallet | VoidSigner,
-  ) {
+  constructor(address: string, abi: ContractInterface, provider: BaseProvider, signer?: Wallet | VoidSigner) {
     const signerOrProvider: BaseProvider | Wallet | VoidSigner = signer ?? provider
 
     super(address, abi, signerOrProvider)
