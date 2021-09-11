@@ -5,7 +5,7 @@ export {
   PocketProviderOptions,
   EthersModuleOptions,
   EthersModuleAsyncOptions,
-  RandomWalletSignerOptions,
+  RandomWalletOptions,
   WordlistLike,
 } from './ethers.interface'
 export {
@@ -25,24 +25,46 @@ export {
 export { getEthersToken } from './ethers.utils'
 export { EthersSigner } from './ethers.signer'
 export { SmartContract, EthersContract } from './ethers.contract'
-export { BaseProvider as EthersBaseProvider, Network } from '@ethersproject/providers'
-export { BigNumber, BigNumberish } from '@ethersproject/bignumber'
+export * from '@ethersproject/abi'
+export * from '@ethersproject/abstract-provider'
+export * from '@ethersproject/abstract-signer'
+export * from '@ethersproject/address'
+export { decode as base64Decode, encode as base64Encode } from '@ethersproject/base64'
+export * from '@ethersproject/basex'
+export * from '@ethersproject/bignumber'
+export * from '@ethersproject/bytes'
+export * from '@ethersproject/constants'
 export {
-  Block,
-  BlockTag,
-  BlockWithTransactions,
-  TransactionReceipt,
-  TransactionRequest,
-  TransactionResponse,
-} from '@ethersproject/abstract-provider'
-export { commify, formatUnits, parseUnits, formatEther, parseEther } from '@ethersproject/units'
-export { BytesLike } from '@ethersproject/bytes'
-export { SigningKey } from '@ethersproject/signing-key'
-export { ExternallyOwnedAccount, VoidSigner } from '@ethersproject/abstract-signer'
-export { Wallet as WalletSigner } from '@ethersproject/wallet'
-export { ProgressCallback } from '@ethersproject/json-wallets'
-export { Wordlist } from '@ethersproject/wordlists'
-export {
-  ContractInterface as SmartContractInterface,
-  ContractFactory as SmartContractFactory,
+  Overrides,
+  PayableOverrides,
+  CallOverrides,
+  PopulatedTransaction,
+  EventFilter as ContractEventFilter,
+  ContractFunction,
+  Event as ContractEvent,
+  ContractReceipt,
+  ContractTransaction,
+  ContractInterface,
+  BaseContract,
+  Contract,
+  ContractFactory,
 } from '@ethersproject/contracts'
+export * from '@ethersproject/hash'
+export * from '@ethersproject/hdnode'
+export * from '@ethersproject/json-wallets'
+export * from '@ethersproject/keccak256'
+export * from '@ethersproject/networks'
+export * from '@ethersproject/pbkdf2'
+export * from '@ethersproject/properties'
+export * from '@ethersproject/providers'
+export * from '@ethersproject/random'
+export { decode as rlpDecode, encode as rlpEncode } from '@ethersproject/rlp'
+export * from '@ethersproject/sha2'
+export * from '@ethersproject/signing-key'
+export { pack, keccak256 as keccak256Pack, sha256 as sha256Pack } from '@ethersproject/solidity'
+export * from '@ethersproject/strings'
+export * from '@ethersproject/transactions'
+export * from '@ethersproject/units'
+export * from '@ethersproject/wallet'
+export * from '@ethersproject/web'
+export * from '@ethersproject/wordlists'

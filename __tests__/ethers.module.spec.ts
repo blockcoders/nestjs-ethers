@@ -4,14 +4,7 @@ import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
 import * as request from 'supertest'
-import {
-  EthersModule,
-  InjectEthersProvider,
-  EthersBaseProvider,
-  MAINNET_NETWORK,
-  RINKEBY_NETWORK,
-  Network,
-} from '../src'
+import { EthersModule, InjectEthersProvider, BaseProvider, MAINNET_NETWORK, RINKEBY_NETWORK, Network } from '../src'
 import {
   RINKEBY_ALCHEMY_BASE_URL,
   RINKEBY_ALCHEMY_API_KEY,
@@ -58,7 +51,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -101,7 +94,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -148,7 +141,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -201,7 +194,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -265,7 +258,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -325,7 +318,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -406,7 +399,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {

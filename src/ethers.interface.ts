@@ -31,7 +31,7 @@ export interface EthersModuleAsyncOptions extends Pick<ModuleMetadata, 'imports'
   inject?: any[]
 }
 
-export interface RandomWalletSignerOptions {
+export interface RandomWalletOptions {
   extraEntropy?: BytesLike
   locale: WordlistLike
   path: string

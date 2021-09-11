@@ -249,18 +249,18 @@ class ConfigModule {}
 class TestModule {}
 ```
 
-## EthersBaseProvider
+## BaseProvider
 
-`EthersBaseProvider` implements standard [Ether.js Provider](https://docs.ethers.io/v5/api/providers/provider/). So if you are familiar with it, you are ready to go.
+`BaseProvider` implements standard [Ether.js Provider](https://docs.ethers.io/v5/api/providers/provider/). So if you are familiar with it, you are ready to go.
 
 ```ts
-import { InjectEthersProvider, EthersBaseProvider } from 'nestjs-ethers';
+import { InjectEthersProvider, BaseProvider } from 'nestjs-ethers';
 
 @Injectable()
 export class TestService {
   constructor(
     @InjectEthersProvider()
-    private readonly ethersProvider: EthersBaseProvider,
+    private readonly ethersProvider: BaseProvider,
   ) {}
   async someMethod(): Promise<Network> {
     return this.ethersProvider.getNetwork();
@@ -270,18 +270,18 @@ export class TestService {
 
 ## EthersSigner 
 
-`EthersSigner` implements methods to create a [WalletSigner](https://docs.ethers.io/v5/api/signer/#Wallet) or [VoidSigner](https://docs.ethers.io/v5/api/signer/#VoidSigner). A `Signer` in ethers is an abstraction of an Ethereum Account, which can be used to sign messages and transactions and send signed transactions to the Ethereum Network. This service will also inject the `EthersBaseProvider` into the wallet.
+`EthersSigner` implements methods to create a [Wallet](https://docs.ethers.io/v5/api/signer/#Wallet) or [VoidSigner](https://docs.ethers.io/v5/api/signer/#VoidSigner). A `Signer` in ethers is an abstraction of an Ethereum Account, which can be used to sign messages and transactions and send signed transactions to the Ethereum Network. This service will also inject the `BaseProvider` into the wallet.
 
-Create a `WalletSigner` from a private key:
+Create a `Wallet` from a private key:
 
 ```ts
-import { EthersSigner, WalletSigner } from 'nestjs-ethers';
+import { EthersSigner, Wallet } from 'nestjs-ethers';
 
 @Injectable()
 export class TestService {
   constructor(private readonly ethersSigner: EthersSigner) {}
   async someMethod(): Promise<string> {
-    const wallet: WalletSigner = this.ethersSigner.createWallet(
+    const wallet: Wallet = this.ethersSigner.createWallet(
       '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
     );
 
@@ -290,32 +290,32 @@ export class TestService {
 }
 ```
 
-Create a random `WalletSigner`:
+Create a random `Wallet`:
 
 ```ts
-import { EthersSigner, WalletSigner } from 'nestjs-ethers';
+import { EthersSigner, Wallet } from 'nestjs-ethers';
 
 @Injectable()
 export class TestService {
   constructor(private readonly ethersSigner: EthersSigner) {}
   async someMethod(): Promise<string> {
-    const wallet: WalletSigner = this.ethersSigner.createRandomWallet();
+    const wallet: Wallet = this.ethersSigner.createRandomWallet();
 
     return wallet.getAddress();
   }
 }
 ```
 
-Create a `WalletSigner` from an encrypted JSON:
+Create a `Wallet` from an encrypted JSON:
 
 ```ts
-import { EthersSigner, WalletSigner } from 'nestjs-ethers';
+import { EthersSigner, Wallet } from 'nestjs-ethers';
 
 @Injectable()
 export class TestService {
   constructor(private readonly ethersSigner: EthersSigner) {}
   async someMethod(): Promise<string> {
-    const wallet: WalletSigner = this.ethersSigner.createWalletfromEncryptedJson(
+    const wallet: Wallet = this.ethersSigner.createWalletfromEncryptedJson(
       {
         address: '012363d61bdc53d0290a0f25e9c89f8257550fb8',
         id: '5ba8719b-faf9-49ec-8bca-21522e3d56dc',
@@ -351,16 +351,16 @@ export class TestService {
 }
 ```
 
-Create a `WalletSigner` from a mnemonic:
+Create a `Wallet` from a mnemonic:
 
 ```ts
-import { EthersSigner, WalletSigner } from 'nestjs-ethers';
+import { EthersSigner, Wallet } from 'nestjs-ethers';
 
 @Injectable()
 export class TestService {
   constructor(private readonly ethersSigner: EthersSigner) {}
   async someMethod(): Promise<string> {
-    const wallet: WalletSigner = this.ethersSigner.createWalletfromMnemonic(
+    const wallet: Wallet = this.ethersSigner.createWalletfromMnemonic(
       'service basket parent alcohol fault similar survey twelve hockey cloud walk panel'
     );
 
@@ -389,7 +389,7 @@ export class TestService {
 
 ## EthersContract
 
-`EthersContract` implements a method for the creation of a [SmartContract](https://docs.ethers.io/v5/api/contract/) instance. This service will also inject the `EthersBaseProvider` into the contract.
+`EthersContract` implements a method for the creation of a [SmartContract](https://docs.ethers.io/v5/api/contract/) instance. This service will also inject the `BaseProvider` into the contract.
 
 Create a `SmartContract` attached to an address:
 
@@ -411,10 +411,10 @@ class TestService {
 }
 ```
 
-Create a `SmartContract` with a WalletSigner:
+Create a `SmartContract` with a Wallet:
 
 ```ts
-import { EthersContract, EthersSigner, SmartContract, WalletSigner } from 'nestjs-ethers';
+import { EthersContract, EthersSigner, SmartContract, Wallet } from 'nestjs-ethers';
 import * as ABI from './utils/ABI.json';
 
 @Injectable()
@@ -424,7 +424,7 @@ class TestService {
     private readonly ethersSigner: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: WalletSigner = this.ethersSigner.createWallet(
+    const wallet: Wallet = this.ethersSigner.createWallet(
       '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
     );
     const contract: SmartContract = this.ethersContract.create(
@@ -441,7 +441,7 @@ class TestService {
 ## Testing a class that uses @InjectEthersProvider
 
 This package exposes a getEthersToken() function that returns a prepared injection token based on the provided context. 
-Using this token, you can easily provide a mock implementation of the `EthersBaseProvider` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
+Using this token, you can easily provide a mock implementation of the `BaseProvider` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
 
 ```ts
   const module: TestingModule = await Test.createTestingModule({

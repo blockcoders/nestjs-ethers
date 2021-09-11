@@ -2,7 +2,7 @@ import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
 import * as request from 'supertest'
-import { EthersModule, InjectEthersProvider, EthersBaseProvider, Network, MAINNET_NETWORK } from '../src'
+import { EthersModule, InjectEthersProvider, BaseProvider, Network, MAINNET_NETWORK } from '../src'
 import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
 
@@ -29,7 +29,7 @@ describe('InjectEthersProvider', () => {
         class TestService {
           constructor(
             @InjectEthersProvider()
-            private readonly ethersProvider: EthersBaseProvider,
+            private readonly ethersProvider: BaseProvider,
           ) {}
           async someMethod(): Promise<Network> {
             return this.ethersProvider.getNetwork()
@@ -77,7 +77,7 @@ describe('InjectEthersProvider', () => {
         class TestController {
           constructor(
             @InjectEthersProvider()
-            private readonly ethersProvider: EthersBaseProvider,
+            private readonly ethersProvider: BaseProvider,
           ) {}
           @Get()
           async get() {
