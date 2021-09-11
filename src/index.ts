@@ -56,7 +56,51 @@ export * from '@ethersproject/keccak256'
 export * from '@ethersproject/networks'
 export * from '@ethersproject/pbkdf2'
 export * from '@ethersproject/properties'
-export * from '@ethersproject/providers'
+export {
+  Provider,
+  BaseProvider as EthersBaseProvider,
+  Resolver,
+  UrlJsonRpcProvider,
+  FallbackProvider,
+  AlchemyProvider,
+  AlchemyWebSocketProvider,
+  CloudflareProvider,
+  EtherscanProvider,
+  InfuraProvider,
+  InfuraWebSocketProvider,
+  JsonRpcProvider,
+  JsonRpcBatchProvider,
+  NodesmithProvider,
+  PocketProvider,
+  StaticJsonRpcProvider,
+  Web3Provider,
+  WebSocketProvider,
+  IpcProvider,
+  JsonRpcSigner,
+  getDefaultProvider,
+  getNetwork,
+  isCommunityResource,
+  isCommunityResourcable,
+  showThrottleMessage,
+  Formatter,
+  Block,
+  BlockTag,
+  EventType,
+  FeeData,
+  Filter,
+  Log,
+  Listener,
+  TransactionReceipt,
+  TransactionRequest,
+  TransactionResponse,
+  ExternalProvider,
+  JsonRpcFetchFunc,
+  Network,
+  Networkish,
+  EnsProvider,
+  EnsResolver,
+  CommunityResourcable,
+} from '@ethersproject/providers'
 export * from '@ethersproject/random'
 export { decode as rlpDecode, encode as rlpEncode } from '@ethersproject/rlp'
 export * from '@ethersproject/sha2'
