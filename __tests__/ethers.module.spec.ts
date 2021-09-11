@@ -7,7 +7,7 @@ import * as request from 'supertest'
 import {
   EthersModule,
   InjectEthersProvider,
-  EthersBaseProvider,
+  BaseProvider,
   MAINNET_NETWORK,
   RINKEBY_NETWORK,
   Network,
@@ -58,7 +58,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -101,7 +101,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -148,7 +148,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -201,7 +201,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -265,7 +265,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -325,7 +325,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {
@@ -406,7 +406,7 @@ describe('Ethers Module Initialization', () => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: EthersBaseProvider,
+              private readonly ethersProvider: BaseProvider,
             ) {}
             @Get()
             async get() {

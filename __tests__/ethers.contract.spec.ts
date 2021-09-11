@@ -74,7 +74,7 @@ describe('EthersSigner', () => {
         await app.close()
       })
 
-      it('should be able to set a WalletSigner into a SmartContract', async () => {
+      it('should be able to set a Wallet into a SmartContract', async () => {
         @Injectable()
         class TestService {
           constructor(private readonly ethersContract: EthersContract, private readonly ethersSigner: EthersSigner) {}
