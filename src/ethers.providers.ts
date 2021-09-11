@@ -1,5 +1,3 @@
-import { defer, lastValueFrom } from 'rxjs';
-import { Provider } from '@nestjs/common';
 import {
   BaseProvider,
   getDefaultProvider,
@@ -9,21 +7,14 @@ import {
   EtherscanProvider,
   InfuraProvider,
   PocketProvider,
-} from '@ethersproject/providers';
-import {
-  EthersModuleOptions,
-  EthersModuleAsyncOptions,
-} from './ethers.interface';
-import { getEthersToken } from './ethers.utils';
-import {
-  ETHERS_MODULE_OPTIONS,
-  ETHERS_PROVIDER_NAME,
-  MAINNET_NETWORK,
-} from './ethers.constants';
+} from '@ethersproject/providers'
+import { Provider } from '@nestjs/common'
+import { defer, lastValueFrom } from 'rxjs'
+import { ETHERS_MODULE_OPTIONS, ETHERS_PROVIDER_NAME, MAINNET_NETWORK } from './ethers.constants'
+import { EthersModuleOptions, EthersModuleAsyncOptions } from './ethers.interface'
+import { getEthersToken } from './ethers.utils'
 
-export async function createBaseProvider(
-  options: EthersModuleOptions = {},
-): Promise<BaseProvider> {
+export async function createBaseProvider(options: EthersModuleOptions = {}): Promise<BaseProvider> {
   const {
     network = MAINNET_NETWORK,
     alchemy,
@@ -33,57 +24,54 @@ export async function createBaseProvider(
     cloudflare = false,
     quorum = 1,
     useDefaultProvider = true,
-  } = options;
+  } = options
 
   if (!useDefaultProvider) {
-    const providers: Array<BaseProvider> = [];
+    const providers: Array<BaseProvider> = []
 
     if (alchemy) {
-      const alchemyProvider = new AlchemyProvider(network, alchemy);
+      const alchemyProvider = new AlchemyProvider(network, alchemy)
 
       // wait until the node is up and running smoothly.
-      await alchemyProvider.ready;
+      await alchemyProvider.ready
 
-      providers.push(alchemyProvider);
+      providers.push(alchemyProvider)
     }
 
     if (etherscan) {
-      const etherscanProvider = new EtherscanProvider(network, etherscan);
+      const etherscanProvider = new EtherscanProvider(network, etherscan)
 
       // wait until the node is up and running smoothly.
-      await etherscanProvider.ready;
+      await etherscanProvider.ready
 
-      providers.push(etherscanProvider);
+      providers.push(etherscanProvider)
     }
 
     if (infura) {
-      const infuraProvider = new InfuraProvider(network, infura);
+      const infuraProvider = new InfuraProvider(network, infura)
 
       // wait until the node is up and running smoothly.
-      await infuraProvider.ready;
+      await infuraProvider.ready
 
-      providers.push(infuraProvider);
+      providers.push(infuraProvider)
     }
 
     if (pocket) {
-      const pocketProvider = new PocketProvider(network, pocket);
+      const pocketProvider = new PocketProvider(network, pocket)
 
       // wait until the node is up and running smoothly.
-      await pocketProvider.ready;
+      await pocketProvider.ready
 
-      providers.push(pocketProvider);
+      providers.push(pocketProvider)
     }
 
-    if (
-      cloudflare &&
-      (network === MAINNET_NETWORK || network === MAINNET_NETWORK.name)
-    ) {
-      const cloudflareProvider = new CloudflareProvider(network);
+    if (cloudflare && (network === MAINNET_NETWORK || network === MAINNET_NETWORK.name)) {
+      const cloudflareProvider = new CloudflareProvider(network)
 
       // wait until the node is up and running smoothly.
-      await cloudflareProvider.ready;
+      await cloudflareProvider.ready
 
-      providers.push(cloudflareProvider);
+      providers.push(cloudflareProvider)
     }
 
     if (providers.length > 1) {
@@ -91,11 +79,11 @@ export async function createBaseProvider(
        * FallbackProvider with selected providers.
        * @see {@link https://docs.ethers.io/v5/api/providers/other/#FallbackProvider}
        */
-      return new FallbackProvider(providers, quorum);
+      return new FallbackProvider(providers, quorum)
     }
 
     if (providers.length === 1) {
-      return providers[0];
+      return providers[0]
     }
   }
 
@@ -110,43 +98,39 @@ export async function createBaseProvider(
     infura,
     pocket,
     quorum,
-  });
+  })
 }
 
-export function createEthersProvider(
-  options: EthersModuleOptions = {},
-): Provider {
+export function createEthersProvider(options: EthersModuleOptions = {}): Provider {
   return {
     provide: getEthersToken(),
     useFactory: async (): Promise<BaseProvider> => {
-      return await lastValueFrom(defer(() => createBaseProvider(options)));
+      return await lastValueFrom(defer(() => createBaseProvider(options)))
     },
-  };
+  }
 }
 
 export function createEthersAsyncProvider(): Provider {
   return {
     provide: getEthersToken(),
     useFactory: async (options: EthersModuleOptions): Promise<BaseProvider> => {
-      return await lastValueFrom(defer(() => createBaseProvider(options)));
+      return await lastValueFrom(defer(() => createBaseProvider(options)))
     },
     inject: [ETHERS_MODULE_OPTIONS],
-  };
+  }
 }
 
-export function createAsyncOptionsProvider(
-  options: EthersModuleAsyncOptions,
-): Provider {
+export function createAsyncOptionsProvider(options: EthersModuleAsyncOptions): Provider {
   return {
     provide: ETHERS_MODULE_OPTIONS,
     useFactory: options.useFactory,
     inject: options.inject || [],
-  };
+  }
 }
 
 export function createProviderName(): Provider {
   return {
     provide: ETHERS_PROVIDER_NAME,
     useValue: getEthersToken(),
-  };
+  }
 }
