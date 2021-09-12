@@ -4,7 +4,16 @@ import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
 import * as request from 'supertest'
-import { EthersModule, InjectEthersProvider, BaseProvider, MAINNET_NETWORK, RINKEBY_NETWORK, Network } from '../src'
+import {
+  EthersModule,
+  InjectEthersProvider,
+  BaseProvider,
+  MAINNET_NETWORK,
+  RINKEBY_NETWORK,
+  BINANCE_TESTNET_NETWORK,
+  Network,
+  BscscanProvider,
+} from '../src'
 import {
   RINKEBY_ALCHEMY_BASE_URL,
   RINKEBY_ALCHEMY_API_KEY,
@@ -23,6 +32,7 @@ import {
   ETHERSCAN_GET_BLOCK_NUMBER_QUERY,
   PROVIDER_GET_BLOCK_NUMBER_BODY,
   PROVIDER_GET_BLOCK_NUMBER_RESPONSE,
+  TESTNET_BSCSCAN_URL,
 } from './utils/constants'
 import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
@@ -180,6 +190,110 @@ describe('Ethers Module Initialization', () => {
             })
 
           await app.close()
+        })
+
+        it('should compile with network option as number', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+          @Module({
+            imports: [EthersModule.forRoot({ network: 1 })],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.network).toBeDefined()
+              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
+              expect(res.body.network).toHaveProperty('chainId', 1)
+              expect(res.body.network).toHaveProperty('ensAddress')
+            })
+
+          await app.close()
+        })
+
+        it('should compile with network option as string', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+          @Module({
+            imports: [EthersModule.forRoot({ network: 'homestead' })],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.network).toBeDefined()
+              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
+              expect(res.body.network).toHaveProperty('chainId', 1)
+              expect(res.body.network).toHaveProperty('ensAddress')
+            })
+
+          await app.close()
+        })
+
+        it('should throw an error when network is invalid', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+
+          @Module({
+            imports: [EthersModule.forRoot({ network: 'sarasa' })],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          await expect(
+            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
+          ).rejects.toThrow(Error)
         })
       })
 
@@ -457,6 +571,346 @@ describe('Ethers Module Initialization', () => {
             })
 
           await app.close()
+        })
+
+        it('should compile with network option as number', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+          @Injectable()
+          class ConfigService {
+            public readonly network = 1
+          }
+
+          @Module({
+            imports: [
+              EthersModule.forRootAsync({
+                providers: [ConfigService],
+                inject: [ConfigService],
+                useFactory: (config: ConfigService) => {
+                  return {
+                    network: config.network,
+                  }
+                },
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.network).toBeDefined()
+              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
+              expect(res.body.network).toHaveProperty('chainId', 1)
+              expect(res.body.network).toHaveProperty('ensAddress')
+            })
+
+          await app.close()
+        })
+
+        it('should compile with network option as string', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+          @Injectable()
+          class ConfigService {
+            public readonly network = 'homestead'
+          }
+
+          @Module({
+            imports: [
+              EthersModule.forRootAsync({
+                providers: [ConfigService],
+                inject: [ConfigService],
+                useFactory: (config: ConfigService) => {
+                  return {
+                    network: config.network,
+                  }
+                },
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.network).toBeDefined()
+              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
+              expect(res.body.network).toHaveProperty('chainId', 1)
+              expect(res.body.network).toHaveProperty('ensAddress')
+            })
+
+          await app.close()
+        })
+
+        it('should throw an error when network is invalid', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+
+          @Injectable()
+          class ConfigService {
+            public readonly network = 'sarasa'
+          }
+
+          @Module({
+            imports: [
+              EthersModule.forRootAsync({
+                providers: [ConfigService],
+                inject: [ConfigService],
+                useFactory: (config: ConfigService) => {
+                  return {
+                    network: config.network,
+                  }
+                },
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          await expect(
+            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
+          ).rejects.toThrow(Error)
+        })
+
+        it('should work with bsccsan provider', async () => {
+          nock(TESTNET_BSCSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly bscProvider: BscscanProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+
+          @Injectable()
+          class ConfigService {
+            public readonly bsccsan = RINKEBY_ETHERSCAN_API_KEY
+          }
+
+          @Module({
+            providers: [ConfigService],
+            exports: [ConfigService],
+          })
+          class ConfigModule {}
+          @Module({
+            imports: [
+              EthersModule.forRootAsync({
+                imports: [ConfigModule],
+                inject: [ConfigService],
+                useFactory: (config: ConfigService) => {
+                  return {
+                    network: BINANCE_TESTNET_NETWORK,
+                    bsccsan: config.bsccsan,
+                    useDefaultProvider: false,
+                  }
+                },
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should use default bsc provider', async () => {
+          nock(TESTNET_BSCSCAN_URL)
+            .get('')
+            .query({
+              ...ETHERSCAN_GET_GAS_PRICE_QUERY,
+              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+            })
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .get('')
+            .query({
+              ...ETHERSCAN_GET_BLOCK_NUMBER_QUERY,
+              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+            })
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly bscProvider: BscscanProvider,
+            ) {}
+            @Get()
+            async get() {
+              try {
+                const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+
+                return { gasPrice: gasPrice.toString() }
+              } catch (error) {
+                console.error(error)
+                return { gasPrice: '' }
+              }
+            }
+          }
+
+          @Injectable()
+          class ConfigService {
+            public readonly bsccsan = RINKEBY_ETHERSCAN_API_KEY
+          }
+
+          @Module({
+            providers: [ConfigService],
+            exports: [ConfigService],
+          })
+          class ConfigModule {}
+          @Module({
+            imports: [
+              EthersModule.forRootAsync({
+                imports: [ConfigModule],
+                inject: [ConfigService],
+                useFactory: (config: ConfigService) => {
+                  return {
+                    network: BINANCE_TESTNET_NETWORK,
+                    bsccsan: config.bsccsan,
+                    useDefaultProvider: true,
+                  }
+                },
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), {
+            logger: false,
+            abortOnError: false,
+          })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should throw an error if the network is different to Mainnet with Cloudflare', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+
+          @Injectable()
+          class ConfigService {
+            public readonly network = RINKEBY_NETWORK
+            public readonly cloudflare = true
+          }
+
+          @Module({
+            imports: [
+              EthersModule.forRootAsync({
+                providers: [ConfigService],
+                inject: [ConfigService],
+                useFactory: (config: ConfigService) => {
+                  return {
+                    network: config.network,
+                    cloudflare: config.cloudflare,
+                    useDefaultProvider: false,
+                  }
+                },
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          await expect(
+            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
+          ).rejects.toThrow(Error)
         })
       })
     })

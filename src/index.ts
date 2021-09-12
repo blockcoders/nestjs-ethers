@@ -9,9 +9,9 @@ export {
   WordlistLike,
 } from './ethers.interface'
 export {
-  HOMESTEAD_NETWORK,
   MAINNET_NETWORK,
   ROPSTEN_NETWORK,
+  TESTNET_NETWORK,
   CLASSIC_MORDOR_NETWORK,
   UNSPECIFIED_NETWORK,
   MORDEN_NETWORK,
@@ -20,7 +20,15 @@ export {
   GOERLI_NETWORK,
   CLASSIC_NETWORK,
   CLASSIC_MORDEN_NETWORK,
+  CLASSIC_TESTNET_NETWORK,
   CLASSIC_KOTTI_NETWORK,
+  XDAI_NETWORK,
+  MATIC_NETWORK,
+  MUMBAI_NETWORK,
+  BNB_NETWORK,
+  BNB_TESTNET_NETWORK,
+  BINANCE_NETWORK,
+  BINANCE_TESTNET_NETWORK,
 } from './ethers.constants'
 export { getEthersToken } from './ethers.utils'
 export { EthersSigner } from './ethers.signer'
@@ -68,3 +76,4 @@ export * from '@ethersproject/units'
 export * from '@ethersproject/wallet'
 export * from '@ethersproject/web'
 export * from '@ethersproject/wordlists'
+export { BscscanProvider } from '@ethers-ancillary/bsc'

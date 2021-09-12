@@ -28,20 +28,16 @@ import {
 import { EthersModuleOptions, EthersModuleAsyncOptions } from './ethers.interface'
 import { getEthersToken } from './ethers.utils'
 
-function isBscNetwork(network: Networkish | undefined) {
-  if (network) {
-    if (typeof network === 'number') {
-      return [BINANCE_NETWORK.chainId, BINANCE_TESTNET_NETWORK.chainId].includes(network)
-    }
-
-    if (typeof network === 'string') {
-      return [BINANCE_NETWORK.name, BINANCE_TESTNET_NETWORK.name].includes(network)
-    }
-
-    return [BINANCE_NETWORK, BINANCE_TESTNET_NETWORK].includes(network)
+function validateBscNetwork(network: Networkish) {
+  if (typeof network === 'number') {
+    return [BINANCE_NETWORK.chainId, BINANCE_TESTNET_NETWORK.chainId].includes(network)
   }
 
-  return false
+  if (typeof network === 'string') {
+    return [BINANCE_NETWORK.name, BINANCE_TESTNET_NETWORK.name].includes(network)
+  }
+
+  return [BINANCE_NETWORK, BINANCE_TESTNET_NETWORK].includes(network)
 }
 
 export async function createBaseProvider(options: EthersModuleOptions = {}): Promise<BaseProvider> {
@@ -58,8 +54,9 @@ export async function createBaseProvider(options: EthersModuleOptions = {}): Pro
   } = options
 
   let providerNetwork: Network | null
+  const isBscNetwork = validateBscNetwork(network)
 
-  if (isBscNetwork(network)) {
+  if (isBscNetwork) {
     providerNetwork = getBscNetwork(network)
   } else {
     providerNetwork = getNetwork(network)
@@ -143,7 +140,7 @@ export async function createBaseProvider(options: EthersModuleOptions = {}): Pro
     }
   }
 
-  if (useDefaultProvider && bsccsan && isBscNetwork(providerNetwork)) {
+  if (useDefaultProvider && bsccsan && isBscNetwork) {
     return getDefaultBscProvider(providerNetwork, {
       bsccsan,
     })
