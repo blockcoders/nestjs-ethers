@@ -86,7 +86,15 @@ interface EthersModuleOptions {
    * Optional parameter for Bscscan API Token
    * @see {@link https://https://bscscan.com/}
    */
-  bsccsan?: string;
+  bscscan?: string;
+  
+  /**
+   * Optional parameter for a custom StaticJsonRpcProvider
+   * You can connect using an URL, ConnectionInfo or an array of both.
+   * @see {@link https://docs.ethers.io/v5/api/providers/jsonrpc-provider/#StaticJsonRpcProvider}
+   * @ses {@link https://docs.ethers.io/v5/api/utils/web/#ConnectionInfo}
+   */
+  custom?: ConnectionInfo | string | (ConnectionInfo | string)[]
 
   /**
    * Optional parameter the number of backends that must agree
@@ -276,23 +284,162 @@ export class TestService {
 
 ## Binance Smart Chain Provider
 
+if you are familiar with [BscscanProvider](https://github.com/ethers-io/ancillary-bsc), you are ready to go.
+
 ```ts
-import { EthersModule, BINANCE_NETWORK } from 'nestjs-ethers';
+import {
+  EthersModule,
+  InjectEthersProvider,
+  BscscanProvider,
+  BINANCE_NETWORK
+} from 'nestjs-ethers';
 
 @Module({
   imports: [
     EthersModule.forRoot({
-      network: RINKEBY_NETWORK,
-      bsccsan: '845ce4ed0120d68eb5740c9160f08f98',
-      quorum: 1,
+      network: BINANCE_NETWORK,
+      bscscan: '845ce4ed0120d68eb5740c9160f08f98',
       useDefaultProvider: false,
     })
   ],
   ...
 })
 class MyModule {}
+
+@Controller('/')
+class TestController {
+  constructor(
+    @InjectEthersProvider()
+    private readonly bscProvider: BscscanProvider,
+  ) {}
+  @Get()
+  async get() {
+    const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+
+    return { gasPrice: gasPrice.toString() }
+  }
+}
 ```
 
+### Binance Smart Chain Default Provider
+
+This will create a `FallbackProvider`, backed by all popular Third-Party BSC services (currently only [BscscanProvider](https://github.com/ethers-io/ancillary-bsc)).
+
+**NOTE:** if `bscscan` is null or undefined. The BSC default provider will use the [community API Key](https://github.com/ethers-io/ancillary-bsc/blob/main/src.ts/bscscan-provider.ts#L8).
+
+```ts
+import {
+  EthersModule,
+  InjectEthersProvider,
+  FallbackProvider,
+  BINANCE_NETWORK
+} from 'nestjs-ethers';
+
+@Module({
+  imports: [
+    EthersModule.forRoot({
+      network: BINANCE_NETWORK,
+      useDefaultProvider: true,
+    })
+  ],
+  ...
+})
+class MyModule {}
+
+@Controller('/')
+class TestController {
+  constructor(
+    @InjectEthersProvider()
+    private readonly bscProvider: FallbackProvider,
+  ) {}
+  @Get()
+  async get() {
+    const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+
+    return { gasPrice: gasPrice.toString() }
+  }
+}
+```
+
+## Custom StaticJsonRpcProvider
+
+if you are familiar with [StaticJsonRpcProvider](https://docs.ethers.io/v5/api/providers/jsonrpc-provider/#StaticJsonRpcProvider), you are ready to go. The custom provider is very helpful when you want to use a RPC that is not defined in [ethers](https://github.com/ethers-io/ethers.js/). This is the case for Binance Smart Chain public [RPCs](https://docs.binance.org/smart-chain/developer/rpc.html).
+
+```ts
+import {
+  EthersModule,
+  InjectEthersProvider,
+  StaticJsonRpcProvider,
+  BNB_TESTNET_NETWORK
+} from 'nestjs-ethers';
+
+@Module({
+  imports: [
+    EthersModule.forRoot({
+      network: BNB_TESTNET_NETWORK,
+      custom: 'https://data-seed-prebsc-1-s1.binance.org:8545,
+      useDefaultProvider: false,
+    })
+  ],
+  ...
+})
+class MyModule {}
+
+@Controller('/')
+class TestController {
+  constructor(
+    @InjectEthersProvider()
+    private readonly customProvider: StaticJsonRpcProvider,
+  ) {}
+  @Get()
+  async get() {
+    const gasPrice: BigNumber = await this.customProvider.getGasPrice()
+
+    return { gasPrice: gasPrice.toString() }
+  }
+}
+```
+
+You can also pass multiple `custom` providers, if you want to use the `FallbackProvider` to send multiple requests simultaneously:
+
+```ts
+import {
+  EthersModule,
+  InjectEthersProvider,
+  FallbackProvider,
+  BNB_TESTNET_NETWORK
+} from 'nestjs-ethers';
+
+@Module({
+  imports: [
+    EthersModule.forRoot({
+      network: BNB_TESTNET_NETWORK,
+      custom: [
+        'https://data-seed-prebsc-1-s1.binance.org:8545',
+        'https://data-seed-prebsc-1-s3.binance.org:8545',
+        'https://data-seed-prebsc-2-s2.binance.org:8545'
+      ],
+      useDefaultProvider: false,
+    })
+  ],
+  ...
+})
+class MyModule {}
+
+@Controller('/')
+class TestController {
+  constructor(
+    @InjectEthersProvider()
+    private readonly customProvider: FallbackProvider,
+  ) {}
+  @Get()
+  async get() {
+    const gasPrice: BigNumber = await this.customProvider.getGasPrice()
+
+    return { gasPrice: gasPrice.toString() }
+  }
+}
+```
 
 ## EthersSigner 
 

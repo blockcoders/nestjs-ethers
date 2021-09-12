@@ -15,8 +15,10 @@ import {
   getNetwork,
   Networkish,
   Network,
+  StaticJsonRpcProvider,
 } from '@ethersproject/providers'
 import { Provider } from '@nestjs/common'
+import { ConnectionInfo } from 'ethers/lib/utils'
 import { defer, lastValueFrom } from 'rxjs'
 import {
   ETHERS_MODULE_OPTIONS,
@@ -48,16 +50,17 @@ export async function createBaseProvider(options: EthersModuleOptions = {}): Pro
     infura,
     pocket,
     cloudflare = false,
-    bsccsan,
+    bscscan,
+    custom,
     quorum = 1,
     useDefaultProvider = true,
   } = options
 
-  let providerNetwork: Network | null
+  let providerNetwork: Network | undefined
   const isBscNetwork = validateBscNetwork(network)
 
   if (isBscNetwork) {
-    providerNetwork = getBscNetwork(network)
+    providerNetwork = getBscNetwork(network) ?? undefined
   } else {
     providerNetwork = getNetwork(network)
   }
@@ -118,13 +121,28 @@ export async function createBaseProvider(options: EthersModuleOptions = {}): Pro
       providers.push(cloudflareProvider)
     }
 
-    if (bsccsan) {
-      const bsccsanProvider = new BscscanProvider(providerNetwork, bsccsan)
+    if (bscscan) {
+      const bscscanProvider = new BscscanProvider(providerNetwork, bscscan)
 
       // wait until the node is up and running smoothly.
-      await bsccsanProvider.ready
+      await bscscanProvider.ready
 
-      providers.push(bsccsanProvider)
+      providers.push(bscscanProvider)
+    }
+
+    if (custom) {
+      const customInfos: (ConnectionInfo | string)[] = !Array.isArray(custom) ? [custom] : custom
+      const customPromises: Array<Promise<Network>> = []
+
+      customInfos.forEach((customInfo) => {
+        const customProvider = new StaticJsonRpcProvider(customInfo, providerNetwork)
+
+        // customPromises.push(customProvider.ready)
+        providers.push(customProvider)
+      })
+
+      // wait until the node is up and running smoothly.
+      await Promise.all(customPromises)
     }
 
     if (providers.length > 1) {
@@ -140,10 +158,10 @@ export async function createBaseProvider(options: EthersModuleOptions = {}): Pro
     }
   }
 
-  if (useDefaultProvider && bsccsan && isBscNetwork) {
-    return getDefaultBscProvider(providerNetwork, {
-      bsccsan,
-    })
+  if (useDefaultProvider && isBscNetwork) {
+    const bscConfig: Record<string, string> = bscscan ? { bscscan } : {}
+
+    return getDefaultBscProvider(providerNetwork, bscConfig)
   }
 
   /**

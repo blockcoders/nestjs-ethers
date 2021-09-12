@@ -2,6 +2,7 @@ import { BytesLike } from '@ethersproject/bytes'
 import { Networkish } from '@ethersproject/networks'
 import { Wordlist } from '@ethersproject/wordlists'
 import { ModuleMetadata } from '@nestjs/common/interfaces'
+import { ConnectionInfo } from 'ethers/lib/utils'
 
 export type WordlistLike = string | Wordlist
 
@@ -22,7 +23,8 @@ export interface EthersModuleOptions extends Record<string, any> {
   cloudflare?: boolean | undefined
   infura?: InfuraProviderOptions | string | undefined
   pocket?: PocketProviderOptions | string | undefined
-  bsccsan?: string | undefined
+  bscscan?: string | undefined
+  custom?: ConnectionInfo | string | (ConnectionInfo | string)[] | undefined
   quorum?: number | undefined
   useDefaultProvider?: boolean | undefined
 }
