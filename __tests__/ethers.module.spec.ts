@@ -301,6 +301,71 @@ describe('Ethers Module Initialization', () => {
             NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
           ).rejects.toThrow(Error)
         })
+
+        it('should throw an error when useDefaultProvider is false and the providers are invalid', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+
+          @Module({
+            imports: [EthersModule.forRoot({ useDefaultProvider: false })],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          await expect(
+            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
+          ).rejects.toThrow(Error)
+        })
+
+        it('should not wait until providers are connected', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: FallbackProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+          @Module({
+            imports: [EthersModule.forRoot({ waitUntilIsConnected: false })],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.network).toBeDefined()
+              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
+              expect(res.body.network).toHaveProperty('chainId', 1)
+              expect(res.body.network).toHaveProperty('ensAddress')
+            })
+
+          await app.close()
+        })
       })
 
       describe('forRootAsync', () => {
@@ -715,6 +780,47 @@ describe('Ethers Module Initialization', () => {
                 useFactory: (config: ConfigService) => {
                   return {
                     network: config.network,
+                  }
+                },
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          await expect(
+            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
+          ).rejects.toThrow(Error)
+        })
+
+        it('should throw an error when useDefaultProvider is false and the providers are invalid', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+
+          @Injectable()
+          class ConfigService {
+            public readonly useDefaultProvider = false
+          }
+
+          @Module({
+            imports: [
+              EthersModule.forRootAsync({
+                providers: [ConfigService],
+                inject: [ConfigService],
+                useFactory: (config: ConfigService) => {
+                  return {
+                    useDefaultProvider: config.useDefaultProvider,
                   }
                 },
               }),

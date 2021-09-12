@@ -23,7 +23,7 @@ export class EthersCoreModule implements OnApplicationShutdown {
     private readonly moduleRef: ModuleRef,
   ) {}
 
-  static forRoot(options: EthersModuleOptions = {}): DynamicModule {
+  static forRoot(options: EthersModuleOptions): DynamicModule {
     const ethersProvider = createEthersProvider(options)
 
     return {
