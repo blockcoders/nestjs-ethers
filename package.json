@@ -1,6 +1,6 @@
 {
   "name": "nestjs-ethers",
-  "version": "0.3.2",
+  "version": "1.0.0-beta.1",
   "description": "The ethers.js library for NestJS",
   "author": "Jose Ramirez <jarcodallo@gmail.com>",
   "license": "Apache",
@@ -44,6 +44,7 @@
   "homepage": "https://github.com/jarcodallo/nestjs-ethers/blob/main/README.md",
   "bugs": "https://github.com/jarcodallo/nestjs-ethers/issues",
   "dependencies": {
+    "@ethers-ancillary/bsc": "0.0.2",
     "ethers": "^5.4.6"
   },
   "devDependencies": {

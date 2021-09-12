@@ -5,6 +5,7 @@ export const RINKEBY_ALCHEMY_POKT_URL = 'https://eth-rinkeby.gateway.pokt.networ
 export const RINKEBY_ETHERSCAN_URL = 'https://api-rinkeby.etherscan.io/api'
 export const RINKEBY_INFURA_URL = 'https://rinkeby.infura.io/v3'
 export const CLOUDFLARE_URL = 'https://cloudflare-eth.com'
+export const TESTNET_BSCSCAN_URL = 'http://api-testnet.bscscan.com/api'
 export const RINKEBY_ETHERSCAN_API_KEY = randomBytes(17).toString('hex')
 export const RINKEBY_ALCHEMY_API_KEY = randomBytes(16).toString('hex')
 export const RINKEBY_POKT_API_KEY = randomBytes(12).toString('hex')
