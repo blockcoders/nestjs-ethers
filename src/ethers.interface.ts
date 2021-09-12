@@ -26,6 +26,7 @@ export interface EthersModuleOptions extends Record<string, any> {
   bscscan?: string | undefined
   custom?: ConnectionInfo | string | (ConnectionInfo | string)[] | undefined
   quorum?: number | undefined
+  waitUntilIsConnected?: boolean | undefined
   useDefaultProvider?: boolean | undefined
 }
 

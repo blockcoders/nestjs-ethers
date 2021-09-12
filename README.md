@@ -103,6 +103,14 @@ interface EthersModuleOptions {
   quorum?: number;
 
   /**
+   * Optional parameter if this option is false, EthersModule won't wait until
+   * the providers are ready. If this option is true, EthersModule  will wait 
+   * until the network has heen established for all the providers.
+   * @see {@link https://docs.ethers.io/v5/api/providers/provider/#Provider-ready}
+   */
+  waitUntilIsConnected?: boolean;
+
+  /**
    * Optional parameter if this option is false, EthersModule will try to connect
    * with the credentials provided in options. If you define more than one provider,
    * EthersModule will use the FallbackProvider to send multiple requests simultaneously.
@@ -377,7 +385,7 @@ import {
   imports: [
     EthersModule.forRoot({
       network: BNB_TESTNET_NETWORK,
-      custom: 'https://data-seed-prebsc-1-s1.binance.org:8545,
+      custom: 'https://data-seed-prebsc-1-s1.binance.org:8545',
       useDefaultProvider: false,
     })
   ],

@@ -4,7 +4,8 @@ import {
   getNetwork as getBscNetwork,
 } from '@ethers-ancillary/bsc'
 import {
-  Provider as BaseProvider,
+  Provider as AbstractProvider,
+  BaseProvider,
   getDefaultProvider,
   FallbackProvider,
   AlchemyProvider,
@@ -42,7 +43,7 @@ function validateBscNetwork(network: Networkish) {
   return [BINANCE_NETWORK, BINANCE_TESTNET_NETWORK].includes(network)
 }
 
-export async function createBaseProvider(options: EthersModuleOptions = {}): Promise<BaseProvider> {
+export async function createBaseProvider(options: EthersModuleOptions): Promise<BaseProvider | AbstractProvider> {
   const {
     network = MAINNET_NETWORK,
     alchemy,
@@ -53,6 +54,7 @@ export async function createBaseProvider(options: EthersModuleOptions = {}): Pro
     bscscan,
     custom,
     quorum = 1,
+    waitUntilIsConnected = true,
     useDefaultProvider = true,
   } = options
 
@@ -73,39 +75,19 @@ export async function createBaseProvider(options: EthersModuleOptions = {}): Pro
     const providers: Array<BaseProvider> = []
 
     if (alchemy) {
-      const alchemyProvider = new AlchemyProvider(providerNetwork, alchemy)
-
-      // wait until the node is up and running smoothly.
-      await alchemyProvider.ready
-
-      providers.push(alchemyProvider)
+      providers.push(new AlchemyProvider(providerNetwork, alchemy))
     }
 
     if (etherscan) {
-      const etherscanProvider = new EtherscanProvider(providerNetwork, etherscan)
-
-      // wait until the node is up and running smoothly.
-      await etherscanProvider.ready
-
-      providers.push(etherscanProvider)
+      providers.push(new EtherscanProvider(providerNetwork, etherscan))
     }
 
     if (infura) {
-      const infuraProvider = new InfuraProvider(providerNetwork, infura)
-
-      // wait until the node is up and running smoothly.
-      await infuraProvider.ready
-
-      providers.push(infuraProvider)
+      providers.push(new InfuraProvider(providerNetwork, infura))
     }
 
     if (pocket) {
-      const pocketProvider = new PocketProvider(providerNetwork, pocket)
-
-      // wait until the node is up and running smoothly.
-      await pocketProvider.ready
-
-      providers.push(pocketProvider)
+      providers.push(new PocketProvider(providerNetwork, pocket))
     }
 
     if (cloudflare) {
@@ -113,49 +95,41 @@ export async function createBaseProvider(options: EthersModuleOptions = {}): Pro
         throw new Error(`Invalid network. Cloudflare only supports ${MAINNET_NETWORK.name}.`)
       }
 
-      const cloudflareProvider = new CloudflareProvider(providerNetwork)
-
-      // wait until the node is up and running smoothly.
-      await cloudflareProvider.ready
-
-      providers.push(cloudflareProvider)
+      providers.push(new CloudflareProvider(providerNetwork))
     }
 
     if (bscscan) {
-      const bscscanProvider = new BscscanProvider(providerNetwork, bscscan)
-
-      // wait until the node is up and running smoothly.
-      await bscscanProvider.ready
-
-      providers.push(bscscanProvider)
+      providers.push(new BscscanProvider(providerNetwork, bscscan))
     }
 
     if (custom) {
       const customInfos: (ConnectionInfo | string)[] = !Array.isArray(custom) ? [custom] : custom
-      const customPromises: Array<Promise<Network>> = []
 
       customInfos.forEach((customInfo) => {
-        const customProvider = new StaticJsonRpcProvider(customInfo, providerNetwork)
-
-        // customPromises.push(customProvider.ready)
-        providers.push(customProvider)
+        providers.push(new StaticJsonRpcProvider(customInfo, providerNetwork))
       })
-
-      // wait until the node is up and running smoothly.
-      await Promise.all(customPromises)
     }
 
-    if (providers.length > 1) {
-      /**
-       * FallbackProvider with selected providers.
-       * @see {@link https://docs.ethers.io/v5/api/providers/other/#FallbackProvider}
-       */
-      return new FallbackProvider(providers, quorum)
-    }
+    if (providers.length > 0) {
+      if (waitUntilIsConnected) {
+        // wait until the node is up and running smoothly.
+        await Promise.all(providers.map((provider) => provider.ready))
+      }
 
-    if (providers.length === 1) {
+      if (providers.length > 1) {
+        /**
+         * FallbackProvider with selected providers.
+         * @see {@link https://docs.ethers.io/v5/api/providers/other/#FallbackProvider}
+         */
+        return new FallbackProvider(providers, quorum)
+      }
+
       return providers[0]
     }
+
+    throw new Error(
+      'Error in provider creation. The property "useDefaultProvider" is false and the providers supplied are invalid.',
+    )
   }
 
   if (useDefaultProvider && isBscNetwork) {
@@ -178,10 +152,10 @@ export async function createBaseProvider(options: EthersModuleOptions = {}): Pro
   })
 }
 
-export function createEthersProvider(options: EthersModuleOptions = {}): Provider {
+export function createEthersProvider(options: EthersModuleOptions): Provider {
   return {
     provide: getEthersToken(),
-    useFactory: async (): Promise<BaseProvider> => {
+    useFactory: async (): Promise<BaseProvider | AbstractProvider> => {
       return await lastValueFrom(defer(() => createBaseProvider(options)))
     },
   }
@@ -190,7 +164,7 @@ export function createEthersProvider(options: EthersModuleOptions = {}): Provide
 export function createEthersAsyncProvider(): Provider {
   return {
     provide: getEthersToken(),
-    useFactory: async (options: EthersModuleOptions): Promise<BaseProvider> => {
+    useFactory: async (options: EthersModuleOptions): Promise<BaseProvider | AbstractProvider> => {
       return await lastValueFrom(defer(() => createBaseProvider(options)))
     },
     inject: [ETHERS_MODULE_OPTIONS],
