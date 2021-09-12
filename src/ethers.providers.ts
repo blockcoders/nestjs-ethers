@@ -109,7 +109,7 @@ export async function createBaseProvider(options: EthersModuleOptions = {}): Pro
     }
 
     if (cloudflare) {
-      if (providerNetwork !== MAINNET_NETWORK) {
+      if (providerNetwork.chainId !== MAINNET_NETWORK.chainId) {
         throw new Error(`Invalid network. Cloudflare only supports ${MAINNET_NETWORK.name}.`)
       }
 
