@@ -62,17 +62,25 @@ export const MUMBAI_NETWORK: Network = {
   chainId: 80001,
   name: 'maticmum',
 }
+export const BNB_NETWORK: Network = {
+  chainId: 56,
+  name: 'bnb',
+}
+export const BNB_TESTNET_NETWORK: Network = {
+  chainId: 97,
+  name: 'bnbt',
+}
 /**
  * @see {@link https://github.com/ethers-io/ancillary-bsc/blob/main/dist/bsc.esm.js#L8}
  */
 export const BINANCE_NETWORK: Network = {
-  chainId: 56,
+  chainId: 0x38,
   name: 'bsc-mainnet',
 }
 /**
  * @see {@link https://github.com/ethers-io/ancillary-bsc/blob/main/dist/bsc.esm.js#L12}
  */
 export const BINANCE_TESTNET_NETWORK: Network = {
-  chainId: 97,
+  chainId: 0x61,
   name: 'bsc-testnet',
 }

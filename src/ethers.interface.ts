@@ -1,5 +1,5 @@
 import { BytesLike } from '@ethersproject/bytes'
-import { Network } from '@ethersproject/providers'
+import { Networkish } from '@ethersproject/networks'
 import { Wordlist } from '@ethersproject/wordlists'
 import { ModuleMetadata } from '@nestjs/common/interfaces'
 
@@ -16,14 +16,15 @@ export interface PocketProviderOptions {
 }
 
 export interface EthersModuleOptions extends Record<string, any> {
-  network?: Network | string
-  alchemy?: string
-  etherscan?: string
-  cloudflare?: boolean
-  infura?: InfuraProviderOptions | string
-  pocket?: PocketProviderOptions | string
-  quorum?: number
-  useDefaultProvider?: boolean
+  network?: Networkish | undefined
+  alchemy?: string | undefined
+  etherscan?: string | undefined
+  cloudflare?: boolean | undefined
+  infura?: InfuraProviderOptions | string | undefined
+  pocket?: PocketProviderOptions | string | undefined
+  bsccsan?: string | undefined
+  quorum?: number | undefined
+  useDefaultProvider?: boolean | undefined
 }
 
 export interface EthersModuleAsyncOptions extends Pick<ModuleMetadata, 'imports' | 'providers'> {

@@ -81,6 +81,12 @@ interface EthersModuleOptions {
    * @see {@link https://pokt.network}
    */
   pocket?: PocketProviderOptions | string;
+  
+  /**
+   * Optional parameter for Bscscan API Token
+   * @see {@link https://https://bscscan.com/}
+   */
+  bsccsan?: string;
 
   /**
    * Optional parameter the number of backends that must agree
@@ -267,6 +273,26 @@ export class TestService {
   }
 }
 ```
+
+## Binance Smart Chain Provider
+
+```ts
+import { EthersModule, BINANCE_NETWORK } from 'nestjs-ethers';
+
+@Module({
+  imports: [
+    EthersModule.forRoot({
+      network: RINKEBY_NETWORK,
+      bsccsan: '845ce4ed0120d68eb5740c9160f08f98',
+      quorum: 1,
+      useDefaultProvider: false,
+    })
+  ],
+  ...
+})
+class MyModule {}
+```
+
 
 ## EthersSigner 
 
