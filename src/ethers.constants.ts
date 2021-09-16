@@ -1,8 +1,8 @@
 import { Network } from '@ethersproject/providers'
 
 export const DECORATED_PREFIX = 'EthersJS'
-export const ETHERS_PROVIDER_NAME = 'EthersProviderName'
 export const ETHERS_MODULE_OPTIONS = 'EthersModuleOptions'
+export const DEFAULT_TOKEN = 'default'
 export const HOMESTEAD_NETWORK: Network = {
   chainId: 1,
   name: 'homestead',

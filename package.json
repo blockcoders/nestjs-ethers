@@ -1,6 +1,6 @@
 {
   "name": "nestjs-ethers",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "The ethers.js library for NestJS",
   "author": "Jose Ramirez <jarcodallo@gmail.com>",
   "license": "Apache",
@@ -80,7 +80,7 @@
   },
   "jest": {
     "verbose": true,
-    "testTimeout": 20000,
+    "testTimeout": 80000,
     "moduleFileExtensions": [
       "js",
       "json",
