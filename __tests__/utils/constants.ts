@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto'
 
-export const RINKEBY_ALCHEMY_BASE_URL = 'https://eth-rinkeby.alchemyapi.io/v2'
-export const RINKEBY_ALCHEMY_POKT_URL = 'https://eth-rinkeby.gateway.pokt.network/v1'
+export const RINKEBY_ALCHEMY_URL = 'https://eth-rinkeby.alchemyapi.io/v2'
+export const RINKEBY_POCKET_URL = 'https://eth-rinkeby.gateway.pokt.network/v1'
 export const RINKEBY_ETHERSCAN_URL = 'https://api-rinkeby.etherscan.io/api'
 export const RINKEBY_INFURA_URL = 'https://rinkeby.infura.io/v3'
 export const CLOUDFLARE_URL = 'https://cloudflare-eth.com'
@@ -9,6 +9,7 @@ export const TESTNET_BSCSCAN_URL = 'http://api-testnet.bscscan.com/api'
 export const CUSTOM_BSC_1_URL = 'https://data-seed-prebsc-1-s1.binance.org:8545'
 export const CUSTOM_BSC_2_URL = 'https://data-seed-prebsc-1-s3.binance.org:8545'
 export const CUSTOM_BSC_3_URL = 'https://data-seed-prebsc-2-s2.binance.org:8545'
+export const MUMBAI_ALCHEMY_URL = 'https://polygon-mumbai.g.alchemy.com/v2/'
 export const RINKEBY_ETHERSCAN_API_KEY = randomBytes(17).toString('hex')
 export const RINKEBY_ALCHEMY_API_KEY = randomBytes(16).toString('hex')
 export const RINKEBY_POKT_API_KEY = randomBytes(12).toString('hex')

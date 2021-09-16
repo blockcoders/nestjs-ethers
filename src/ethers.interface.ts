@@ -26,12 +26,14 @@ export interface EthersModuleOptions extends Record<string, any> {
   bscscan?: string | undefined
   custom?: ConnectionInfo | string | (ConnectionInfo | string)[] | undefined
   quorum?: number | undefined
+  token?: string | undefined
   waitUntilIsConnected?: boolean | undefined
   useDefaultProvider?: boolean | undefined
 }
 
 export interface EthersModuleAsyncOptions extends Pick<ModuleMetadata, 'imports' | 'providers'> {
-  useFactory: (...args: any[]) => EthersModuleOptions | Promise<EthersModuleOptions>
+  token?: string | undefined
+  useFactory: (...args: any[]) => Omit<EthersModuleOptions, 'token'> | Promise<Omit<EthersModuleOptions, 'token'>>
   inject?: any[]
 }
 

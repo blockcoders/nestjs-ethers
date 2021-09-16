@@ -1,5 +1,5 @@
 export { EthersModule } from './ethers.module'
-export { InjectEthersProvider } from './ethers.decorators'
+export { InjectEthersProvider, InjectContractProvider, InjectSignerProvider } from './ethers.decorators'
 export {
   InfuraProviderOptions,
   PocketProviderOptions,
@@ -30,9 +30,9 @@ export {
   BINANCE_NETWORK,
   BINANCE_TESTNET_NETWORK,
 } from './ethers.constants'
-export { getEthersToken } from './ethers.utils'
+export { getEthersToken, getContractToken, getSigneroken } from './ethers.utils'
 export { EthersSigner } from './ethers.signer'
-export { SmartContract, EthersContract } from './ethers.contract'
+export { EthersContract } from './ethers.contract'
 export * from '@ethersproject/abi'
 export * from '@ethersproject/abstract-provider'
 export * from '@ethersproject/abstract-signer'

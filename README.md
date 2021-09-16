@@ -116,6 +116,13 @@ interface EthersModuleOptions {
    * EthersModule will use the FallbackProvider to send multiple requests simultaneously.
    */
   useDefaultProvider?: boolean;
+  
+  /**
+   * Optional parameter to associate a token name to EthersProvider,
+   * the token is used to request an instance of a class by the same name.
+   * This can be useful when you want multiple intances of EthersProvider.
+   */
+  token?: string;
 }
 ```
 
@@ -619,9 +626,189 @@ class TestService {
 }
 ```
 
+## Multichain mode
+
+You can use the `token` property to use multiple instances of Ethers. This can be helpful when you want to connect with more than an EVN compatible chain like `BSC`, `Polygon` or `Fantom`.
+
+If you know what you're doing, you can enable it like so:
+
+### Synchronous
+
+```ts
+import { Module, Controller, Get } from '@nestjs/common'
+import {
+  EthersModule,
+  InjectEthersProvider,
+  InjectEthersProvider,
+  InjectEthersProvider,
+  PocketProvider,
+  AlchemyProvider,
+  StaticJsonRpcProvider,
+  BigNumber,
+  RINKEBY_NETWORK,
+  MUMBAI_NETWORK,
+  BNB_TESTNET_NETWORK,
+} from 'nestjs-ethers';
+
+@Controller('/')
+class TestController {
+  constructor(
+    @InjectEthersProvider('eth')
+    private readonly pocketProvider: PocketProvider,
+    @InjectEthersProvider('poly')
+    private readonly alchemyProvider: AlchemyProvider,
+    @InjectEthersProvider('bsc')
+    private readonly customProvider: StaticJsonRpcProvider,
+  ) {}
+  @Get()
+  async get() {
+    const pocketGasPrice: BigNumber = await this.pocketProvider.getGasPrice()
+    const alchemyGasPrice: BigNumber = await this.alchemyProvider.getGasPrice()
+    const bscGasPrice: BigNumber = await this.customProvider.getGasPrice()
+
+    return {
+      pocketGasPrice: pocketGasPrice.toString(),
+      alchemyGasPrice: alchemyGasPrice.toString(),
+      bscGasPrice: bscGasPrice.toString(),
+    }
+  }
+}
+
+@Module({
+  imports: [
+    EthersModule.forRoot({
+      token: 'eth',
+      network: RINKEBY_NETWORK,
+      pocket: {
+        applicationId: '9b0afc55221c429104d04ef9',
+        applicationSecretKey: 'b5e6d6a55426712a42a93f39555973fc',
+      },
+      useDefaultProvider: false,
+    }),
+    EthersModule.forRoot({
+      token: 'poly',
+      network: MUMBAI_NETWORK,
+      alchemy: '845ce4ed0120d68eb5740c9160f08f98',
+      useDefaultProvider: false,
+    }),
+    EthersModule.forRoot({
+      token: 'bsc',
+      network: BNB_TESTNET_NETWORK,
+      custom: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+      useDefaultProvider: false,
+    }),
+  ],
+  controllers: [TestController],
+})
+class TestModule {}
+```
+
+### Asynchronous configuration
+
+```ts
+import { Module, Controller, Get } from '@nestjs/common'
+import {
+  EthersModule,
+  InjectEthersProvider,
+  InjectEthersProvider,
+  InjectEthersProvider,
+  PocketProvider,
+  AlchemyProvider,
+  StaticJsonRpcProvider,
+  BigNumber,
+  RINKEBY_NETWORK,
+  MUMBAI_NETWORK,
+  BNB_TESTNET_NETWORK,
+} from 'nestjs-ethers';
+
+@Controller('/')
+class TestController {
+  constructor(
+    @InjectEthersProvider('eth')
+    private readonly pocketProvider: PocketProvider,
+    @InjectEthersProvider('poly')
+    private readonly alchemyProvider: AlchemyProvider,
+    @InjectEthersProvider('bsc')
+    private readonly customProvider: StaticJsonRpcProvider,
+  ) {}
+  @Get()
+  async get() {
+    const pocketGasPrice: BigNumber = await this.pocketProvider.getGasPrice()
+    const alchemyGasPrice: BigNumber = await this.alchemyProvider.getGasPrice()
+    const bscGasPrice: BigNumber = await this.customProvider.getGasPrice()
+
+    return {
+      pocketGasPrice: pocketGasPrice.toString(),
+      alchemyGasPrice: alchemyGasPrice.toString(),
+      bscGasPrice: bscGasPrice.toString(),
+    }
+  }
+}
+
+@Injectable()
+class ConfigService {
+  public readonly applicationId: '9b0afc55221c429104d04ef9'
+  public readonly applicationSecretKey: 'b5e6d6a55426712a42a93f39555973fc'
+  public readonly alchemy: '845ce4ed0120d68eb5740c9160f08f98'
+  public readonly custom: 'https://data-seed-prebsc-1-s1.binance.org:8545'
+}
+
+@Module({
+  providers: [ConfigService],
+  exports: [ConfigService],
+})
+class ConfigModule {}
+
+@Module({
+  imports: [
+    EthersModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      token: 'eth',
+      useFactory: (config: ConfigService) => {
+        return {
+          network: RINKEBY_NETWORK,
+          pocket: {
+            applicationId: config.applicationId,
+            applicationSecretKey: config.applicationSecretKey,
+          },
+          useDefaultProvider: false,
+        }
+      },
+    }),
+    EthersModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      token: 'poly',
+      useFactory: (config: ConfigService) => {
+        return {
+          network: MUMBAI_NETWORK,
+          alchemy: config.alchemy,
+          useDefaultProvider: false,
+        }
+      },
+    }),
+    EthersModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      token: 'bsc',
+      useFactory: (config: ConfigService) => {
+        return {
+          network: BNB_TESTNET_NETWORK,
+          custom: config.custom,
+          useDefaultProvider: false,
+        }
+      },
+    }),
+  ],
+  controllers: [TestController],
+})
+class TestModule {}
+```
+
 ## Testing a class that uses @InjectEthersProvider
 
-This package exposes a getEthersToken() function that returns a prepared injection token based on the provided context. 
+This package exposes a getEthersToken(token?: string) function that returns a prepared injection token based on the provided context. 
 Using this token, you can easily provide a mock implementation of the `BaseProvider` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
 
 ```ts

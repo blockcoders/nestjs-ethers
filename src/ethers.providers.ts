@@ -21,15 +21,11 @@ import {
 import { Provider } from '@nestjs/common'
 import { ConnectionInfo } from 'ethers/lib/utils'
 import { defer, lastValueFrom } from 'rxjs'
-import {
-  ETHERS_MODULE_OPTIONS,
-  ETHERS_PROVIDER_NAME,
-  MAINNET_NETWORK,
-  BINANCE_NETWORK,
-  BINANCE_TESTNET_NETWORK,
-} from './ethers.constants'
+import { ETHERS_MODULE_OPTIONS, MAINNET_NETWORK, BINANCE_NETWORK, BINANCE_TESTNET_NETWORK } from './ethers.constants'
+import { EthersContract } from './ethers.contract'
 import { EthersModuleOptions, EthersModuleAsyncOptions } from './ethers.interface'
-import { getEthersToken } from './ethers.utils'
+import { EthersSigner } from './ethers.signer'
+import { getEthersToken, getContractToken, getSigneroken } from './ethers.utils'
 
 function validateBscNetwork(network: Networkish) {
   if (typeof network === 'number') {
@@ -154,16 +150,16 @@ export async function createBaseProvider(options: EthersModuleOptions): Promise<
 
 export function createEthersProvider(options: EthersModuleOptions): Provider {
   return {
-    provide: getEthersToken(),
+    provide: getEthersToken(options.token),
     useFactory: async (): Promise<BaseProvider | AbstractProvider> => {
       return await lastValueFrom(defer(() => createBaseProvider(options)))
     },
   }
 }
 
-export function createEthersAsyncProvider(): Provider {
+export function createEthersAsyncProvider(token?: string): Provider {
   return {
-    provide: getEthersToken(),
+    provide: getEthersToken(token),
     useFactory: async (options: EthersModuleOptions): Promise<BaseProvider | AbstractProvider> => {
       return await lastValueFrom(defer(() => createBaseProvider(options)))
     },
@@ -179,9 +175,22 @@ export function createAsyncOptionsProvider(options: EthersModuleAsyncOptions): P
   }
 }
 
-export function createProviderName(): Provider {
+export function createContractProvider(token?: string): Provider {
   return {
-    provide: ETHERS_PROVIDER_NAME,
-    useValue: getEthersToken(),
+    provide: getContractToken(token),
+    useFactory: async (provider: AbstractProvider): Promise<EthersContract> => {
+      return await lastValueFrom(defer(async () => new EthersContract(provider)))
+    },
+    inject: [getEthersToken(token)],
+  }
+}
+
+export function createSignerProvider(token?: string): Provider {
+  return {
+    provide: getSigneroken(token),
+    useFactory: async (provider: AbstractProvider): Promise<EthersSigner> => {
+      return await lastValueFrom(defer(async () => new EthersSigner(provider)))
+    },
+    inject: [getEthersToken(token)],
   }
 }

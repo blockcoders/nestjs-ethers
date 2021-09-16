@@ -1,62 +1,66 @@
-import { BaseProvider } from '@ethersproject/providers'
-import { DynamicModule, Global, Module, OnApplicationShutdown, Inject } from '@nestjs/common'
-import { ModuleRef } from '@nestjs/core'
-import { ETHERS_PROVIDER_NAME } from './ethers.constants'
+import { Provider as AbstractProvider } from '@ethersproject/providers'
+import { DynamicModule, Global, Module, OnApplicationShutdown } from '@nestjs/common'
+import { DiscoveryModule, DiscoveryService } from '@nestjs/core'
 import { EthersContract } from './ethers.contract'
 import { EthersModuleOptions, EthersModuleAsyncOptions } from './ethers.interface'
 import {
   createEthersProvider,
   createEthersAsyncProvider,
   createAsyncOptionsProvider,
-  createProviderName,
+  createContractProvider,
+  createSignerProvider,
 } from './ethers.providers'
 import { EthersSigner } from './ethers.signer'
 
 @Global()
-@Module({
-  providers: [EthersSigner, EthersContract],
-  exports: [EthersSigner, EthersContract],
-})
+@Module({})
 export class EthersCoreModule implements OnApplicationShutdown {
-  constructor(
-    @Inject(ETHERS_PROVIDER_NAME) private readonly providerName: string,
-    private readonly moduleRef: ModuleRef,
-  ) {}
+  constructor(private readonly discoveryService: DiscoveryService) {}
 
   static forRoot(options: EthersModuleOptions): DynamicModule {
     const ethersProvider = createEthersProvider(options)
+    const contractProvider = createContractProvider(options.token)
+    const signerProvider = createSignerProvider(options.token)
 
     return {
       module: EthersCoreModule,
-      providers: [EthersSigner, EthersContract, ethersProvider, createProviderName()],
-      exports: [EthersSigner, EthersContract, ethersProvider],
+      imports: [DiscoveryModule],
+      providers: [EthersSigner, EthersContract, ethersProvider, contractProvider, signerProvider],
+      exports: [EthersSigner, EthersContract, ethersProvider, contractProvider, signerProvider],
     }
   }
 
   static forRootAsync(options: EthersModuleAsyncOptions): DynamicModule {
-    const ethersProvider = createEthersAsyncProvider()
+    const ethersProvider = createEthersAsyncProvider(options.token)
     const asyncOptionsProvider = createAsyncOptionsProvider(options)
+    const contractProvider = createContractProvider(options.token)
+    const signerProvider = createSignerProvider(options.token)
 
     return {
       module: EthersCoreModule,
-      imports: options.imports,
+      imports: [DiscoveryModule, ...(options.imports || [])],
       providers: [
         EthersSigner,
         EthersContract,
         asyncOptionsProvider,
         ethersProvider,
-        createProviderName(),
+        contractProvider,
+        signerProvider,
         ...(options.providers || []),
       ],
-      exports: [EthersSigner, EthersContract, ethersProvider],
+      exports: [EthersSigner, EthersContract, ethersProvider, contractProvider, signerProvider],
     }
   }
 
   async onApplicationShutdown() {
-    const provider = this.moduleRef.get<BaseProvider>(this.providerName)
+    const providers = this.discoveryService.getProviders() ?? []
 
-    if (provider) {
-      provider.removeAllListeners()
-    }
+    providers.forEach((provider) => {
+      const { instance } = provider ?? {}
+
+      if (provider.isDependencyTreeStatic() && instance && instance instanceof AbstractProvider) {
+        instance.removeAllListeners()
+      }
+    })
   }
 }

@@ -16,11 +16,14 @@ import {
   FallbackProvider,
   StaticJsonRpcProvider,
   BNB_TESTNET_NETWORK,
+  MUMBAI_NETWORK,
+  PocketProvider,
+  AlchemyProvider,
 } from '../src'
 import {
-  RINKEBY_ALCHEMY_BASE_URL,
+  RINKEBY_ALCHEMY_URL,
   RINKEBY_ALCHEMY_API_KEY,
-  RINKEBY_ALCHEMY_POKT_URL,
+  RINKEBY_POCKET_URL,
   RINKEBY_POKT_API_KEY,
   RINKEBY_POKT_SECRET_KEY,
   RINKEBY_ETHERSCAN_URL,
@@ -39,6 +42,7 @@ import {
   CUSTOM_BSC_1_URL,
   CUSTOM_BSC_2_URL,
   CUSTOM_BSC_3_URL,
+  MUMBAI_ALCHEMY_URL,
 } from './utils/constants'
 import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
@@ -102,7 +106,7 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work with alchemy provider', async () => {
-          nock(RINKEBY_ALCHEMY_BASE_URL)
+          nock(RINKEBY_ALCHEMY_URL)
             .post(`/${RINKEBY_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
@@ -149,7 +153,7 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work with pocket provider', async () => {
-          nock(RINKEBY_ALCHEMY_POKT_URL)
+          nock(RINKEBY_POCKET_URL)
             .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
@@ -362,6 +366,394 @@ describe('Ethers Module Initialization', () => {
               expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
               expect(res.body.network).toHaveProperty('chainId', 1)
               expect(res.body.network).toHaveProperty('ensAddress')
+            })
+
+          await app.close()
+        })
+
+        it('should work with bscscan provider', async () => {
+          nock(TESTNET_BSCSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly bscProvider: BscscanProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: BINANCE_TESTNET_NETWORK,
+                bscscan: RINKEBY_ETHERSCAN_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should use the default bsc provider without community token', async () => {
+          nock(TESTNET_BSCSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly bscProvider: FallbackProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: BINANCE_TESTNET_NETWORK,
+                bscscan: RINKEBY_ETHERSCAN_API_KEY,
+                useDefaultProvider: true,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), {
+            logger: false,
+            abortOnError: false,
+          })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should use the default bsc provider', async () => {
+          nock(TESTNET_BSCSCAN_URL)
+            .get('')
+            .query({
+              ...ETHERSCAN_GET_GAS_PRICE_QUERY,
+              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+            })
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .get('')
+            .query({
+              ...ETHERSCAN_GET_BLOCK_NUMBER_QUERY,
+              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+            })
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly bscProvider: FallbackProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: BINANCE_TESTNET_NETWORK,
+                useDefaultProvider: true,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), {
+            logger: false,
+            abortOnError: false,
+          })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should throw an error if the network is different to Mainnet with Cloudflare', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: RINKEBY_NETWORK,
+                cloudflare: true,
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          await expect(
+            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
+          ).rejects.toThrow(Error)
+        })
+
+        it('should work with one custom provider', async () => {
+          nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly customProvider: StaticJsonRpcProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.customProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: BNB_TESTNET_NETWORK,
+                custom: CUSTOM_BSC_1_URL,
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should work with more than one custom provider', async () => {
+          nock(CUSTOM_BSC_1_URL)
+            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          nock(CUSTOM_BSC_2_URL)
+            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          nock(CUSTOM_BSC_3_URL)
+            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly customProvider: FallbackProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.customProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: BNB_TESTNET_NETWORK,
+                custom: [CUSTOM_BSC_1_URL, CUSTOM_BSC_2_URL, CUSTOM_BSC_3_URL],
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should work with multiple instances of ethers provider', async () => {
+          nock(RINKEBY_POCKET_URL)
+            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          nock(MUMBAI_ALCHEMY_URL)
+            .post(`/${RINKEBY_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider('eth')
+              private readonly pocketProvider: PocketProvider,
+              @InjectEthersProvider('poly')
+              private readonly alchemyProvider: AlchemyProvider,
+              @InjectEthersProvider('bsc')
+              private readonly customProvider: StaticJsonRpcProvider,
+            ) {}
+            @Get()
+            async get() {
+              const pocketGasPrice: BigNumber = await this.pocketProvider.getGasPrice()
+              const alchemyGasPrice: BigNumber = await this.alchemyProvider.getGasPrice()
+              const bscGasPrice: BigNumber = await this.customProvider.getGasPrice()
+
+              return {
+                pocketGasPrice: pocketGasPrice.toString(),
+                alchemyGasPrice: alchemyGasPrice.toString(),
+                bscGasPrice: bscGasPrice.toString(),
+              }
+            }
+          }
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                token: 'eth',
+                network: RINKEBY_NETWORK,
+                pocket: {
+                  applicationId: RINKEBY_POKT_API_KEY,
+                  applicationSecretKey: RINKEBY_POKT_SECRET_KEY,
+                },
+                useDefaultProvider: false,
+              }),
+              EthersModule.forRoot({
+                token: 'poly',
+                network: MUMBAI_NETWORK,
+                alchemy: RINKEBY_ALCHEMY_API_KEY,
+                useDefaultProvider: false,
+              }),
+              EthersModule.forRoot({
+                token: 'bsc',
+                network: BNB_TESTNET_NETWORK,
+                custom: CUSTOM_BSC_1_URL,
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), {
+            logger: false,
+            abortOnError: false,
+          })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('pocketGasPrice', '1000000000')
+              expect(res.body).toHaveProperty('alchemyGasPrice', '1000000000')
+              expect(res.body).toHaveProperty('bscGasPrice', '1000000000')
             })
 
           await app.close()
@@ -834,6 +1226,53 @@ describe('Ethers Module Initialization', () => {
           ).rejects.toThrow(Error)
         })
 
+        it('should not wait until providers are connected', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: FallbackProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+          @Module({
+            imports: [
+              EthersModule.forRootAsync({
+                useFactory: () => {
+                  return {
+                    waitUntilIsConnected: false,
+                  }
+                },
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.network).toBeDefined()
+              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
+              expect(res.body.network).toHaveProperty('chainId', 1)
+              expect(res.body.network).toHaveProperty('ensAddress')
+            })
+
+          await app.close()
+        })
+
         it('should work with bscscan provider', async () => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
@@ -916,14 +1355,9 @@ describe('Ethers Module Initialization', () => {
             ) {}
             @Get()
             async get() {
-              try {
-                const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
 
-                return { gasPrice: gasPrice.toString() }
-              } catch (error) {
-                console.error(error)
-                return { gasPrice: '' }
-              }
+              return { gasPrice: gasPrice.toString() }
             }
           }
 
@@ -999,14 +1433,9 @@ describe('Ethers Module Initialization', () => {
             ) {}
             @Get()
             async get() {
-              try {
-                const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
 
-                return { gasPrice: gasPrice.toString() }
-              } catch (error) {
-                console.error(error)
-                return { gasPrice: '' }
-              }
+              return { gasPrice: gasPrice.toString() }
             }
           }
 
@@ -1112,14 +1541,9 @@ describe('Ethers Module Initialization', () => {
             ) {}
             @Get()
             async get() {
-              try {
-                const gasPrice: BigNumber = await this.customProvider.getGasPrice()
+              const gasPrice: BigNumber = await this.customProvider.getGasPrice()
 
-                return { gasPrice: gasPrice.toString() }
-              } catch (error) {
-                console.error(error)
-                return { gasPrice: '' }
-              }
+              return { gasPrice: gasPrice.toString() }
             }
           }
 
@@ -1195,14 +1619,9 @@ describe('Ethers Module Initialization', () => {
             ) {}
             @Get()
             async get() {
-              try {
-                const gasPrice: BigNumber = await this.customProvider.getGasPrice()
+              const gasPrice: BigNumber = await this.customProvider.getGasPrice()
 
-                return { gasPrice: gasPrice.toString() }
-              } catch (error) {
-                console.error(error)
-                return { gasPrice: '' }
-              }
+              return { gasPrice: gasPrice.toString() }
             }
           }
 
@@ -1246,6 +1665,123 @@ describe('Ethers Module Initialization', () => {
             .expect((res) => {
               expect(res.body).toBeDefined()
               expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should work with multiple instances of ethers provider', async () => {
+          nock(RINKEBY_POCKET_URL)
+            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          nock(MUMBAI_ALCHEMY_URL)
+            .post(`/${RINKEBY_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider('eth')
+              private readonly pocketProvider: PocketProvider,
+              @InjectEthersProvider('poly')
+              private readonly alchemyProvider: AlchemyProvider,
+              @InjectEthersProvider('bsc')
+              private readonly customProvider: StaticJsonRpcProvider,
+            ) {}
+            @Get()
+            async get() {
+              const pocketGasPrice: BigNumber = await this.pocketProvider.getGasPrice()
+              const alchemyGasPrice: BigNumber = await this.alchemyProvider.getGasPrice()
+              const bscGasPrice: BigNumber = await this.customProvider.getGasPrice()
+
+              return {
+                pocketGasPrice: pocketGasPrice.toString(),
+                alchemyGasPrice: alchemyGasPrice.toString(),
+                bscGasPrice: bscGasPrice.toString(),
+              }
+            }
+          }
+
+          @Injectable()
+          class ConfigService {
+            public readonly applicationId = RINKEBY_POKT_API_KEY
+            public readonly applicationSecretKey = RINKEBY_POKT_SECRET_KEY
+            public readonly alchemy = RINKEBY_ALCHEMY_API_KEY
+            public readonly custom = CUSTOM_BSC_1_URL
+          }
+
+          @Module({
+            providers: [ConfigService],
+            exports: [ConfigService],
+          })
+          class ConfigModule {}
+
+          @Module({
+            imports: [
+              EthersModule.forRootAsync({
+                imports: [ConfigModule],
+                inject: [ConfigService],
+                token: 'eth',
+                useFactory: (config: ConfigService) => {
+                  return {
+                    network: RINKEBY_NETWORK,
+                    pocket: {
+                      applicationId: config.applicationId,
+                      applicationSecretKey: config.applicationSecretKey,
+                    },
+                    useDefaultProvider: false,
+                  }
+                },
+              }),
+              EthersModule.forRootAsync({
+                imports: [ConfigModule],
+                inject: [ConfigService],
+                token: 'poly',
+                useFactory: (config: ConfigService) => {
+                  return {
+                    network: MUMBAI_NETWORK,
+                    alchemy: config.alchemy,
+                    useDefaultProvider: false,
+                  }
+                },
+              }),
+              EthersModule.forRootAsync({
+                imports: [ConfigModule],
+                inject: [ConfigService],
+                token: 'bsc',
+                useFactory: (config: ConfigService) => {
+                  return {
+                    network: BNB_TESTNET_NETWORK,
+                    custom: config.custom,
+                    useDefaultProvider: false,
+                  }
+                },
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), {
+            logger: false,
+            abortOnError: false,
+          })
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('pocketGasPrice', '1000000000')
+              expect(res.body).toHaveProperty('alchemyGasPrice', '1000000000')
+              expect(res.body).toHaveProperty('bscGasPrice', '1000000000')
             })
 
           await app.close()
