@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+Published by **[jarcodallo](https://github.com/jarcodallo)** on **2022/01/15**
+- [#129](https://github.com/jarcodallo/nestjs-ethers/pull/129) Update dependencies
+
 ## 1.0.0
 Published by **[jarcodallo](https://github.com/jarcodallo)** on **2021/09/16**
 - [#129](https://github.com/jarcodallo/nestjs-ethers/pull/129) Add module context token
