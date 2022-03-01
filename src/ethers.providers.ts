@@ -25,7 +25,7 @@ import { ETHERS_MODULE_OPTIONS, MAINNET_NETWORK, BINANCE_NETWORK, BINANCE_TESTNE
 import { EthersContract } from './ethers.contract'
 import { EthersModuleOptions, EthersModuleAsyncOptions } from './ethers.interface'
 import { EthersSigner } from './ethers.signer'
-import { getEthersToken, getContractToken, getSigneroken } from './ethers.utils'
+import { getEthersToken, getContractToken, getSignerToken } from './ethers.utils'
 
 function validateBscNetwork(network: Networkish) {
   if (typeof network === 'number') {
@@ -187,7 +187,7 @@ export function createContractProvider(token?: string): Provider {
 
 export function createSignerProvider(token?: string): Provider {
   return {
-    provide: getSigneroken(token),
+    provide: getSignerToken(token),
     useFactory: async (provider: AbstractProvider): Promise<EthersSigner> => {
       return await lastValueFrom(defer(async () => new EthersSigner(provider)))
     },

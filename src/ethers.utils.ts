@@ -8,6 +8,6 @@ export function getContractToken(token?: string): string {
   return `${DECORATED_PREFIX}:Contract:${token || DEFAULT_TOKEN}`
 }
 
-export function getSigneroken(token?: string): string {
+export function getSignerToken(token?: string): string {
   return `${DECORATED_PREFIX}:Signer:${token || DEFAULT_TOKEN}`
 }
