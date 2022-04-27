@@ -30,7 +30,7 @@ export {
   BINANCE_NETWORK,
   BINANCE_TESTNET_NETWORK,
 } from './ethers.constants'
-export { getEthersToken, getContractToken, getSigneroken } from './ethers.utils'
+export { getEthersToken, getContractToken, getSignerToken } from './ethers.utils'
 export { EthersSigner } from './ethers.signer'
 export { EthersContract } from './ethers.contract'
 export * from '@ethersproject/abi'
