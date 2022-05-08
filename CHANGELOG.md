@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2
+Published by **[blockcoders](https://github.com/blockcoders)** on **2022/05/08**
+- [#137](https://github.com/blockcoders/nestjs-ethers/pull/137) Update dependencies
+- [#135](https://github.com/blockcoders/nestjs-ethers/pull/135) Fix typo getSigneroken to getSignerToken by [@hanchchch](https://github.com/hanchchch)
+
 ## 1.0.1
 Published by **[blockcoders](https://github.com/blockcoders)** on **2022/01/15**
 - [#133](https://github.com/blockcoders/nestjs-ethers/pull/133) Update dependencies
