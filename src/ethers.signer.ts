@@ -24,7 +24,7 @@ export class EthersSigner {
     return wallet.connect(this.provider)
   }
 
-  async createWalletfromEncryptedJson(
+  async createWalletFromEncryptedJson(
     jsonString: string,
     password: BytesLike,
     progressCallback?: ProgressCallback,
