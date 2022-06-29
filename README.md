@@ -512,7 +512,7 @@ export class TestService {
     private readonly signer: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: Wallet = this.ethersSigner.createWalletfromEncryptedJson(
+    const wallet: Wallet = this.ethersSigner.createWalletFromEncryptedJson(
       {
         address: '012363d61bdc53d0290a0f25e9c89f8257550fb8',
         id: '5ba8719b-faf9-49ec-8bca-21522e3d56dc',
@@ -604,7 +604,7 @@ import * as ABI from './utils/ABI.json';
 class TestService {
   constructor(
     @InjectContractProvider()
-    private readonly contract: EthersContract,
+    private readonly ethersContract: EthersContract,
   ) {}
   async someMethod(): Promise<Network> {
     const contract: Contract = this.ethersContract.create(
@@ -635,7 +635,7 @@ import * as ABI from './utils/ABI.json';
 class TestService {
   constructor(
     @InjectContractProvider()
-    private readonly contract: EthersContract,
+    private readonly ethersContract: EthersContract,
     @InjectSignerProvider()
     private readonly signer: EthersSigner,
   ) {}
