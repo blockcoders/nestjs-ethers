@@ -851,6 +851,40 @@ Using this token, you can easily provide a mock implementation of the `BaseProvi
   }).compile();
 ```
 
+## Testing a class that uses @InjectContractProvider
+
+This package exposes a getContractToken(token?: string) function that returns a prepared injection token based on the contract provided context. 
+Using this token, you can easily provide a mock implementation of the `ethers.Contract` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
+
+```ts
+  const module: TestingModule = await Test.createTestingModule({
+    providers: [
+      MyService,
+      {
+        provide: getContractToken(MyService.name),
+        useValue: mockContractProvider,
+      },
+    ],
+  }).compile();
+```
+
+## Testing a class that uses @InjectSignerProvider
+
+This package exposes a getSignerToken(token?: string) function that returns a prepared injection token based on the signer provided context. 
+Using this token, you can easily provide a mock implementation of the `ethers.Signer` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
+
+```ts
+  const module: TestingModule = await Test.createTestingModule({
+    providers: [
+      MyService,
+      {
+        provide: getSignerToken(MyService.name),
+        useValue: mockSignerProvider,
+      },
+    ],
+  }).compile();
+```
+
 ## Migration
 
 ### v1

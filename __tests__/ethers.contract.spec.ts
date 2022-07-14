@@ -1,17 +1,11 @@
+import { Contract } from '@ethersproject/contracts'
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
 import * as request from 'supertest'
-import {
-  EthersModule,
-  EthersContract,
-  Contract,
-  EthersSigner,
-  InjectContractProvider,
-  InjectSignerProvider,
-} from '../src'
+import { EthersModule, EthersContract, EthersSigner, InjectContractProvider, InjectSignerProvider } from '../src'
 import * as ABI from './utils/ABI.json'
-import { ETHERS_ADDRESS, ETHERS_PRIVATE_KEY } from './utils/constants'
+import { ETHERS_ADDRESS, ETHERS_PRIVATE_KEY, NEST_APP_OPTIONS } from './utils/constants'
 import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
 
@@ -70,7 +64,7 @@ describe('EthersContract', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -128,7 +122,7 @@ describe('EthersContract', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -189,7 +183,7 @@ describe('EthersContract', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -255,7 +249,7 @@ describe('EthersContract', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
