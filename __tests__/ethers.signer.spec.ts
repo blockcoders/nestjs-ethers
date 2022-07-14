@@ -9,6 +9,7 @@ import {
   ETHERS_MNEMONIC,
   ETHERS_JSON_WALLET_PASSWORD,
   ETHERS_JSON_WALLET,
+  NEST_APP_OPTIONS,
 } from './utils/constants'
 import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
@@ -68,7 +69,7 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -119,7 +120,7 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -173,7 +174,7 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -224,7 +225,7 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -275,7 +276,7 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -336,7 +337,7 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -395,7 +396,7 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -457,7 +458,7 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -516,7 +517,7 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -575,7 +576,7 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()

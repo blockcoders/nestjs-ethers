@@ -1,5 +1,13 @@
 // import { randomBytes } from 'crypto';
 import { BigNumber } from '@ethersproject/bignumber'
+import { Network } from '@ethersproject/networks'
+import {
+  BaseProvider,
+  FallbackProvider,
+  StaticJsonRpcProvider,
+  PocketProvider,
+  AlchemyProvider,
+} from '@ethersproject/providers'
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
@@ -7,18 +15,13 @@ import * as request from 'supertest'
 import {
   EthersModule,
   InjectEthersProvider,
-  BaseProvider,
   MAINNET_NETWORK,
   RINKEBY_NETWORK,
-  BINANCE_TESTNET_NETWORK,
-  Network,
   BscscanProvider,
-  FallbackProvider,
-  StaticJsonRpcProvider,
-  BNB_TESTNET_NETWORK,
+  BINANCE_TESTNET_NETWORK,
   MUMBAI_NETWORK,
-  PocketProvider,
-  AlchemyProvider,
+  BSCSCAN_DEFAULT_API_KEY,
+  BINANCE_POCKET_DEFAULT_APP_ID,
 } from '../src'
 import {
   RINKEBY_ALCHEMY_URL,
@@ -43,6 +46,8 @@ import {
   CUSTOM_BSC_2_URL,
   CUSTOM_BSC_3_URL,
   MUMBAI_ALCHEMY_URL,
+  NEST_APP_OPTIONS,
+  TESTNET_BSCPOCKET_URL,
 } from './utils/constants'
 import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
@@ -86,7 +91,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -135,7 +140,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -185,7 +190,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -222,7 +227,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -261,7 +266,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -352,7 +357,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -403,7 +408,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -420,13 +425,19 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should use the default bsc provider without community token', async () => {
+        it('should use the default binance providers without community token', async () => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
             .get('')
             .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          nock(TESTNET_BSCPOCKET_URL)
+            .post(`/${RINKEBY_POKT_API_KEY}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
           @Controller('/')
@@ -448,6 +459,7 @@ describe('Ethers Module Initialization', () => {
               EthersModule.forRoot({
                 network: BINANCE_TESTNET_NETWORK,
                 bscscan: RINKEBY_ETHERSCAN_API_KEY,
+                pocket: RINKEBY_POKT_API_KEY,
                 useDefaultProvider: true,
               }),
             ],
@@ -475,19 +487,25 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should use the default bsc provider', async () => {
+        it('should use the default binance providers', async () => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query({
               ...ETHERSCAN_GET_GAS_PRICE_QUERY,
-              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+              apikey: BSCSCAN_DEFAULT_API_KEY,
             })
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
             .get('')
             .query({
               ...ETHERSCAN_GET_BLOCK_NUMBER_QUERY,
-              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+              apikey: BSCSCAN_DEFAULT_API_KEY,
             })
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          nock(TESTNET_BSCPOCKET_URL)
+            .post(`/${BINANCE_POCKET_DEFAULT_APP_ID}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .post(`/${BINANCE_POCKET_DEFAULT_APP_ID}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
           @Controller('/')
@@ -587,7 +605,7 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: BNB_TESTNET_NETWORK,
+                network: BINANCE_TESTNET_NETWORK,
                 custom: CUSTOM_BSC_1_URL,
                 useDefaultProvider: false,
               }),
@@ -596,7 +614,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -649,7 +667,7 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: BNB_TESTNET_NETWORK,
+                network: BINANCE_TESTNET_NETWORK,
                 custom: [CUSTOM_BSC_1_URL, CUSTOM_BSC_2_URL, CUSTOM_BSC_3_URL],
                 useDefaultProvider: false,
               }),
@@ -658,7 +676,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -675,7 +693,7 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should work with multiple instances of ethers provider', async () => {
+        it.only('should work with multiple instances of ethers provider', async () => {
           nock(RINKEBY_POCKET_URL)
             .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -698,15 +716,21 @@ describe('Ethers Module Initialization', () => {
             ) {}
             @Get()
             async get() {
-              const pocketGasPrice: BigNumber = await this.pocketProvider.getGasPrice()
-              const alchemyGasPrice: BigNumber = await this.alchemyProvider.getGasPrice()
-              const bscGasPrice: BigNumber = await this.customProvider.getGasPrice()
+              try {
+                const pocketGasPrice: BigNumber = await this.pocketProvider.getGasPrice()
+                const alchemyGasPrice: BigNumber = await this.alchemyProvider.getGasPrice()
+                const bscGasPrice: BigNumber = await this.customProvider.getGasPrice()
 
-              return {
-                pocketGasPrice: pocketGasPrice.toString(),
-                alchemyGasPrice: alchemyGasPrice.toString(),
-                bscGasPrice: bscGasPrice.toString(),
+                return {
+                  pocketGasPrice: pocketGasPrice.toString(),
+                  alchemyGasPrice: alchemyGasPrice.toString(),
+                  bscGasPrice: bscGasPrice.toString(),
+                }
+              } catch (error) {
+                console.error(error)
               }
+
+              return {}
             }
           }
           @Module({
@@ -728,7 +752,7 @@ describe('Ethers Module Initialization', () => {
               }),
               EthersModule.forRoot({
                 token: 'bsc',
-                network: BNB_TESTNET_NETWORK,
+                network: BINANCE_TESTNET_NETWORK,
                 custom: CUSTOM_BSC_1_URL,
                 useDefaultProvider: false,
               }),
@@ -809,7 +833,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -871,7 +895,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -934,7 +958,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1019,7 +1043,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1071,7 +1095,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1125,7 +1149,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1254,7 +1278,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1321,7 +1345,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1338,13 +1362,19 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should use the default bsc provider without community token', async () => {
+        it('should use the default binance providers without community token', async () => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
             .get('')
             .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          nock(TESTNET_BSCPOCKET_URL)
+            .post(`/${RINKEBY_POKT_API_KEY}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
           @Controller('/')
@@ -1364,6 +1394,7 @@ describe('Ethers Module Initialization', () => {
           @Injectable()
           class ConfigService {
             public readonly bscscan = RINKEBY_ETHERSCAN_API_KEY
+            public readonly pocket = RINKEBY_POKT_API_KEY
             public readonly useDefaultProvider = true
           }
 
@@ -1380,6 +1411,7 @@ describe('Ethers Module Initialization', () => {
                 useFactory: (config: ConfigService) => {
                   return {
                     network: BINANCE_TESTNET_NETWORK,
+                    pocket: config.pocket,
                     bscscan: config.bscscan,
                     useDefaultProvider: config.useDefaultProvider,
                   }
@@ -1410,18 +1442,18 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should use the default bsc provider', async () => {
+        it('should use the default binance providers', async () => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query({
               ...ETHERSCAN_GET_GAS_PRICE_QUERY,
-              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+              apikey: BSCSCAN_DEFAULT_API_KEY,
             })
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
             .get('')
             .query({
               ...ETHERSCAN_GET_BLOCK_NUMBER_QUERY,
-              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+              apikey: BSCSCAN_DEFAULT_API_KEY,
             })
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
@@ -1564,7 +1596,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: BNB_TESTNET_NETWORK,
+                    network: BINANCE_TESTNET_NETWORK,
                     custom: config.custom,
                     useDefaultProvider: false,
                   }
@@ -1575,7 +1607,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1642,7 +1674,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: BNB_TESTNET_NETWORK,
+                    network: BINANCE_TESTNET_NETWORK,
                     custom: config.custom,
                     useDefaultProvider: false,
                   }
@@ -1653,7 +1685,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1754,7 +1786,7 @@ describe('Ethers Module Initialization', () => {
                 token: 'bsc',
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: BNB_TESTNET_NETWORK,
+                    network: BINANCE_TESTNET_NETWORK,
                     custom: config.custom,
                     useDefaultProvider: false,
                   }

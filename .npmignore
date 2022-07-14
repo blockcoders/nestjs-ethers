@@ -1,5 +1,6 @@
 __tests__/
 .github/
+.circleci/
 coverage/
 *.tsbuildinfo
 *.js.map

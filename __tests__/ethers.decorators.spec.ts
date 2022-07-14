@@ -1,3 +1,6 @@
+import { Contract } from '@ethersproject/contracts'
+import { Network } from '@ethersproject/networks'
+import { BaseProvider } from '@ethersproject/providers'
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
@@ -7,15 +10,12 @@ import {
   InjectEthersProvider,
   InjectContractProvider,
   InjectSignerProvider,
-  BaseProvider,
-  Network,
   MAINNET_NETWORK,
   EthersContract,
   EthersSigner,
-  Contract,
 } from '../src'
 import * as ABI from './utils/ABI.json'
-import { ETHERS_ADDRESS } from './utils/constants'
+import { ETHERS_ADDRESS, NEST_APP_OPTIONS } from './utils/constants'
 import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
 
@@ -68,7 +68,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -107,7 +107,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -157,7 +157,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -193,7 +193,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -240,7 +240,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -276,7 +276,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -331,7 +331,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -378,7 +378,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -436,7 +436,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -480,7 +480,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -535,7 +535,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -579,7 +579,7 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
