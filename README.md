@@ -472,7 +472,7 @@ export class TestService {
     private readonly signer: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: Wallet = this.ethersSigner.createWallet(
+    const wallet: Wallet = this.signer.createWallet(
       '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
     );
 
@@ -493,7 +493,7 @@ export class TestService {
     private readonly signer: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: Wallet = this.ethersSigner.createRandomWallet();
+    const wallet: Wallet = this.signer.createRandomWallet();
 
     return wallet.getAddress();
   }
@@ -512,7 +512,7 @@ export class TestService {
     private readonly signer: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: Wallet = this.ethersSigner.createWalletFromEncryptedJson(
+    const wallet: Wallet = this.signer.createWalletFromEncryptedJson(
       {
         address: '012363d61bdc53d0290a0f25e9c89f8257550fb8',
         id: '5ba8719b-faf9-49ec-8bca-21522e3d56dc',
@@ -560,7 +560,7 @@ export class TestService {
     private readonly signer: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: Wallet = this.ethersSigner.createWalletfromMnemonic(
+    const wallet: Wallet = this.signer.createWalletfromMnemonic(
       'service basket parent alcohol fault similar survey twelve hockey cloud walk panel'
     );
 
@@ -581,7 +581,7 @@ export class TestService {
     private readonly signer: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: VoidSigner = this.ethersSigner.createVoidSigner(
+    const wallet: VoidSigner = this.signer.createVoidSigner(
       '0x012363d61bdc53d0290a0f25e9c89f8257550fb8'
     );
 
@@ -640,7 +640,7 @@ class TestService {
     private readonly signer: EthersSigner,
   ) {}
   async someMethod(): Promise<Network> {
-    const wallet: Wallet = this.ethersSigner.createWallet(
+    const wallet: Wallet = this.signer.createWallet(
       '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
     );
     const contract: Contract = this.ethersContract.create(
@@ -874,7 +874,7 @@ import { EthersSigner, WalletSigner } from 'nestjs-ethers';
 export class TestService {
   constructor(private readonly ethersSigner: EthersSigner) {}
   async someMethod(): Promise<string> {
-    const wallet: WalletSigner = this.ethersSigner.createWallet(
+    const wallet: WalletSigner = this.signer.createWallet(
       '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
     );
 
@@ -892,7 +892,8 @@ export class TestService {
     private readonly signer: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: Wallet = this.ethersSigner.createWallet(
+    const wallet: Wallet = this.signer
+    .createWallet(
       '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
     );
 
