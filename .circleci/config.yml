@@ -6,7 +6,7 @@ orbs:
   # The Node.js orb contains a set of prepackaged CircleCI configuration you can utilize
   # Orbs reduce the amount of configuration required for common tasks. 
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/node
-  node: circleci/node@5.0.0
+  node: circleci/node@5.0.3
   coveralls: coveralls/coveralls@1.0.6
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
       node-version:
         type: string
     docker:
-      - image: circleci/node:<< parameters.node-version >>
+      - image: cimg/node:<< parameters.node-version >>
     resource_class: small
     steps:
       - checkout
@@ -50,4 +50,4 @@ workflows:
       - test:
           matrix:
             parameters:
-              node-version: ['16.13', '14.18', '12.22']
+              node-version: ['18.12', '16.18', '14.21']

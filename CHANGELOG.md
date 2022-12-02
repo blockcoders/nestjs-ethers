@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.0
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/01/15**
+
+## 1.0.3
+Published by **[blockcoders](https://github.com/blockcoders)** on **2022/05/08**
+- [#140](https://github.com/blockcoders/nestjs-ethers/pull/140) Update dependencies
+- [#139](https://github.com/blockcoders/nestjs-ethers/pull/139) Fix: Function name createWalletFromEncryptedJson by [@GustavoRSSilva](https://github.com/GustavoRSSilva)
+- [#138](https://github.com/blockcoders/nestjs-ethers/pull/138) Fix: README injected variable ethersContract by [@GustavoRSSilva](https://github.com/GustavoRSSilva)
+
 ## 1.0.2
 Published by **[blockcoders](https://github.com/blockcoders)** on **2022/05/08**
 - [#137](https://github.com/blockcoders/nestjs-ethers/pull/137) Update dependencies

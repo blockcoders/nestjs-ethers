@@ -469,7 +469,7 @@ import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
 export class TestService {
   constructor(
     @InjectSignerProvider()
-    private readonly signer: EthersSigner,
+    private readonly ethersSigner: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
     const wallet: Wallet = this.ethersSigner.createWallet(
@@ -490,7 +490,7 @@ import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
 export class TestService {
   constructor(
     @InjectSignerProvider()
-    private readonly signer: EthersSigner,
+    private readonly ethersSigner: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
     const wallet: Wallet = this.ethersSigner.createRandomWallet();
@@ -509,10 +509,10 @@ import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
 export class TestService {
   constructor(
     @InjectSignerProvider()
-    private readonly signer: EthersSigner,
+    private readonly ethersSigner: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: Wallet = this.ethersSigner.createWalletfromEncryptedJson(
+    const wallet: Wallet = this.ethersSigner.createWalletFromEncryptedJson(
       {
         address: '012363d61bdc53d0290a0f25e9c89f8257550fb8',
         id: '5ba8719b-faf9-49ec-8bca-21522e3d56dc',
@@ -557,7 +557,7 @@ import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
 export class TestService {
   constructor(
     @InjectSignerProvider()
-    private readonly signer: EthersSigner,
+    private readonly ethersSigner: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
     const wallet: Wallet = this.ethersSigner.createWalletfromMnemonic(
@@ -578,7 +578,7 @@ import { EthersSigner, InjectSignerProvider, VoidSigner } from 'nestjs-ethers';
 export class TestService {
   constructor(
     @InjectSignerProvider()
-    private readonly signer: EthersSigner,
+    private readonly ethersSigner: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
     const wallet: VoidSigner = this.ethersSigner.createVoidSigner(
@@ -604,7 +604,7 @@ import * as ABI from './utils/ABI.json';
 class TestService {
   constructor(
     @InjectContractProvider()
-    private readonly contract: EthersContract,
+    private readonly ethersContract: EthersContract,
   ) {}
   async someMethod(): Promise<Network> {
     const contract: Contract = this.ethersContract.create(
@@ -635,9 +635,9 @@ import * as ABI from './utils/ABI.json';
 class TestService {
   constructor(
     @InjectContractProvider()
-    private readonly contract: EthersContract,
+    private readonly ethersContract: EthersContract,
     @InjectSignerProvider()
-    private readonly signer: EthersSigner,
+    private readonly ethersSigner: EthersSigner,
   ) {}
   async someMethod(): Promise<Network> {
     const wallet: Wallet = this.ethersSigner.createWallet(
@@ -923,10 +923,11 @@ import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
 export class TestService {
   constructor(
     @InjectSignerProvider()
-    private readonly signer: EthersSigner,
+    private readonly ethersSigner: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: Wallet = this.ethersSigner.createWallet(
+    const wallet: Wallet = this.ethersSigner
+    .createWallet(
       '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
     );
 

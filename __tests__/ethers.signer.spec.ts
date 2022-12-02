@@ -143,7 +143,7 @@ describe('EthersSigner', () => {
               private readonly signer: EthersSigner,
             ) {}
             async someMethod(): Promise<string> {
-              const wallet = await this.signer.createWalletfromEncryptedJson(
+              const wallet = await this.signer.createWalletFromEncryptedJson(
                 ETHERS_JSON_WALLET,
                 ETHERS_JSON_WALLET_PASSWORD,
               )
@@ -419,7 +419,7 @@ describe('EthersSigner', () => {
               private readonly signer: EthersSigner,
             ) {}
             async someMethod(): Promise<string> {
-              const wallet = await this.signer.createWalletfromEncryptedJson(
+              const wallet = await this.signer.createWalletFromEncryptedJson(
                 ETHERS_JSON_WALLET,
                 ETHERS_JSON_WALLET_PASSWORD,
               )
