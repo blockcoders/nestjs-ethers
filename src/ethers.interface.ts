@@ -21,36 +21,31 @@ export interface MoralisProviderOptions {
   region?: string
 }
 
-export interface BaseModuleOptions {
-  network?: Networkish | undefined
-  custom?: ConnectionInfo | string | (ConnectionInfo | string)[] | undefined
-  quorum?: number | undefined
-  token?: string | undefined
-  waitUntilIsConnected?: boolean | undefined
-  useDefaultProvider?: boolean | undefined
+export interface AnkrProviderOptions {
+  apiKey?: string
+  projectSecret?: string
 }
 
-export interface EthereumModuleOptions extends BaseModuleOptions {
+export interface ProviderOptions {
   alchemy?: string | undefined
   etherscan?: string | undefined
+  bscscan?: string | undefined
   cloudflare?: boolean | undefined
   infura?: InfuraProviderOptions | string | undefined
   pocket?: PocketProviderOptions | string | undefined
   moralis?: MoralisProviderOptions | undefined
+  ankr?: AnkrProviderOptions | string | undefined
+  nodesmith?: string | undefined
+  custom?: ConnectionInfo | string | (ConnectionInfo | string)[] | undefined
+  quorum?: number | undefined
 }
 
-export interface BinanceModuleOptions extends BaseModuleOptions {
-  bscscan?: string | undefined
-  pocket?: PocketProviderOptions | string | undefined
-  moralis?: MoralisProviderOptions | undefined
+export interface EthersModuleOptions extends ProviderOptions {
+  network?: Networkish | undefined
+  token?: string | undefined
+  waitUntilIsConnected?: boolean | undefined
+  useDefaultProvider?: boolean | undefined
 }
-
-export interface MaticModuleOptions extends BaseModuleOptions {
-  alchemy?: string | undefined
-  infura?: InfuraProviderOptions | string | undefined
-}
-
-export type EthersModuleOptions = EthereumModuleOptions | BinanceModuleOptions | MaticModuleOptions
 
 export interface EthersModuleAsyncOptions extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   token?: string | undefined

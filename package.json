@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "engineStrict": false,
   "engines": {
-    "node": "^12.x || >=14.x || >=16.x"
+    "node": "^14.x || >=16.x || >=18.x"
   },
   "scripts": {
     "build": "rm -rf ./dist && tsc --p tsconfig.build.json",
@@ -45,6 +45,7 @@
   "bugs": "https://github.com/blockcoders/nestjs-ethers/issues",
   "devDependencies": {
     "@ethersproject/abstract-signer": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/contracts": "^5.7.0",
     "@ethersproject/json-wallets": "^5.7.0",
@@ -60,14 +61,14 @@
     "@nestjs/platform-fastify": "^9.2.1",
     "@nestjs/testing": "^9.2.1",
     "@types/express": "^4.17.14",
-    "@types/jest": "^29.2.3",
+    "@types/jest": "^29.2.4",
     "@types/node": "^18.11.10",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "axios": ">=1.2.0",
     "coveralls": "^3.1.1",
-    "eslint": "^8.28.0",
+    "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -76,8 +77,8 @@
     "pre-commit": "^1.2.2",
     "prettier": "^2.8.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.5.7",
-    "supertest": "^6.3.1",
+    "rxjs": "^7.6.0",
+    "supertest": "^6.3.2",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
     "tsc-watch": "^5.0.3",
@@ -114,8 +115,8 @@
     "testEnvironment": "node"
   },
   "peerDependencies": {
-    "@nestjs/common": "^8.0.0",
     "@ethersproject/abstract-signer": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/contracts": "^5.7.0",
     "@ethersproject/json-wallets": "^5.7.0",
@@ -124,6 +125,7 @@
     "@ethersproject/signing-key": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
     "@ethersproject/web": "^5.7.1",
-    "@ethersproject/wordlists": "^5.7.0"
+    "@ethersproject/wordlists": "^5.7.0",
+    "@nestjs/common": "^8.0.0"
   }
 }

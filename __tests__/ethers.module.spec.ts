@@ -16,7 +16,7 @@ import {
   EthersModule,
   InjectEthersProvider,
   MAINNET_NETWORK,
-  RINKEBY_NETWORK,
+  GOERLI_NETWORK,
   BscscanProvider,
   BINANCE_TESTNET_NETWORK,
   MUMBAI_NETWORK,
@@ -24,17 +24,17 @@ import {
   BINANCE_POCKET_DEFAULT_APP_ID,
 } from '../src'
 import {
-  RINKEBY_ALCHEMY_URL,
-  RINKEBY_ALCHEMY_API_KEY,
-  RINKEBY_POCKET_URL,
-  RINKEBY_POKT_API_KEY,
-  RINKEBY_POKT_SECRET_KEY,
-  RINKEBY_ETHERSCAN_URL,
-  RINKEBY_ETHERSCAN_API_KEY,
-  RINKEBY_INFURA_URL,
+  GOERLI_ALCHEMY_URL,
+  GOERLI_ALCHEMY_API_KEY,
+  GOERLI_POCKET_URL,
+  GOERLI_POKT_API_KEY,
+  GOERLI_POKT_SECRET_KEY,
+  GOERLI_ETHERSCAN_URL,
+  GOERLI_ETHERSCAN_API_KEY,
+  GOERLI_INFURA_URL,
   CLOUDFLARE_URL,
-  RINKEBY_INFURA_PROJECT_ID,
-  RINKEBY_INFURA_PROJECT_SECRET,
+  GOERLI_INFURA_PROJECT_ID,
+  GOERLI_INFURA_PROJECT_SECRET,
   ETHERSCAN_GET_GAS_PRICE_QUERY,
   PROVIDER_GET_GAS_PRICE_BODY,
   PROVIDER_GET_GAS_PRICE_RESPONSE,
@@ -111,8 +111,8 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work with alchemy provider', async () => {
-          nock(RINKEBY_ALCHEMY_URL)
-            .post(`/${RINKEBY_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+          nock(GOERLI_ALCHEMY_URL)
+            .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -131,8 +131,8 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: RINKEBY_NETWORK,
-                alchemy: RINKEBY_ALCHEMY_API_KEY,
+                network: GOERLI_NETWORK,
+                alchemy: GOERLI_ALCHEMY_API_KEY,
                 useDefaultProvider: false,
               }),
             ],
@@ -158,8 +158,8 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work with pocket provider', async () => {
-          nock(RINKEBY_POCKET_URL)
-            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+          nock(GOERLI_POCKET_URL)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -178,10 +178,10 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: RINKEBY_NETWORK,
+                network: GOERLI_NETWORK,
                 pocket: {
-                  applicationId: RINKEBY_POKT_API_KEY,
-                  applicationSecretKey: RINKEBY_POKT_SECRET_KEY,
+                  applicationId: GOERLI_POKT_API_KEY,
+                  applicationSecretKey: GOERLI_POKT_SECRET_KEY,
                 },
                 useDefaultProvider: false,
               }),
@@ -400,7 +400,7 @@ describe('Ethers Module Initialization', () => {
             imports: [
               EthersModule.forRoot({
                 network: BINANCE_TESTNET_NETWORK,
-                bscscan: RINKEBY_ETHERSCAN_API_KEY,
+                bscscan: GOERLI_ETHERSCAN_API_KEY,
                 useDefaultProvider: false,
               }),
             ],
@@ -435,9 +435,9 @@ describe('Ethers Module Initialization', () => {
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
           nock(TESTNET_BSCPOCKET_URL)
-            .post(`/${RINKEBY_POKT_API_KEY}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
+            .post(`/${GOERLI_POKT_API_KEY}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
           @Controller('/')
@@ -458,8 +458,8 @@ describe('Ethers Module Initialization', () => {
             imports: [
               EthersModule.forRoot({
                 network: BINANCE_TESTNET_NETWORK,
-                bscscan: RINKEBY_ETHERSCAN_API_KEY,
-                pocket: RINKEBY_POKT_API_KEY,
+                bscscan: GOERLI_ETHERSCAN_API_KEY,
+                pocket: GOERLI_POKT_API_KEY,
                 useDefaultProvider: true,
               }),
             ],
@@ -571,7 +571,7 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: RINKEBY_NETWORK,
+                network: GOERLI_NETWORK,
                 cloudflare: true,
                 useDefaultProvider: false,
               }),
@@ -693,13 +693,13 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it.only('should work with multiple instances of ethers provider', async () => {
-          nock(RINKEBY_POCKET_URL)
-            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+        it('should work with multiple instances of ethers provider', async () => {
+          nock(GOERLI_POCKET_URL)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           nock(MUMBAI_ALCHEMY_URL)
-            .post(`/${RINKEBY_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+            .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -737,17 +737,17 @@ describe('Ethers Module Initialization', () => {
             imports: [
               EthersModule.forRoot({
                 token: 'eth',
-                network: RINKEBY_NETWORK,
+                network: GOERLI_NETWORK,
                 pocket: {
-                  applicationId: RINKEBY_POKT_API_KEY,
-                  applicationSecretKey: RINKEBY_POKT_SECRET_KEY,
+                  applicationId: GOERLI_POKT_API_KEY,
+                  applicationSecretKey: GOERLI_POKT_SECRET_KEY,
                 },
                 useDefaultProvider: false,
               }),
               EthersModule.forRoot({
                 token: 'poly',
                 network: MUMBAI_NETWORK,
-                alchemy: RINKEBY_ALCHEMY_API_KEY,
+                alchemy: GOERLI_ALCHEMY_API_KEY,
                 useDefaultProvider: false,
               }),
               EthersModule.forRoot({
@@ -786,7 +786,7 @@ describe('Ethers Module Initialization', () => {
 
       describe('forRootAsync', () => {
         it('should compile properly with useFactory', async () => {
-          nock(RINKEBY_ETHERSCAN_URL)
+          nock(GOERLI_ETHERSCAN_URL)
             .get('')
             .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -807,7 +807,7 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly etherscan = RINKEBY_ETHERSCAN_API_KEY
+            public readonly etherscan = GOERLI_ETHERSCAN_API_KEY
           }
 
           @Module({
@@ -822,7 +822,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: RINKEBY_NETWORK,
+                    network: GOERLI_NETWORK,
                     etherscan: config.etherscan,
                     useDefaultProvider: false,
                   }
@@ -851,8 +851,8 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work properly when pass dependencies via providers', async () => {
-          nock(RINKEBY_INFURA_URL)
-            .post(`/${RINKEBY_INFURA_PROJECT_ID}`, PROVIDER_GET_GAS_PRICE_BODY)
+          nock(GOERLI_INFURA_URL)
+            .post(`/${GOERLI_INFURA_PROJECT_ID}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -872,8 +872,8 @@ describe('Ethers Module Initialization', () => {
           @Injectable()
           class ConfigService {
             public readonly infura = {
-              projectId: RINKEBY_INFURA_PROJECT_ID,
-              projectSecret: RINKEBY_INFURA_PROJECT_SECRET,
+              projectId: GOERLI_INFURA_PROJECT_ID,
+              projectSecret: GOERLI_INFURA_PROJECT_SECRET,
             }
           }
 
@@ -884,7 +884,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: RINKEBY_NETWORK,
+                    network: GOERLI_NETWORK,
                     infura: config.infura,
                     useDefaultProvider: false,
                   }
@@ -976,16 +976,16 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work properly when useFactory uses more than one Provider', async () => {
-          nock(RINKEBY_INFURA_URL)
-            .post(`/${RINKEBY_INFURA_PROJECT_ID}`, {
+          nock(GOERLI_INFURA_URL)
+            .post(`/${GOERLI_INFURA_PROJECT_ID}`, {
               ...PROVIDER_GET_GAS_PRICE_BODY,
               id: 43,
             })
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post(`/${RINKEBY_INFURA_PROJECT_ID}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
+            .post(`/${GOERLI_INFURA_PROJECT_ID}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
-          nock(RINKEBY_ETHERSCAN_URL)
+          nock(GOERLI_ETHERSCAN_URL)
             .get('/')
             .query({
               ...ETHERSCAN_GET_GAS_PRICE_QUERY,
@@ -1012,10 +1012,10 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly etherscan = RINKEBY_ETHERSCAN_API_KEY
+            public readonly etherscan = GOERLI_ETHERSCAN_API_KEY
             public readonly infura = {
-              projectId: RINKEBY_INFURA_PROJECT_ID,
-              projectSecret: RINKEBY_INFURA_PROJECT_SECRET,
+              projectId: GOERLI_INFURA_PROJECT_ID,
+              projectSecret: GOERLI_INFURA_PROJECT_SECRET,
             }
           }
 
@@ -1031,7 +1031,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: RINKEBY_NETWORK,
+                    network: GOERLI_NETWORK,
                     etherscan: config.etherscan,
                     infura: config.infura,
                     useDefaultProvider: false,
@@ -1319,7 +1319,7 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly bscscan = RINKEBY_ETHERSCAN_API_KEY
+            public readonly bscscan = GOERLI_ETHERSCAN_API_KEY
           }
 
           @Module({
@@ -1372,9 +1372,9 @@ describe('Ethers Module Initialization', () => {
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
           nock(TESTNET_BSCPOCKET_URL)
-            .post(`/${RINKEBY_POKT_API_KEY}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
+            .post(`/${GOERLI_POKT_API_KEY}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
           @Controller('/')
@@ -1393,8 +1393,8 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly bscscan = RINKEBY_ETHERSCAN_API_KEY
-            public readonly pocket = RINKEBY_POKT_API_KEY
+            public readonly bscscan = GOERLI_ETHERSCAN_API_KEY
+            public readonly pocket = GOERLI_POKT_API_KEY
             public readonly useDefaultProvider = true
           }
 
@@ -1535,7 +1535,7 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly network = RINKEBY_NETWORK
+            public readonly network = GOERLI_NETWORK
             public readonly cloudflare = true
           }
 
@@ -1703,12 +1703,12 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work with multiple instances of ethers provider', async () => {
-          nock(RINKEBY_POCKET_URL)
-            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+          nock(GOERLI_POCKET_URL)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           nock(MUMBAI_ALCHEMY_URL)
-            .post(`/${RINKEBY_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+            .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -1739,9 +1739,9 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly applicationId = RINKEBY_POKT_API_KEY
-            public readonly applicationSecretKey = RINKEBY_POKT_SECRET_KEY
-            public readonly alchemy = RINKEBY_ALCHEMY_API_KEY
+            public readonly applicationId = GOERLI_POKT_API_KEY
+            public readonly applicationSecretKey = GOERLI_POKT_SECRET_KEY
+            public readonly alchemy = GOERLI_ALCHEMY_API_KEY
             public readonly custom = CUSTOM_BSC_1_URL
           }
 
@@ -1759,7 +1759,7 @@ describe('Ethers Module Initialization', () => {
                 token: 'eth',
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: RINKEBY_NETWORK,
+                    network: GOERLI_NETWORK,
                     pocket: {
                       applicationId: config.applicationId,
                       applicationSecretKey: config.applicationSecretKey,

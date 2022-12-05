@@ -2,6 +2,7 @@ import {
   BaseProvider,
   EtherscanProvider,
   FallbackProvider,
+  getDefaultProvider,
   Network,
   Networkish,
   PocketProvider,
@@ -14,13 +15,11 @@ import {
   BINANCE_TESTNET_NETWORK,
   BSCSCAN_DEFAULT_API_KEY,
   GOERLI_NETWORK,
-  KOVAN_NETWORK,
   MAINNET_NETWORK,
-  RINKEBY_NETWORK,
-  ROPSTEN_NETWORK,
+  SEPOLIA_NETWORK,
 } from './ethers.constants'
-import { BinanceModuleOptions, MoralisProviderOptions, PocketProviderOptions } from './ethers.interface'
-import { getBinanceNetwork, getEthereumNetwork } from './ethers.utils'
+import { MoralisProviderOptions, PocketProviderOptions, ProviderOptions } from './ethers.interface'
+import { getBinanceNetwork, getEthereumNetwork, isBinanceNetwork } from './ethers.utils'
 
 export class BscscanProvider extends EtherscanProvider {
   constructor(_network: Networkish, apiKey?: string) {
@@ -146,14 +145,8 @@ export class EthereumMoralisProvider extends MoralisProvider {
       case GOERLI_NETWORK.chainId:
         endpoint = 'eth/goerli'
         break
-      case ROPSTEN_NETWORK.chainId:
-        endpoint = 'eth/ropsten'
-        break
-      case RINKEBY_NETWORK.chainId:
-        endpoint = 'eth/rinkeby'
-        break
-      case KOVAN_NETWORK.chainId:
-        endpoint = 'eth/kovan'
+      case SEPOLIA_NETWORK.chainId:
+        endpoint = 'eth/sepolia'
         break
       default:
         throw new Error(`unsupported network ${network.name}`)
@@ -188,7 +181,7 @@ export async function getFallbackProvider(providers: BaseProvider[] = [], quorum
 
 export async function getBinanceDefaultProvider(
   network: Network,
-  options?: Pick<BinanceModuleOptions, 'bscscan' | 'pocket' | 'moralis'>,
+  options?: Pick<ProviderOptions, 'bscscan' | 'pocket' | 'moralis' | 'quorum'>,
 ) {
   const providers: Array<BaseProvider> = [
     new BscscanProvider(network, options?.bscscan),
@@ -199,5 +192,13 @@ export async function getBinanceDefaultProvider(
     providers.push(new BinanceMoralisProvider(network, options.moralis))
   }
 
-  return getFallbackProvider(providers, Math.min(providers.length, 2), true)
+  return getFallbackProvider(providers, options?.quorum ?? Math.min(providers.length, 2), true)
+}
+
+export async function getNetworkDefaultProvider(network: Network, options: ProviderOptions = {}) {
+  if (isBinanceNetwork(network)) {
+    return getBinanceDefaultProvider(network, options)
+  }
+
+  return getDefaultProvider(network, options)
 }

@@ -1,10 +1,10 @@
 import { NestApplicationOptions } from '@nestjs/common'
 import { randomBytes } from 'crypto'
 
-export const RINKEBY_ALCHEMY_URL = 'https://eth-rinkeby.alchemyapi.io/v2'
-export const RINKEBY_POCKET_URL = 'https://eth-rinkeby.gateway.pokt.network/v1'
-export const RINKEBY_ETHERSCAN_URL = 'https://api-rinkeby.etherscan.io/api'
-export const RINKEBY_INFURA_URL = 'https://rinkeby.infura.io/v3'
+export const GOERLI_ALCHEMY_URL = 'https://eth-goerli.g.alchemy.com/v2/'
+export const GOERLI_POCKET_URL = 'https://eth-goerli.gateway.pokt.network/v1/lb'
+export const GOERLI_ETHERSCAN_URL = 'https://api-goerli.etherscan.io/api'
+export const GOERLI_INFURA_URL = 'https://goerli.infura.io/v3'
 export const CLOUDFLARE_URL = 'https://cloudflare-eth.com'
 export const TESTNET_BSCSCAN_URL = 'https://api-testnet.bscscan.com/api'
 export const TESTNET_BSCPOCKET_URL = 'https://bsc-testnet.gateway.pokt.network/v1/lb'
@@ -12,12 +12,12 @@ export const CUSTOM_BSC_1_URL = 'https://data-seed-prebsc-1-s1.binance.org:8545'
 export const CUSTOM_BSC_2_URL = 'https://data-seed-prebsc-1-s3.binance.org:8545'
 export const CUSTOM_BSC_3_URL = 'https://data-seed-prebsc-2-s2.binance.org:8545'
 export const MUMBAI_ALCHEMY_URL = 'https://polygon-mumbai.g.alchemy.com/v2/'
-export const RINKEBY_ETHERSCAN_API_KEY = randomBytes(17).toString('hex')
-export const RINKEBY_ALCHEMY_API_KEY = randomBytes(16).toString('hex')
-export const RINKEBY_POKT_API_KEY = randomBytes(12).toString('hex')
-export const RINKEBY_POKT_SECRET_KEY = randomBytes(16).toString('hex')
-export const RINKEBY_INFURA_PROJECT_ID = randomBytes(16).toString('hex')
-export const RINKEBY_INFURA_PROJECT_SECRET = randomBytes(16).toString('hex')
+export const GOERLI_ETHERSCAN_API_KEY = randomBytes(17).toString('hex')
+export const GOERLI_ALCHEMY_API_KEY = randomBytes(16).toString('hex')
+export const GOERLI_POKT_API_KEY = randomBytes(12).toString('hex')
+export const GOERLI_POKT_SECRET_KEY = randomBytes(16).toString('hex')
+export const GOERLI_INFURA_PROJECT_ID = randomBytes(16).toString('hex')
+export const GOERLI_INFURA_PROJECT_SECRET = randomBytes(16).toString('hex')
 export const PROVIDER_GET_GAS_PRICE_BODY = {
   method: 'eth_gasPrice',
   params: [],
@@ -32,12 +32,12 @@ export const PROVIDER_GET_GAS_PRICE_RESPONSE = {
 export const ETHERSCAN_GET_GAS_PRICE_QUERY = {
   module: 'proxy',
   action: 'eth_gasPrice',
-  apikey: RINKEBY_ETHERSCAN_API_KEY,
+  apikey: GOERLI_ETHERSCAN_API_KEY,
 }
 export const ETHERSCAN_GET_BLOCK_NUMBER_QUERY = {
   module: 'proxy',
   action: 'eth_blockNumber',
-  apikey: RINKEBY_ETHERSCAN_API_KEY,
+  apikey: GOERLI_ETHERSCAN_API_KEY,
 }
 export const PROVIDER_GET_BLOCK_NUMBER_BODY = {
   method: 'eth_blockNumber',
