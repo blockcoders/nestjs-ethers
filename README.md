@@ -5,6 +5,7 @@ NestJS-Ethers
 [![CircleCI](https://circleci.com/gh/blockcoders/nestjs-ethers/tree/main.svg?style=svg)](https://circleci.com/gh/blockcoders/nestjs-ethers/tree/main)
 [![Coverage Status](https://coveralls.io/repos/github/blockcoders/nestjs-ethers/badge.svg?branch=main)](https://coveralls.io/github/blockcoders/nestjs-ethers?branch=main)
 [![vulnerabilities](https://badgen.net/snyk/blockcoders/nestjs-ethers)](https://snyk.io/test/github/blockcoders/nestjs-ethers)
+[![CodeQL](https://github.com/blockcoders/nestjs-ethers/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/blockcoders/nestjs-ethers/actions/workflows/codeql-analysis.yml)
 [![supported platforms](https://img.shields.io/badge/platforms-Express%20%26%20Fastify-green)](https://img.shields.io/badge/platforms-Express%20%26%20Fastify-green)
 
 
