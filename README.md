@@ -62,6 +62,12 @@ interface EthersModuleOptions {
    * @see {@link https://etherscan.io}
    */
   etherscan?: string;
+  
+  /**
+   * Optional parameter for Bscscan API Token
+   * @see {@link https://bscscan.com/}
+   */
+  bscscan?: string;
 
   /**
    * Optional parameter for use Cloudflare Provider
@@ -84,10 +90,18 @@ interface EthersModuleOptions {
   pocket?: PocketProviderOptions | string;
   
   /**
-   * Optional parameter for Bscscan API Token
-   * @see {@link https://https://bscscan.com/}
+   * Optional parameter for Moralis API Token
+   * or MoralisProviderOptions(apiKey, region)
+   * @see {@link https://moralis.io/}
    */
-  bscscan?: string;
+  moralis?: MoralisProviderOptions | string;
+  
+  /**
+   * Optional parameter for Ankr API Token
+   * or AnkrProviderOptions(apiKey, projectSecret)
+   * @see {@link https://www.ankr.com/}
+   */
+  ankr?: AnkrProviderOptions | string;
   
   /**
    * Optional parameter for a custom StaticJsonRpcProvider
@@ -117,6 +131,12 @@ interface EthersModuleOptions {
    * EthersModule will use the FallbackProvider to send multiple requests simultaneously.
    */
   useDefaultProvider?: boolean;
+
+  /**
+   * Optional parameter if this option is true, EthersModule will disable 
+   * the console.log in the ethers.js library.
+   */
+  disableEthersLogger?: boolean
   
   /**
    * Optional parameter to associate a token name to EthersProvider,
