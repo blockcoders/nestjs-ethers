@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/01/07**
+- [#143](https://github.com/blockcoders/nestjs-ethers/pull/143) Fix @nestjs/common peer dependenciy version
+
 ## 2.0.0
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/01/07**
 - [#140](https://github.com/blockcoders/nestjs-ethers/pull/140) Release v2.0.0 - Nest.js v9

@@ -1,6 +1,6 @@
 {
   "name": "nestjs-ethers",
-  "version": "2.0.0",
+  "version": "2.0.1-beta.1",
   "description": "The ethers.js library for NestJS",
   "author": "Blockcoders Engineering <hello@blockcoders.io>",
   "license": "Apache",
@@ -99,7 +99,7 @@
     "@ethersproject/wallet": "^5.7.0",
     "@ethersproject/web": "^5.7.1",
     "@ethersproject/wordlists": "^5.7.0",
-    "@nestjs/common": "^8.0.0"
+    "@nestjs/common": "^9.2.1"
   },
   "jest": {
     "verbose": true,
