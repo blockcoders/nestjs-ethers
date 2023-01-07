@@ -834,7 +834,7 @@ class ConfigModule {}
 class TestModule {}
 ```
 
-## Testing a class that uses @InjectEthersProvider
+## Testing a class that uses InjectEthersProvider
 
 This package exposes a getEthersToken(token?: string) function that returns a prepared injection token based on the provided context. 
 Using this token, you can easily provide a mock implementation of the `BaseProvider` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
@@ -851,7 +851,7 @@ Using this token, you can easily provide a mock implementation of the `BaseProvi
   }).compile();
 ```
 
-## Testing a class that uses @InjectContractProvider
+## Testing a class that uses InjectContractProvider
 
 This package exposes a getContractToken(token?: string) function that returns a prepared injection token based on the contract provided context. 
 Using this token, you can easily provide a mock implementation of the `ethers.Contract` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
@@ -868,7 +868,7 @@ Using this token, you can easily provide a mock implementation of the `ethers.Co
   }).compile();
 ```
 
-## Testing a class that uses @InjectSignerProvider
+## Testing a class that uses InjectSignerProvider
 
 This package exposes a getSignerToken(token?: string) function that returns a prepared injection token based on the signer provided context. 
 Using this token, you can easily provide a mock implementation of the `ethers.Signer` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
