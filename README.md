@@ -14,7 +14,7 @@ Ethereum utilities for NestJS based on [Ethers.js](https://github.com/ethers-io/
 ## Install
 
 ```sh
-npm i nestjs-ethers ethers
+npm i nestjs-ethers
 ```
 
 ## Register module

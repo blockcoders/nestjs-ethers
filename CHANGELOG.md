@@ -17,7 +17,6 @@ Published by **[blockcoders](https://github.com/blockcoders)** on **2023/01/07**
 - Ethers.js is not longer part of the index.ts export.
 - @ethersproject/* is now part of peerDependencies.
 - Rename `MATIC_NETWORK` with `POLYGON_NETWORK`.
-- Install `ethers` manually
 
 ## 1.0.3
 Published by **[blockcoders](https://github.com/blockcoders)** on **2022/05/08**
