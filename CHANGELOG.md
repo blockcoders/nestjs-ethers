@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.3
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/01/07**
+- Add @ethersproject/* as dependencies
+
+## 2.0.2
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/01/07**
+- Update Readme
+
 ## 2.0.1
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/01/07**
 - [#145](https://github.com/blockcoders/nestjs-ethers/pull/145) Fix @nestjs/common peer dependenciy version
