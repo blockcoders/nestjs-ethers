@@ -16,9 +16,9 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\" --fix",
     "lint:ci": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\"",
-    "test": "DEBUG=nock.scope:ethereum.api.nodesmith.io jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "test": "jest --runInBand --detectOpenHandles",
+    "test:watch": "jest --watch --runInBand --detectOpenHandles",
+    "test:cov": "jest --coverage --runInBand --detectOpenHandles",
     "prepublishOnly": "npm run lint:ci && npm run test"
   },
   "precommit": [
