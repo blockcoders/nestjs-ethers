@@ -3,6 +3,7 @@ import { randomBytes } from 'crypto'
 
 export const GOERLI_ALCHEMY_URL = 'https://eth-goerli.g.alchemy.com/v2/'
 export const GOERLI_POCKET_URL = 'https://eth-goerli.gateway.pokt.network/v1/lb'
+export const BSC_POCKET_URL = 'https://bsc-mainnet.gateway.pokt.network/v1/lb'
 export const GOERLI_ETHERSCAN_URL = 'https://api-goerli.etherscan.io/api'
 export const GOERLI_INFURA_URL = 'https://goerli.infura.io/v3'
 export const CLOUDFLARE_URL = 'https://cloudflare-eth.com'
@@ -18,6 +19,12 @@ export const GOERLI_POKT_API_KEY = randomBytes(12).toString('hex')
 export const GOERLI_POKT_SECRET_KEY = randomBytes(16).toString('hex')
 export const GOERLI_INFURA_PROJECT_ID = randomBytes(16).toString('hex')
 export const GOERLI_INFURA_PROJECT_SECRET = randomBytes(16).toString('hex')
+export const GOERLI_MORALIS_API_KEY = randomBytes(12).toString('hex')
+export const GOERLI_MORALIS_URL = `https://speedy-nodes-nyc.moralis.io/${GOERLI_MORALIS_API_KEY}/eth/goerli`
+export const BINANCE_TESTNET_MORALIS_API_KEY = randomBytes(12).toString('hex')
+export const BINANCE_TESTNET_MORALIS_URL = `https://speedy-nodes-nyc.moralis.io/${BINANCE_TESTNET_MORALIS_API_KEY}/bsc/testnet`
+export const GOERLI_ANKR_API_KEY = randomBytes(12).toString('hex')
+export const GOERLI_ANKR_URL = `https://rpc.ankr.com/eth_goerli/${GOERLI_ANKR_API_KEY}`
 export const PROVIDER_GET_GAS_PRICE_BODY = {
   method: 'eth_gasPrice',
   params: [],

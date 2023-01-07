@@ -13,10 +13,6 @@ export const UNSPECIFIED_NETWORK: Network = {
   chainId: 0,
   name: 'unspecified',
 }
-export const MORDEN_NETWORK: Network = {
-  chainId: 2,
-  name: 'morden',
-}
 export const GOERLI_NETWORK: Network = {
   chainId: 5,
   name: 'goerli',
@@ -39,11 +35,11 @@ export const MUMBAI_NETWORK: Network = {
 }
 export const BINANCE_NETWORK: Network = {
   chainId: 56,
-  name: 'binance',
+  name: 'bnb',
 }
 export const BINANCE_TESTNET_NETWORK: Network = {
   chainId: 97,
-  name: 'binance-testnet',
+  name: 'bnbt',
 }
 export const OPTIMISM_NETWORK: Network = {
   chainId: 10,
@@ -105,7 +101,6 @@ export const AURORA_TESTNET_NETWORK: Network = {
 export const NETWORKS_BY_CHAIN_ID: Record<number, Network> = {
   [MAINNET_NETWORK.chainId]: MAINNET_NETWORK,
   [UNSPECIFIED_NETWORK.chainId]: UNSPECIFIED_NETWORK,
-  [MORDEN_NETWORK.chainId]: MORDEN_NETWORK,
   [GOERLI_NETWORK.chainId]: GOERLI_NETWORK,
   [SEPOLIA_NETWORK.chainId]: SEPOLIA_NETWORK,
   [GNOSIS_NETWORK.chainId]: GNOSIS_NETWORK,
@@ -132,7 +127,6 @@ export const NETWORKS_BY_CHAIN_ID: Record<number, Network> = {
 export const NETWORKS_BY_NAME: Record<string, Network> = {
   [MAINNET_NETWORK.name]: MAINNET_NETWORK,
   [UNSPECIFIED_NETWORK.name]: UNSPECIFIED_NETWORK,
-  [MORDEN_NETWORK.name]: MORDEN_NETWORK,
   [GOERLI_NETWORK.name]: GOERLI_NETWORK,
   [SEPOLIA_NETWORK.name]: SEPOLIA_NETWORK,
   [GNOSIS_NETWORK.name]: GNOSIS_NETWORK,

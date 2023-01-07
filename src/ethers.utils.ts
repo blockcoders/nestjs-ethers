@@ -4,12 +4,6 @@ import {
   BINANCE_TESTNET_NETWORK,
   DECORATED_PREFIX,
   DEFAULT_TOKEN,
-  GOERLI_NETWORK,
-  SEPOLIA_NETWORK,
-  MAINNET_NETWORK,
-  POLYGON_NETWORK,
-  MORDEN_NETWORK,
-  MUMBAI_NETWORK,
   NETWORKS_BY_CHAIN_ID,
   NETWORKS_BY_NAME,
   UNSPECIFIED_NETWORK,
@@ -55,46 +49,4 @@ export function isBinanceNetwork(network: Network): boolean {
     default:
       return false
   }
-}
-
-export function isEthereumNetwork(network: Network): boolean {
-  switch (network.chainId) {
-    case MAINNET_NETWORK.chainId:
-    case MORDEN_NETWORK.chainId:
-    case GOERLI_NETWORK.chainId:
-    case SEPOLIA_NETWORK.chainId:
-      return true
-    default:
-      return false
-  }
-}
-
-export function isPolygonNetwork(network: Network): boolean {
-  switch (network.chainId) {
-    case POLYGON_NETWORK.chainId:
-    case MUMBAI_NETWORK.chainId:
-      return true
-    default:
-      return false
-  }
-}
-
-export function getBinanceNetwork(_network: Networkish): Network {
-  const network = getNetwork(_network)
-
-  if (!isBinanceNetwork(network)) {
-    throw new Error(`Unsupported network binance network: ${network.name}`)
-  }
-
-  return network
-}
-
-export function getEthereumNetwork(_network: Networkish): Network {
-  const network = getNetwork(_network)
-
-  if (!isEthereumNetwork(network)) {
-    throw new Error(`Unsupported network ethereum network: ${network.name}`)
-  }
-
-  return network
 }

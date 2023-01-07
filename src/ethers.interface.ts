@@ -33,9 +33,8 @@ export interface ProviderOptions {
   cloudflare?: boolean | undefined
   infura?: InfuraProviderOptions | string | undefined
   pocket?: PocketProviderOptions | string | undefined
-  moralis?: MoralisProviderOptions | undefined
+  moralis?: MoralisProviderOptions | string | undefined
   ankr?: AnkrProviderOptions | string | undefined
-  nodesmith?: string | undefined
   custom?: ConnectionInfo | string | (ConnectionInfo | string)[] | undefined
   quorum?: number | undefined
 }
@@ -45,6 +44,7 @@ export interface EthersModuleOptions extends ProviderOptions {
   token?: string | undefined
   waitUntilIsConnected?: boolean | undefined
   useDefaultProvider?: boolean | undefined
+  disableEthersLogger?: boolean | undefined
 }
 
 export interface EthersModuleAsyncOptions extends Pick<ModuleMetadata, 'imports' | 'providers'> {

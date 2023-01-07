@@ -22,6 +22,7 @@ import {
   MUMBAI_NETWORK,
   BSCSCAN_DEFAULT_API_KEY,
   BINANCE_POCKET_DEFAULT_APP_ID,
+  BINANCE_NETWORK,
 } from '../src'
 import {
   GOERLI_ALCHEMY_URL,
@@ -48,6 +49,13 @@ import {
   MUMBAI_ALCHEMY_URL,
   NEST_APP_OPTIONS,
   TESTNET_BSCPOCKET_URL,
+  BSC_POCKET_URL,
+  GOERLI_MORALIS_URL,
+  GOERLI_MORALIS_API_KEY,
+  BINANCE_TESTNET_MORALIS_URL,
+  BINANCE_TESTNET_MORALIS_API_KEY,
+  GOERLI_ANKR_URL,
+  GOERLI_ANKR_API_KEY,
 } from './utils/constants'
 import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
@@ -179,6 +187,193 @@ describe('Ethers Module Initialization', () => {
             imports: [
               EthersModule.forRoot({
                 network: GOERLI_NETWORK,
+                pocket: {
+                  applicationId: GOERLI_POKT_API_KEY,
+                  applicationSecretKey: GOERLI_POKT_SECRET_KEY,
+                },
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should work with ethereum moralis provider', async () => {
+          nock(GOERLI_MORALIS_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: GOERLI_NETWORK,
+                moralis: GOERLI_MORALIS_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should work with bsc moralis provider', async () => {
+          nock(BINANCE_TESTNET_MORALIS_URL)
+            .post('', PROVIDER_GET_GAS_PRICE_BODY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: BINANCE_TESTNET_NETWORK,
+                moralis: BINANCE_TESTNET_MORALIS_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should work with ankr provider', async () => {
+          nock(GOERLI_ANKR_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: GOERLI_NETWORK,
+                ankr: GOERLI_ANKR_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should work with binance pocket provider', async () => {
+          nock(BSC_POCKET_URL)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: BINANCE_NETWORK,
                 pocket: {
                   applicationId: GOERLI_POKT_API_KEY,
                   applicationSecretKey: GOERLI_POKT_SECRET_KEY,
@@ -353,6 +548,45 @@ describe('Ethers Module Initialization', () => {
           }
           @Module({
             imports: [EthersModule.forRoot({ waitUntilIsConnected: false })],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.network).toBeDefined()
+              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
+              expect(res.body.network).toHaveProperty('chainId', 1)
+              expect(res.body.network).toHaveProperty('ensAddress')
+            })
+
+          await app.close()
+        })
+
+        it('should disable ethers logger', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: FallbackProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+          @Module({
+            imports: [EthersModule.forRoot({ disableEthersLogger: true })],
             controllers: [TestController],
           })
           class TestModule {}
@@ -716,21 +950,15 @@ describe('Ethers Module Initialization', () => {
             ) {}
             @Get()
             async get() {
-              try {
-                const pocketGasPrice: BigNumber = await this.pocketProvider.getGasPrice()
-                const alchemyGasPrice: BigNumber = await this.alchemyProvider.getGasPrice()
-                const bscGasPrice: BigNumber = await this.customProvider.getGasPrice()
+              const pocketGasPrice: BigNumber = await this.pocketProvider.getGasPrice()
+              const alchemyGasPrice: BigNumber = await this.alchemyProvider.getGasPrice()
+              const bscGasPrice: BigNumber = await this.customProvider.getGasPrice()
 
-                return {
-                  pocketGasPrice: pocketGasPrice.toString(),
-                  alchemyGasPrice: alchemyGasPrice.toString(),
-                  bscGasPrice: bscGasPrice.toString(),
-                }
-              } catch (error) {
-                console.error(error)
+              return {
+                pocketGasPrice: pocketGasPrice.toString(),
+                alchemyGasPrice: alchemyGasPrice.toString(),
+                bscGasPrice: bscGasPrice.toString(),
               }
-
-              return {}
             }
           }
           @Module({

@@ -1,3 +1,4 @@
+import { Logger, LogLevel } from '@ethersproject/logger'
 import {
   Provider as AbstractProvider,
   BaseProvider,
@@ -8,7 +9,6 @@ import {
   PocketProvider,
   StaticJsonRpcProvider,
   AnkrProvider,
-  NodesmithProvider,
 } from '@ethersproject/providers'
 import { ConnectionInfo } from '@ethersproject/web'
 import { Provider } from '@nestjs/common'
@@ -33,6 +33,7 @@ export async function createBaseProvider(options: EthersModuleOptions): Promise<
     quorum = 1,
     waitUntilIsConnected = true,
     useDefaultProvider = true,
+    disableEthersLogger = false,
     alchemy,
     etherscan,
     bscscan,
@@ -40,10 +41,14 @@ export async function createBaseProvider(options: EthersModuleOptions): Promise<
     pocket,
     moralis,
     ankr,
-    nodesmith,
     cloudflare = false,
     custom,
   } = options
+
+  if (disableEthersLogger) {
+    Logger.setLogLevel(LogLevel.OFF)
+  }
+
   const providerNetwork = getNetwork(network)
 
   if (!useDefaultProvider) {
@@ -93,10 +98,6 @@ export async function createBaseProvider(options: EthersModuleOptions): Promise<
       providers.push(new AnkrProvider(providerNetwork, ankr))
     }
 
-    if (nodesmith) {
-      providers.push(new NodesmithProvider(providerNetwork, nodesmith))
-    }
-
     if (custom) {
       const customInfos: (ConnectionInfo | string)[] = !Array.isArray(custom) ? [custom] : custom
 
@@ -121,7 +122,6 @@ export async function createBaseProvider(options: EthersModuleOptions): Promise<
     pocket,
     moralis,
     ankr,
-    nodesmith,
     quorum,
   })
 }

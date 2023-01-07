@@ -19,11 +19,11 @@ import {
   SEPOLIA_NETWORK,
 } from './ethers.constants'
 import { MoralisProviderOptions, PocketProviderOptions, ProviderOptions } from './ethers.interface'
-import { getBinanceNetwork, getEthereumNetwork, isBinanceNetwork } from './ethers.utils'
+import { getNetwork, isBinanceNetwork } from './ethers.utils'
 
 export class BscscanProvider extends EtherscanProvider {
   constructor(_network: Networkish, apiKey?: string) {
-    const network = getBinanceNetwork(_network)
+    const network = getNetwork(_network)
 
     super(network.chainId, apiKey || BSCSCAN_DEFAULT_API_KEY)
   }
@@ -46,7 +46,7 @@ export class BscscanProvider extends EtherscanProvider {
 
 export class BinancePocketProvider extends PocketProvider {
   constructor(_network: Networkish, apiKey?: PocketProviderOptions | string) {
-    const network = getBinanceNetwork(_network)
+    const network = getNetwork(_network)
 
     super(network.chainId, apiKey || { applicationId: BINANCE_POCKET_DEFAULT_APP_ID, loadBalancer: true })
   }
@@ -79,7 +79,7 @@ export class BinancePocketProvider extends PocketProvider {
   }
 
   isCommunityResource(): boolean {
-    return this.applicationSecretKey === BINANCE_POCKET_DEFAULT_APP_ID
+    return this.applicationId === BINANCE_POCKET_DEFAULT_APP_ID
   }
 }
 
@@ -107,7 +107,7 @@ export class MoralisProvider extends UrlJsonRpcProvider {
 
 export class BinanceMoralisProvider extends MoralisProvider {
   constructor(_network: Networkish, apiKey?: MoralisProviderOptions | string) {
-    const network = getBinanceNetwork(_network)
+    const network = getNetwork(_network)
 
     super(network, apiKey)
   }
@@ -125,13 +125,13 @@ export class BinanceMoralisProvider extends MoralisProvider {
         throw new Error(`unsupported network ${network.name}`)
     }
 
-    return MoralisProvider.getConnectionInfo(apiKey, endpoint)
+    return MoralisProvider.getConnectionInfo(MoralisProvider.getApiKey(apiKey), endpoint)
   }
 }
 
 export class EthereumMoralisProvider extends MoralisProvider {
   constructor(_network: Networkish, apiKey?: MoralisProviderOptions | string) {
-    const network = getEthereumNetwork(_network)
+    const network = getNetwork(_network)
 
     super(network, apiKey)
   }
@@ -152,11 +152,15 @@ export class EthereumMoralisProvider extends MoralisProvider {
         throw new Error(`unsupported network ${network.name}`)
     }
 
-    return MoralisProvider.getConnectionInfo(apiKey, endpoint)
+    return MoralisProvider.getConnectionInfo(MoralisProvider.getApiKey(apiKey), endpoint)
   }
 }
 
-export async function getFallbackProvider(providers: BaseProvider[] = [], quorum = 1, waitUntilIsConnected = true) {
+export async function getFallbackProvider(
+  providers: BaseProvider[] = [],
+  quorum = 1,
+  waitUntilIsConnected = true,
+): Promise<FallbackProvider | BaseProvider> {
   if (providers.length < 1) {
     throw new Error(
       'Error in provider creation. The property "useDefaultProvider" is false and the providers supplied are invalid.',
