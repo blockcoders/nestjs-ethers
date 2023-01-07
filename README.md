@@ -4,7 +4,8 @@ NestJS-Ethers
 [![npm](https://img.shields.io/npm/v/nestjs-ethers)](https://www.npmjs.com/package/nestjs-ethers)
 [![CircleCI](https://circleci.com/gh/blockcoders/nestjs-ethers/tree/main.svg?style=svg)](https://circleci.com/gh/blockcoders/nestjs-ethers/tree/main)
 [![Coverage Status](https://coveralls.io/repos/github/blockcoders/nestjs-ethers/badge.svg?branch=main)](https://coveralls.io/github/blockcoders/nestjs-ethers?branch=main)
-[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/nestjs-ethers)](https://snyk.io/test/github/blockcoders/nestjs-ethers)
+[![vulnerabilities](https://badgen.net/snyk/blockcoders/nestjs-ethers)](https://snyk.io/test/github/blockcoders/nestjs-ethers)
+[![CodeQL](https://github.com/blockcoders/nestjs-ethers/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/blockcoders/nestjs-ethers/actions/workflows/codeql-analysis.yml)
 [![supported platforms](https://img.shields.io/badge/platforms-Express%20%26%20Fastify-green)](https://img.shields.io/badge/platforms-Express%20%26%20Fastify-green)
 
 
@@ -61,6 +62,12 @@ interface EthersModuleOptions {
    * @see {@link https://etherscan.io}
    */
   etherscan?: string;
+  
+  /**
+   * Optional parameter for Bscscan API Token
+   * @see {@link https://bscscan.com/}
+   */
+  bscscan?: string;
 
   /**
    * Optional parameter for use Cloudflare Provider
@@ -83,10 +90,18 @@ interface EthersModuleOptions {
   pocket?: PocketProviderOptions | string;
   
   /**
-   * Optional parameter for Bscscan API Token
-   * @see {@link https://https://bscscan.com/}
+   * Optional parameter for Moralis API Token
+   * or MoralisProviderOptions(apiKey, region)
+   * @see {@link https://moralis.io/}
    */
-  bscscan?: string;
+  moralis?: MoralisProviderOptions | string;
+  
+  /**
+   * Optional parameter for Ankr API Token
+   * or AnkrProviderOptions(apiKey, projectSecret)
+   * @see {@link https://www.ankr.com/}
+   */
+  ankr?: AnkrProviderOptions | string;
   
   /**
    * Optional parameter for a custom StaticJsonRpcProvider
@@ -116,6 +131,12 @@ interface EthersModuleOptions {
    * EthersModule will use the FallbackProvider to send multiple requests simultaneously.
    */
   useDefaultProvider?: boolean;
+
+  /**
+   * Optional parameter if this option is true, EthersModule will disable 
+   * the console.log in the ethers.js library.
+   */
+  disableEthersLogger?: boolean
   
   /**
    * Optional parameter to associate a token name to EthersProvider,
@@ -834,7 +855,7 @@ class ConfigModule {}
 class TestModule {}
 ```
 
-## Testing a class that uses @InjectEthersProvider
+## Testing a class that uses InjectEthersProvider
 
 This package exposes a getEthersToken(token?: string) function that returns a prepared injection token based on the provided context. 
 Using this token, you can easily provide a mock implementation of the `BaseProvider` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
@@ -846,6 +867,40 @@ Using this token, you can easily provide a mock implementation of the `BaseProvi
       {
         provide: getEthersToken(MyService.name),
         useValue: mockProvider,
+      },
+    ],
+  }).compile();
+```
+
+## Testing a class that uses InjectContractProvider
+
+This package exposes a getContractToken(token?: string) function that returns a prepared injection token based on the contract provided context. 
+Using this token, you can easily provide a mock implementation of the `ethers.Contract` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
+
+```ts
+  const module: TestingModule = await Test.createTestingModule({
+    providers: [
+      MyService,
+      {
+        provide: getContractToken(MyService.name),
+        useValue: mockContractProvider,
+      },
+    ],
+  }).compile();
+```
+
+## Testing a class that uses InjectSignerProvider
+
+This package exposes a getSignerToken(token?: string) function that returns a prepared injection token based on the signer provided context. 
+Using this token, you can easily provide a mock implementation of the `ethers.Signer` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
+
+```ts
+  const module: TestingModule = await Test.createTestingModule({
+    providers: [
+      MyService,
+      {
+        provide: getSignerToken(MyService.name),
+        useValue: mockSignerProvider,
       },
     ],
   }).compile();

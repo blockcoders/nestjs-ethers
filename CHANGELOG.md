@@ -1,8 +1,21 @@
 # Changelog
 
+## 2.0.0
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/01/07**
+- [#140](https://github.com/blockcoders/nestjs-ethers/pull/140) Release v2.0.0 - Nest.js v9
+- [#142](https://github.com/blockcoders/nestjs-ethers/pull/142) Update README.md by [@copocaneta](https://github.com/copocaneta)
+
+### BREAKING CHANGE
+- Dropped support for node < 14
+- Upgrade @nestjs/* from 8.x to 9.x
+- Remove deprecated ethereum chains (ropsten, rinkeby and kovan).
+- Add new RPC providers Moralis and Ankr.
+- Ethers.js is not longer part of the index.ts export.
+- @ethersproject/* is now part of peerDependencies.
+
 ## 1.0.3
 Published by **[blockcoders](https://github.com/blockcoders)** on **2022/05/08**
-- [#140](https://github.com/blockcoders/nestjs-ethers/pull/140) Update dependencies
+- [#141](https://github.com/blockcoders/nestjs-ethers/pull/141) Update dependencies
 - [#139](https://github.com/blockcoders/nestjs-ethers/pull/139) Fix: Function name createWalletFromEncryptedJson by [@GustavoRSSilva](https://github.com/GustavoRSSilva)
 - [#138](https://github.com/blockcoders/nestjs-ethers/pull/138) Fix: README injected variable ethersContract by [@GustavoRSSilva](https://github.com/GustavoRSSilva)
 

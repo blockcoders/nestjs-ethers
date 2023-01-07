@@ -1,5 +1,13 @@
 // import { randomBytes } from 'crypto';
 import { BigNumber } from '@ethersproject/bignumber'
+import { Network } from '@ethersproject/networks'
+import {
+  BaseProvider,
+  FallbackProvider,
+  StaticJsonRpcProvider,
+  PocketProvider,
+  AlchemyProvider,
+} from '@ethersproject/providers'
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
@@ -7,31 +15,27 @@ import * as request from 'supertest'
 import {
   EthersModule,
   InjectEthersProvider,
-  BaseProvider,
   MAINNET_NETWORK,
-  RINKEBY_NETWORK,
-  BINANCE_TESTNET_NETWORK,
-  Network,
+  GOERLI_NETWORK,
   BscscanProvider,
-  FallbackProvider,
-  StaticJsonRpcProvider,
-  BNB_TESTNET_NETWORK,
+  BINANCE_TESTNET_NETWORK,
   MUMBAI_NETWORK,
-  PocketProvider,
-  AlchemyProvider,
+  BSCSCAN_DEFAULT_API_KEY,
+  BINANCE_POCKET_DEFAULT_APP_ID,
+  BINANCE_NETWORK,
 } from '../src'
 import {
-  RINKEBY_ALCHEMY_URL,
-  RINKEBY_ALCHEMY_API_KEY,
-  RINKEBY_POCKET_URL,
-  RINKEBY_POKT_API_KEY,
-  RINKEBY_POKT_SECRET_KEY,
-  RINKEBY_ETHERSCAN_URL,
-  RINKEBY_ETHERSCAN_API_KEY,
-  RINKEBY_INFURA_URL,
+  GOERLI_ALCHEMY_URL,
+  GOERLI_ALCHEMY_API_KEY,
+  GOERLI_POCKET_URL,
+  GOERLI_POKT_API_KEY,
+  GOERLI_POKT_SECRET_KEY,
+  GOERLI_ETHERSCAN_URL,
+  GOERLI_ETHERSCAN_API_KEY,
+  GOERLI_INFURA_URL,
   CLOUDFLARE_URL,
-  RINKEBY_INFURA_PROJECT_ID,
-  RINKEBY_INFURA_PROJECT_SECRET,
+  GOERLI_INFURA_PROJECT_ID,
+  GOERLI_INFURA_PROJECT_SECRET,
   ETHERSCAN_GET_GAS_PRICE_QUERY,
   PROVIDER_GET_GAS_PRICE_BODY,
   PROVIDER_GET_GAS_PRICE_RESPONSE,
@@ -43,6 +47,15 @@ import {
   CUSTOM_BSC_2_URL,
   CUSTOM_BSC_3_URL,
   MUMBAI_ALCHEMY_URL,
+  NEST_APP_OPTIONS,
+  TESTNET_BSCPOCKET_URL,
+  BSC_POCKET_URL,
+  GOERLI_MORALIS_URL,
+  GOERLI_MORALIS_API_KEY,
+  BINANCE_TESTNET_MORALIS_URL,
+  BINANCE_TESTNET_MORALIS_API_KEY,
+  GOERLI_ANKR_URL,
+  GOERLI_ANKR_API_KEY,
 } from './utils/constants'
 import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
@@ -86,7 +99,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -106,8 +119,8 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work with alchemy provider', async () => {
-          nock(RINKEBY_ALCHEMY_URL)
-            .post(`/${RINKEBY_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+          nock(GOERLI_ALCHEMY_URL)
+            .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -126,8 +139,8 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: RINKEBY_NETWORK,
-                alchemy: RINKEBY_ALCHEMY_API_KEY,
+                network: GOERLI_NETWORK,
+                alchemy: GOERLI_ALCHEMY_API_KEY,
                 useDefaultProvider: false,
               }),
             ],
@@ -135,7 +148,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -153,8 +166,8 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work with pocket provider', async () => {
-          nock(RINKEBY_POCKET_URL)
-            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+          nock(GOERLI_POCKET_URL)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -173,10 +186,10 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: RINKEBY_NETWORK,
+                network: GOERLI_NETWORK,
                 pocket: {
-                  applicationId: RINKEBY_POKT_API_KEY,
-                  applicationSecretKey: RINKEBY_POKT_SECRET_KEY,
+                  applicationId: GOERLI_POKT_API_KEY,
+                  applicationSecretKey: GOERLI_POKT_SECRET_KEY,
                 },
                 useDefaultProvider: false,
               }),
@@ -185,7 +198,194 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should work with ethereum moralis provider', async () => {
+          nock(GOERLI_MORALIS_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: GOERLI_NETWORK,
+                moralis: GOERLI_MORALIS_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should work with bsc moralis provider', async () => {
+          nock(BINANCE_TESTNET_MORALIS_URL)
+            .post('', PROVIDER_GET_GAS_PRICE_BODY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: BINANCE_TESTNET_NETWORK,
+                moralis: BINANCE_TESTNET_MORALIS_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should work with ankr provider', async () => {
+          nock(GOERLI_ANKR_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: GOERLI_NETWORK,
+                ankr: GOERLI_ANKR_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body).toBeDefined()
+              expect(res.body).toHaveProperty('gasPrice', '1000000000')
+            })
+
+          await app.close()
+        })
+
+        it('should work with binance pocket provider', async () => {
+          nock(BSC_POCKET_URL)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: BaseProvider,
+            ) {}
+            @Get()
+            async get() {
+              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+
+              return { gasPrice: gasPrice.toString() }
+            }
+          }
+          @Module({
+            imports: [
+              EthersModule.forRoot({
+                network: BINANCE_NETWORK,
+                pocket: {
+                  applicationId: GOERLI_POKT_API_KEY,
+                  applicationSecretKey: GOERLI_POKT_SECRET_KEY,
+                },
+                useDefaultProvider: false,
+              }),
+            ],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -222,7 +422,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -261,7 +461,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -352,7 +552,46 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
+          const server = app.getHttpServer()
+
+          await app.init()
+          await extraWait(PlatformAdapter, app)
+
+          await request(server)
+            .get('/')
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.network).toBeDefined()
+              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
+              expect(res.body.network).toHaveProperty('chainId', 1)
+              expect(res.body.network).toHaveProperty('ensAddress')
+            })
+
+          await app.close()
+        })
+
+        it('should disable ethers logger', async () => {
+          @Controller('/')
+          class TestController {
+            constructor(
+              @InjectEthersProvider()
+              private readonly ethersProvider: FallbackProvider,
+            ) {}
+            @Get()
+            async get() {
+              const network: Network = await this.ethersProvider.getNetwork()
+
+              return { network }
+            }
+          }
+          @Module({
+            imports: [EthersModule.forRoot({ disableEthersLogger: true })],
+            controllers: [TestController],
+          })
+          class TestModule {}
+
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -395,7 +634,7 @@ describe('Ethers Module Initialization', () => {
             imports: [
               EthersModule.forRoot({
                 network: BINANCE_TESTNET_NETWORK,
-                bscscan: RINKEBY_ETHERSCAN_API_KEY,
+                bscscan: GOERLI_ETHERSCAN_API_KEY,
                 useDefaultProvider: false,
               }),
             ],
@@ -403,7 +642,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -420,13 +659,19 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should use the default bsc provider without community token', async () => {
+        it('should use the default binance providers without community token', async () => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
             .get('')
             .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          nock(TESTNET_BSCPOCKET_URL)
+            .post(`/${GOERLI_POKT_API_KEY}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
           @Controller('/')
@@ -447,7 +692,8 @@ describe('Ethers Module Initialization', () => {
             imports: [
               EthersModule.forRoot({
                 network: BINANCE_TESTNET_NETWORK,
-                bscscan: RINKEBY_ETHERSCAN_API_KEY,
+                bscscan: GOERLI_ETHERSCAN_API_KEY,
+                pocket: GOERLI_POKT_API_KEY,
                 useDefaultProvider: true,
               }),
             ],
@@ -475,19 +721,25 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should use the default bsc provider', async () => {
+        it('should use the default binance providers', async () => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query({
               ...ETHERSCAN_GET_GAS_PRICE_QUERY,
-              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+              apikey: BSCSCAN_DEFAULT_API_KEY,
             })
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
             .get('')
             .query({
               ...ETHERSCAN_GET_BLOCK_NUMBER_QUERY,
-              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+              apikey: BSCSCAN_DEFAULT_API_KEY,
             })
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          nock(TESTNET_BSCPOCKET_URL)
+            .post(`/${BINANCE_POCKET_DEFAULT_APP_ID}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .post(`/${BINANCE_POCKET_DEFAULT_APP_ID}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
           @Controller('/')
@@ -553,7 +805,7 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: RINKEBY_NETWORK,
+                network: GOERLI_NETWORK,
                 cloudflare: true,
                 useDefaultProvider: false,
               }),
@@ -587,7 +839,7 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: BNB_TESTNET_NETWORK,
+                network: BINANCE_TESTNET_NETWORK,
                 custom: CUSTOM_BSC_1_URL,
                 useDefaultProvider: false,
               }),
@@ -596,7 +848,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -649,7 +901,7 @@ describe('Ethers Module Initialization', () => {
           @Module({
             imports: [
               EthersModule.forRoot({
-                network: BNB_TESTNET_NETWORK,
+                network: BINANCE_TESTNET_NETWORK,
                 custom: [CUSTOM_BSC_1_URL, CUSTOM_BSC_2_URL, CUSTOM_BSC_3_URL],
                 useDefaultProvider: false,
               }),
@@ -658,7 +910,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -676,12 +928,12 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work with multiple instances of ethers provider', async () => {
-          nock(RINKEBY_POCKET_URL)
-            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+          nock(GOERLI_POCKET_URL)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           nock(MUMBAI_ALCHEMY_URL)
-            .post(`/${RINKEBY_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+            .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -713,22 +965,22 @@ describe('Ethers Module Initialization', () => {
             imports: [
               EthersModule.forRoot({
                 token: 'eth',
-                network: RINKEBY_NETWORK,
+                network: GOERLI_NETWORK,
                 pocket: {
-                  applicationId: RINKEBY_POKT_API_KEY,
-                  applicationSecretKey: RINKEBY_POKT_SECRET_KEY,
+                  applicationId: GOERLI_POKT_API_KEY,
+                  applicationSecretKey: GOERLI_POKT_SECRET_KEY,
                 },
                 useDefaultProvider: false,
               }),
               EthersModule.forRoot({
                 token: 'poly',
                 network: MUMBAI_NETWORK,
-                alchemy: RINKEBY_ALCHEMY_API_KEY,
+                alchemy: GOERLI_ALCHEMY_API_KEY,
                 useDefaultProvider: false,
               }),
               EthersModule.forRoot({
                 token: 'bsc',
-                network: BNB_TESTNET_NETWORK,
+                network: BINANCE_TESTNET_NETWORK,
                 custom: CUSTOM_BSC_1_URL,
                 useDefaultProvider: false,
               }),
@@ -762,7 +1014,7 @@ describe('Ethers Module Initialization', () => {
 
       describe('forRootAsync', () => {
         it('should compile properly with useFactory', async () => {
-          nock(RINKEBY_ETHERSCAN_URL)
+          nock(GOERLI_ETHERSCAN_URL)
             .get('')
             .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -783,7 +1035,7 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly etherscan = RINKEBY_ETHERSCAN_API_KEY
+            public readonly etherscan = GOERLI_ETHERSCAN_API_KEY
           }
 
           @Module({
@@ -798,7 +1050,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: RINKEBY_NETWORK,
+                    network: GOERLI_NETWORK,
                     etherscan: config.etherscan,
                     useDefaultProvider: false,
                   }
@@ -809,7 +1061,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -827,8 +1079,8 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work properly when pass dependencies via providers', async () => {
-          nock(RINKEBY_INFURA_URL)
-            .post(`/${RINKEBY_INFURA_PROJECT_ID}`, PROVIDER_GET_GAS_PRICE_BODY)
+          nock(GOERLI_INFURA_URL)
+            .post(`/${GOERLI_INFURA_PROJECT_ID}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -848,8 +1100,8 @@ describe('Ethers Module Initialization', () => {
           @Injectable()
           class ConfigService {
             public readonly infura = {
-              projectId: RINKEBY_INFURA_PROJECT_ID,
-              projectSecret: RINKEBY_INFURA_PROJECT_SECRET,
+              projectId: GOERLI_INFURA_PROJECT_ID,
+              projectSecret: GOERLI_INFURA_PROJECT_SECRET,
             }
           }
 
@@ -860,7 +1112,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: RINKEBY_NETWORK,
+                    network: GOERLI_NETWORK,
                     infura: config.infura,
                     useDefaultProvider: false,
                   }
@@ -871,7 +1123,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -934,7 +1186,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -952,16 +1204,16 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work properly when useFactory uses more than one Provider', async () => {
-          nock(RINKEBY_INFURA_URL)
-            .post(`/${RINKEBY_INFURA_PROJECT_ID}`, {
+          nock(GOERLI_INFURA_URL)
+            .post(`/${GOERLI_INFURA_PROJECT_ID}`, {
               ...PROVIDER_GET_GAS_PRICE_BODY,
               id: 43,
             })
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post(`/${RINKEBY_INFURA_PROJECT_ID}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
+            .post(`/${GOERLI_INFURA_PROJECT_ID}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
-          nock(RINKEBY_ETHERSCAN_URL)
+          nock(GOERLI_ETHERSCAN_URL)
             .get('/')
             .query({
               ...ETHERSCAN_GET_GAS_PRICE_QUERY,
@@ -988,10 +1240,10 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly etherscan = RINKEBY_ETHERSCAN_API_KEY
+            public readonly etherscan = GOERLI_ETHERSCAN_API_KEY
             public readonly infura = {
-              projectId: RINKEBY_INFURA_PROJECT_ID,
-              projectSecret: RINKEBY_INFURA_PROJECT_SECRET,
+              projectId: GOERLI_INFURA_PROJECT_ID,
+              projectSecret: GOERLI_INFURA_PROJECT_SECRET,
             }
           }
 
@@ -1007,7 +1259,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: RINKEBY_NETWORK,
+                    network: GOERLI_NETWORK,
                     etherscan: config.etherscan,
                     infura: config.infura,
                     useDefaultProvider: false,
@@ -1019,7 +1271,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1071,7 +1323,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1125,7 +1377,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1254,7 +1506,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1295,7 +1547,7 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly bscscan = RINKEBY_ETHERSCAN_API_KEY
+            public readonly bscscan = GOERLI_ETHERSCAN_API_KEY
           }
 
           @Module({
@@ -1321,7 +1573,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1338,13 +1590,19 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should use the default bsc provider without community token', async () => {
+        it('should use the default binance providers without community token', async () => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
             .get('')
             .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
+          nock(TESTNET_BSCPOCKET_URL)
+            .post(`/${GOERLI_POKT_API_KEY}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
+            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
           @Controller('/')
@@ -1363,7 +1621,8 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly bscscan = RINKEBY_ETHERSCAN_API_KEY
+            public readonly bscscan = GOERLI_ETHERSCAN_API_KEY
+            public readonly pocket = GOERLI_POKT_API_KEY
             public readonly useDefaultProvider = true
           }
 
@@ -1380,6 +1639,7 @@ describe('Ethers Module Initialization', () => {
                 useFactory: (config: ConfigService) => {
                   return {
                     network: BINANCE_TESTNET_NETWORK,
+                    pocket: config.pocket,
                     bscscan: config.bscscan,
                     useDefaultProvider: config.useDefaultProvider,
                   }
@@ -1410,18 +1670,18 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should use the default bsc provider', async () => {
+        it('should use the default binance providers', async () => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query({
               ...ETHERSCAN_GET_GAS_PRICE_QUERY,
-              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+              apikey: BSCSCAN_DEFAULT_API_KEY,
             })
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
             .get('')
             .query({
               ...ETHERSCAN_GET_BLOCK_NUMBER_QUERY,
-              apikey: 'EVTS3CU31AATZV72YQ55TPGXGMVIFUQ9M9',
+              apikey: BSCSCAN_DEFAULT_API_KEY,
             })
             .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
 
@@ -1503,7 +1763,7 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly network = RINKEBY_NETWORK
+            public readonly network = GOERLI_NETWORK
             public readonly cloudflare = true
           }
 
@@ -1564,7 +1824,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: BNB_TESTNET_NETWORK,
+                    network: BINANCE_TESTNET_NETWORK,
                     custom: config.custom,
                     useDefaultProvider: false,
                   }
@@ -1575,7 +1835,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1642,7 +1902,7 @@ describe('Ethers Module Initialization', () => {
                 inject: [ConfigService],
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: BNB_TESTNET_NETWORK,
+                    network: BINANCE_TESTNET_NETWORK,
                     custom: config.custom,
                     useDefaultProvider: false,
                   }
@@ -1653,7 +1913,7 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), { logger: false })
+          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
           const server = app.getHttpServer()
 
           await app.init()
@@ -1671,12 +1931,12 @@ describe('Ethers Module Initialization', () => {
         })
 
         it('should work with multiple instances of ethers provider', async () => {
-          nock(RINKEBY_POCKET_URL)
-            .post(`/${RINKEBY_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+          nock(GOERLI_POCKET_URL)
+            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           nock(MUMBAI_ALCHEMY_URL)
-            .post(`/${RINKEBY_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
+            .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -1707,9 +1967,9 @@ describe('Ethers Module Initialization', () => {
 
           @Injectable()
           class ConfigService {
-            public readonly applicationId = RINKEBY_POKT_API_KEY
-            public readonly applicationSecretKey = RINKEBY_POKT_SECRET_KEY
-            public readonly alchemy = RINKEBY_ALCHEMY_API_KEY
+            public readonly applicationId = GOERLI_POKT_API_KEY
+            public readonly applicationSecretKey = GOERLI_POKT_SECRET_KEY
+            public readonly alchemy = GOERLI_ALCHEMY_API_KEY
             public readonly custom = CUSTOM_BSC_1_URL
           }
 
@@ -1727,7 +1987,7 @@ describe('Ethers Module Initialization', () => {
                 token: 'eth',
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: RINKEBY_NETWORK,
+                    network: GOERLI_NETWORK,
                     pocket: {
                       applicationId: config.applicationId,
                       applicationSecretKey: config.applicationSecretKey,
@@ -1754,7 +2014,7 @@ describe('Ethers Module Initialization', () => {
                 token: 'bsc',
                 useFactory: (config: ConfigService) => {
                   return {
-                    network: BNB_TESTNET_NETWORK,
+                    network: BINANCE_TESTNET_NETWORK,
                     custom: config.custom,
                     useDefaultProvider: false,
                   }

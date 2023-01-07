@@ -1,71 +1,55 @@
-import {
-  BscscanProvider,
-  getDefaultProvider as getDefaultBscProvider,
-  getNetwork as getBscNetwork,
-} from '@ethers-ancillary/bsc'
+import { Logger, LogLevel } from '@ethersproject/logger'
 import {
   Provider as AbstractProvider,
   BaseProvider,
-  getDefaultProvider,
-  FallbackProvider,
   AlchemyProvider,
   CloudflareProvider,
   EtherscanProvider,
   InfuraProvider,
   PocketProvider,
-  getNetwork,
-  Networkish,
-  Network,
   StaticJsonRpcProvider,
+  AnkrProvider,
 } from '@ethersproject/providers'
+import { ConnectionInfo } from '@ethersproject/web'
 import { Provider } from '@nestjs/common'
-import { ConnectionInfo } from 'ethers/lib/utils'
 import { defer, lastValueFrom } from 'rxjs'
-import { ETHERS_MODULE_OPTIONS, MAINNET_NETWORK, BINANCE_NETWORK, BINANCE_TESTNET_NETWORK } from './ethers.constants'
+import { ETHERS_MODULE_OPTIONS, MAINNET_NETWORK } from './ethers.constants'
 import { EthersContract } from './ethers.contract'
+import {
+  BinanceMoralisProvider,
+  BinancePocketProvider,
+  BscscanProvider,
+  EthereumMoralisProvider,
+  getFallbackProvider,
+  getNetworkDefaultProvider,
+} from './ethers.custom-rpcs'
 import { EthersModuleOptions, EthersModuleAsyncOptions } from './ethers.interface'
 import { EthersSigner } from './ethers.signer'
-import { getEthersToken, getContractToken, getSignerToken } from './ethers.utils'
-
-function validateBscNetwork(network: Networkish) {
-  if (typeof network === 'number') {
-    return [BINANCE_NETWORK.chainId, BINANCE_TESTNET_NETWORK.chainId].includes(network)
-  }
-
-  if (typeof network === 'string') {
-    return [BINANCE_NETWORK.name, BINANCE_TESTNET_NETWORK.name].includes(network)
-  }
-
-  return [BINANCE_NETWORK, BINANCE_TESTNET_NETWORK].includes(network)
-}
+import { getEthersToken, getContractToken, getSignerToken, getNetwork, isBinanceNetwork } from './ethers.utils'
 
 export async function createBaseProvider(options: EthersModuleOptions): Promise<BaseProvider | AbstractProvider> {
   const {
     network = MAINNET_NETWORK,
-    alchemy,
-    etherscan,
-    infura,
-    pocket,
-    cloudflare = false,
-    bscscan,
-    custom,
     quorum = 1,
     waitUntilIsConnected = true,
     useDefaultProvider = true,
+    disableEthersLogger = false,
+    alchemy,
+    etherscan,
+    bscscan,
+    infura,
+    pocket,
+    moralis,
+    ankr,
+    cloudflare = false,
+    custom,
   } = options
 
-  let providerNetwork: Network | undefined
-  const isBscNetwork = validateBscNetwork(network)
-
-  if (isBscNetwork) {
-    providerNetwork = getBscNetwork(network) ?? undefined
-  } else {
-    providerNetwork = getNetwork(network)
+  if (disableEthersLogger) {
+    Logger.setLogLevel(LogLevel.OFF)
   }
 
-  if (!providerNetwork) {
-    throw new Error(`Invalid network ${network}.`)
-  }
+  const providerNetwork = getNetwork(network)
 
   if (!useDefaultProvider) {
     const providers: Array<BaseProvider> = []
@@ -78,12 +62,28 @@ export async function createBaseProvider(options: EthersModuleOptions): Promise<
       providers.push(new EtherscanProvider(providerNetwork, etherscan))
     }
 
+    if (bscscan) {
+      providers.push(new BscscanProvider(providerNetwork, bscscan))
+    }
+
     if (infura) {
       providers.push(new InfuraProvider(providerNetwork, infura))
     }
 
     if (pocket) {
-      providers.push(new PocketProvider(providerNetwork, pocket))
+      if (isBinanceNetwork(providerNetwork)) {
+        providers.push(new BinancePocketProvider(providerNetwork, pocket))
+      } else {
+        providers.push(new PocketProvider(providerNetwork, pocket))
+      }
+    }
+
+    if (moralis) {
+      if (isBinanceNetwork(providerNetwork)) {
+        providers.push(new BinanceMoralisProvider(providerNetwork, moralis))
+      } else {
+        providers.push(new EthereumMoralisProvider(providerNetwork, moralis))
+      }
     }
 
     if (cloudflare) {
@@ -94,8 +94,8 @@ export async function createBaseProvider(options: EthersModuleOptions): Promise<
       providers.push(new CloudflareProvider(providerNetwork))
     }
 
-    if (bscscan) {
-      providers.push(new BscscanProvider(providerNetwork, bscscan))
+    if (ankr) {
+      providers.push(new AnkrProvider(providerNetwork, ankr))
     }
 
     if (custom) {
@@ -106,32 +106,7 @@ export async function createBaseProvider(options: EthersModuleOptions): Promise<
       })
     }
 
-    if (providers.length > 0) {
-      if (waitUntilIsConnected) {
-        // wait until the node is up and running smoothly.
-        await Promise.all(providers.map((provider) => provider.ready))
-      }
-
-      if (providers.length > 1) {
-        /**
-         * FallbackProvider with selected providers.
-         * @see {@link https://docs.ethers.io/v5/api/providers/other/#FallbackProvider}
-         */
-        return new FallbackProvider(providers, quorum)
-      }
-
-      return providers[0]
-    }
-
-    throw new Error(
-      'Error in provider creation. The property "useDefaultProvider" is false and the providers supplied are invalid.',
-    )
-  }
-
-  if (useDefaultProvider && isBscNetwork) {
-    const bscConfig: Record<string, string> = bscscan ? { bscscan } : {}
-
-    return getDefaultBscProvider(providerNetwork, bscConfig)
+    return getFallbackProvider(providers, quorum, waitUntilIsConnected)
   }
 
   /**
@@ -139,11 +114,14 @@ export async function createBaseProvider(options: EthersModuleOptions): Promise<
    * It creates a FallbackProvider connected to as many backend services as possible.
    * @see {@link https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider}
    */
-  return getDefaultProvider(providerNetwork, {
+  return getNetworkDefaultProvider(providerNetwork, {
     alchemy,
     etherscan,
+    bscscan,
     infura,
     pocket,
+    moralis,
+    ankr,
     quorum,
   })
 }
