@@ -37,6 +37,7 @@ export interface ProviderOptions {
   ankr?: AnkrProviderOptions | string | undefined
   custom?: ConnectionInfo | string | (ConnectionInfo | string)[] | undefined
   quorum?: number | undefined
+  batched?: boolean | undefined
 }
 
 export interface EthersModuleOptions extends ProviderOptions {

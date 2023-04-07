@@ -1,3 +1,4 @@
+import { providers as multicall } from '@0xsequence/multicall'
 import {
   BaseProvider,
   EtherscanProvider,
@@ -205,4 +206,8 @@ export async function getNetworkDefaultProvider(network: Network, options: Provi
   }
 
   return getDefaultProvider(network, options)
+}
+
+export async function getMulticallProvider(provider: FallbackProvider | BaseProvider) {
+  return new multicall.MulticallProvider(provider)
 }
