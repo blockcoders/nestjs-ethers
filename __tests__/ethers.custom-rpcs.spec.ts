@@ -1,3 +1,4 @@
+import { providers as multicall } from '@0xsequence/multicall'
 import {
   AlchemyProvider,
   AnkrProvider,
@@ -21,6 +22,7 @@ import {
   EthereumMoralisProvider,
   getBinanceDefaultProvider,
   getFallbackProvider,
+  getMulticallProvider,
   getNetworkDefaultProvider,
   MoralisProvider,
 } from '../src/ethers.custom-rpcs'
@@ -214,6 +216,19 @@ describe('Ethers Custom RPC', () => {
       ])
 
       expect(provider).toBeInstanceOf(FallbackProvider)
+    })
+  })
+
+  describe('getMulticallProvider', () => {
+    it('should return a instance of MulticallProvider', async () => {
+      const fallbackProvider = await getFallbackProvider([
+        new CloudflareProvider(MAINNET_NETWORK),
+        new InfuraProvider(MAINNET_NETWORK),
+      ])
+
+      const provider = await getMulticallProvider(fallbackProvider)
+
+      expect(provider).toBeInstanceOf(multicall.MulticallProvider)
     })
   })
 
