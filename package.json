@@ -44,6 +44,7 @@
   "homepage": "https://github.com/blockcoders/nestjs-ethers/blob/main/README.md",
   "bugs": "https://github.com/blockcoders/nestjs-ethers/issues",
   "dependencies": {
+    "@0xsequence/multicall": "^0.43.26",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",
