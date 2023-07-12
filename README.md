@@ -1,5 +1,4 @@
-NestJS-Ethers
-=============
+# NestJS-Ethers
 
 [![npm](https://img.shields.io/npm/v/nestjs-ethers)](https://www.npmjs.com/package/nestjs-ethers)
 [![CircleCI](https://circleci.com/gh/blockcoders/nestjs-ethers/tree/main.svg?style=svg)](https://circleci.com/gh/blockcoders/nestjs-ethers/tree/main)
@@ -7,7 +6,6 @@ NestJS-Ethers
 [![vulnerabilities](https://badgen.net/snyk/blockcoders/nestjs-ethers)](https://snyk.io/test/github/blockcoders/nestjs-ethers)
 [![CodeQL](https://github.com/blockcoders/nestjs-ethers/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/blockcoders/nestjs-ethers/actions/workflows/codeql-analysis.yml)
 [![supported platforms](https://img.shields.io/badge/platforms-Express%20%26%20Fastify-green)](https://img.shields.io/badge/platforms-Express%20%26%20Fastify-green)
-
 
 Ethereum utilities for NestJS based on [Ethers.js](https://github.com/ethers-io/ethers.js/)
 
@@ -33,7 +31,7 @@ import { EthersModule } from 'nestjs-ethers';
 class MyModule {}
 ```
 
-**NOTE:** *By default `EthersModule` will try to connect using [getDefaultProvider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider). It's the safest, easiest way to begin developing on Ethereum. It creates a [FallbackProvider](https://docs.ethers.io/v5/api/providers/other/#FallbackProvider) connected to as many backend services as possible.* 
+**NOTE:** _By default `EthersModule` will try to connect using [getDefaultProvider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider). It's the safest, easiest way to begin developing on Ethereum. It creates a [FallbackProvider](https://docs.ethers.io/v5/api/providers/other/#FallbackProvider) connected to as many backend services as possible._
 
 ### Configuration params
 
@@ -49,60 +47,60 @@ interface EthersModuleOptions {
    * such as http://localhost:8545 or wss://example.com.
    * @see {@link https://docs.ethers.io/v5/api/providers/types/#providers-Networkish}
    */
-  network?: Network | string;
+  network?: Network | string
 
   /**
    * Optional parameter for Alchemy API Token
    * @see {@link https://alchemyapi.io}
    */
-  alchemy?: string;
+  alchemy?: string
 
   /**
    * Optional parameter for Etherscan API Token
    * @see {@link https://etherscan.io}
    */
-  etherscan?: string;
-  
+  etherscan?: string
+
   /**
    * Optional parameter for Bscscan API Token
    * @see {@link https://bscscan.com/}
    */
-  bscscan?: string;
+  bscscan?: string
 
   /**
    * Optional parameter for use Cloudflare Provider
    * @see {@link https://cloudflare-eth.com}
    */
-  cloudflare?: boolean;
+  cloudflare?: boolean
 
   /**
    * Optional parameter for Infura Project ID
    * or InfuraProviderOptions(applicationId, applicationSecretKey)
    * @see {@link https://infura.io}
    */
-  infura?: InfuraProviderOptions | string;
+  infura?: InfuraProviderOptions | string
 
   /**
    * Optional parameter for Pocket Network Application ID
    * or PocketProviderOptions(projectId, projectSecret)
    * @see {@link https://pokt.network}
    */
-  pocket?: PocketProviderOptions | string;
-  
+  pocket?: PocketProviderOptions | string
+
   /**
    * Optional parameter for Moralis API Token
    * or MoralisProviderOptions(apiKey, region)
    * @see {@link https://moralis.io/}
    */
-  moralis?: MoralisProviderOptions | string;
-  
+  moralis?: MoralisProviderOptions | string
+
   /**
    * Optional parameter for Ankr API Token
    * or AnkrProviderOptions(apiKey, projectSecret)
    * @see {@link https://www.ankr.com/}
    */
-  ankr?: AnkrProviderOptions | string;
-  
+  ankr?: AnkrProviderOptions | string
+
   /**
    * Optional parameter for a custom StaticJsonRpcProvider
    * You can connect using an URL, ConnectionInfo or an array of both.
@@ -112,38 +110,48 @@ interface EthersModuleOptions {
   custom?: ConnectionInfo | string | (ConnectionInfo | string)[]
 
   /**
+   * Optional parameter to use MulticallProvider
+   * Will create a MulticallProvider instance using StaticJsonRpcProvider when using custom provider.
+   * @see {@link https://www.npmjs.com/package/@0xsequence/multicall}
+   *
+   * Check if is sequence multicall contract is deployed on a network.
+   * @see {@link https://blockscan.com/address/0xd130B43062D875a4B7aF3f8fc036Bc6e9D3E1B3E}
+   */
+  batched?: boolean
+
+  /**
    * Optional parameter the number of backends that must agree
    * (default: 2 for mainnet, 1 for testnets)
    */
-  quorum?: number;
+  quorum?: number
 
   /**
    * Optional parameter if this option is false, EthersModule won't wait until
-   * the providers are ready. If this option is true, EthersModule  will wait 
+   * the providers are ready. If this option is true, EthersModule  will wait
    * until the network has heen established for all the providers.
    * @see {@link https://docs.ethers.io/v5/api/providers/provider/#Provider-ready}
    */
-  waitUntilIsConnected?: boolean;
+  waitUntilIsConnected?: boolean
 
   /**
    * Optional parameter if this option is false, EthersModule will try to connect
    * with the credentials provided in options. If you define more than one provider,
    * EthersModule will use the FallbackProvider to send multiple requests simultaneously.
    */
-  useDefaultProvider?: boolean;
+  useDefaultProvider?: boolean
 
   /**
-   * Optional parameter if this option is true, EthersModule will disable 
+   * Optional parameter if this option is true, EthersModule will disable
    * the console.log in the ethers.js library.
    */
   disableEthersLogger?: boolean
-  
+
   /**
    * Optional parameter to associate a token name to EthersProvider,
    * the token is used to request an instance of a class by the same name.
    * This can be useful when you want multiple intances of EthersProvider.
    */
-  token?: string;
+  token?: string
 }
 ```
 
@@ -226,14 +234,14 @@ class TestModule {}
 Or you can just pass `ConfigService` to `providers`, if you don't have any `ConfigModule`:
 
 ```ts
-import { EthersModule, RINKEBY_NETWORK } from 'nestjs-ethers';
+import { EthersModule, RINKEBY_NETWORK } from 'nestjs-ethers'
 
 @Injectable()
 class ConfigService {
   public readonly pocket: {
-    applicationId: '9b0afc55221c429104d04ef9',
-    applicationSecretKey: 'b5e6d6a55426712a42a93f39555973fc',
-  };
+    applicationId: '9b0afc55221c429104d04ef9'
+    applicationSecretKey: 'b5e6d6a55426712a42a93f39555973fc'
+  }
 }
 
 @Module({
@@ -246,11 +254,11 @@ class ConfigService {
           network: RINKEBY_NETWORK,
           pocket: config.pocket,
           useDefaultProvider: false,
-        };
-      }
-    })
+        }
+      },
+    }),
   ],
-  controllers: [TestController]
+  controllers: [TestController],
 })
 class TestModule {}
 ```
@@ -304,7 +312,7 @@ class TestModule {}
 `BaseProvider` implements standard [Ether.js Provider](https://docs.ethers.io/v5/api/providers/provider/). So if you are familiar with it, you are ready to go.
 
 ```ts
-import { InjectEthersProvider, BaseProvider } from 'nestjs-ethers';
+import { InjectEthersProvider, BaseProvider } from 'nestjs-ethers'
 
 @Injectable()
 export class TestService {
@@ -313,7 +321,7 @@ export class TestService {
     private readonly ethersProvider: BaseProvider,
   ) {}
   async someMethod(): Promise<Network> {
-    return this.ethersProvider.getNetwork();
+    return this.ethersProvider.getNetwork()
   }
 }
 ```
@@ -477,14 +485,59 @@ class TestController {
 }
 ```
 
-## EthersSigner 
+## Custom MulticallProvider
+
+If you want to use [MulticallProvider](https://www.npmjs.com/package/@0xsequence/multicall). This support any ethers.js v5 providers including but not limited to StaticJsonRpcProvider, FallbackProvider, InfuraProvider, etc.
+
+Useful when you want to reduce request time as the requests are now aggregated.
+
+```ts
+import {
+  EthersModule,
+  InjectEthersProvider,
+  BNB_TESTNET_NETWORK
+} from 'nestjs-ethers';
+
+import {
+  providers
+} from '@0xsequence/multicall';
+
+@Module({
+  imports: [
+    EthersModule.forRoot({
+      network: BNB_TESTNET_NETWORK,
+      custom: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+      useDefaultProvider: false,
+      batched: true
+    })
+  ],
+  ...
+})
+class MyModule {}
+
+@Controller('/')
+class TestController {
+  constructor(
+    @InjectEthersProvider()
+    private readonly multicallProvider: providers.MulticallProvider,
+  ) {}
+  @Get()
+  async get() {
+    const gasPrice: BigNumber = await this.multicallProvider.getGasPrice()
+
+    return { gasPrice: gasPrice.toString() }
+  }
+}
+```
+
+## EthersSigner
 
 `EthersSigner` implements methods to create a [Wallet](https://docs.ethers.io/v5/api/signer/#Wallet) or [VoidSigner](https://docs.ethers.io/v5/api/signer/#VoidSigner). A `Signer` in ethers is an abstraction of an Ethereum Account, which can be used to sign messages and transactions and send signed transactions to the Ethereum Network. This service will also inject the `BaseProvider` into the wallet.
 
 Create a `Wallet` from a private key:
 
 ```ts
-import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
+import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers'
 
 @Injectable()
 export class TestService {
@@ -494,10 +547,10 @@ export class TestService {
   ) {}
   async someMethod(): Promise<string> {
     const wallet: Wallet = this.ethersSigner.createWallet(
-      '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
-    );
+      '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb',
+    )
 
-    return wallet.getAddress();
+    return wallet.getAddress()
   }
 }
 ```
@@ -505,7 +558,7 @@ export class TestService {
 Create a random [Wallet](https://docs.ethers.io/v5/api/signer/#Wallet-createRandom):
 
 ```ts
-import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
+import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers'
 
 @Injectable()
 export class TestService {
@@ -514,9 +567,9 @@ export class TestService {
     private readonly ethersSigner: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: Wallet = this.ethersSigner.createRandomWallet();
+    const wallet: Wallet = this.ethersSigner.createRandomWallet()
 
-    return wallet.getAddress();
+    return wallet.getAddress()
   }
 }
 ```
@@ -524,7 +577,7 @@ export class TestService {
 Create a [Wallet](https://docs.ethers.io/v5/api/signer/#Wallet-fromEncryptedJson) from an encrypted JSON:
 
 ```ts
-import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
+import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers'
 
 @Injectable()
 export class TestService {
@@ -541,8 +594,7 @@ export class TestService {
         Crypto: {
           cipher: 'aes-128-ctr',
           cipherparams: { iv: 'bc0473d60284d2d6994bb6793e916d06' },
-          ciphertext:
-            'e73ed0b0c53bcaea4516a15faba3f6d76dbe71b9b46a460ed7e04a68e0867dd7',
+          ciphertext: 'e73ed0b0c53bcaea4516a15faba3f6d76dbe71b9b46a460ed7e04a68e0867dd7',
           kdf: 'scrypt',
           kdfparams: {
             salt: '97f0b6e17c392f76a726ceea02bac98f17265f1aa5cf8f9ad1c2b56025bc4714',
@@ -561,10 +613,10 @@ export class TestService {
           version: '0.1',
         },
       },
-      'password'
-    );
+      'password',
+    )
 
-    return wallet.getAddress();
+    return wallet.getAddress()
   }
 }
 ```
@@ -572,7 +624,7 @@ export class TestService {
 Create a [Wallet](https://docs.ethers.io/v5/api/signer/#Wallet.fromMnemonic) from a mnemonic:
 
 ```ts
-import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
+import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers'
 
 @Injectable()
 export class TestService {
@@ -582,10 +634,10 @@ export class TestService {
   ) {}
   async someMethod(): Promise<string> {
     const wallet: Wallet = this.ethersSigner.createWalletfromMnemonic(
-      'service basket parent alcohol fault similar survey twelve hockey cloud walk panel'
-    );
+      'service basket parent alcohol fault similar survey twelve hockey cloud walk panel',
+    )
 
-    return wallet.getAddress();
+    return wallet.getAddress()
   }
 }
 ```
@@ -593,7 +645,7 @@ export class TestService {
 Create a [VoidSigner](https://docs.ethers.io/v5/api/signer/ from an address:
 
 ```ts
-import { EthersSigner, InjectSignerProvider, VoidSigner } from 'nestjs-ethers';
+import { EthersSigner, InjectSignerProvider, VoidSigner } from 'nestjs-ethers'
 
 @Injectable()
 export class TestService {
@@ -602,11 +654,9 @@ export class TestService {
     private readonly ethersSigner: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: VoidSigner = this.ethersSigner.createVoidSigner(
-      '0x012363d61bdc53d0290a0f25e9c89f8257550fb8'
-    );
+    const wallet: VoidSigner = this.ethersSigner.createVoidSigner('0x012363d61bdc53d0290a0f25e9c89f8257550fb8')
 
-    return wallet.getAddress();
+    return wallet.getAddress()
   }
 }
 ```
@@ -618,8 +668,8 @@ export class TestService {
 Create a `SmartContract` attached to an address:
 
 ```ts
-import { EthersContract, InjectContractProvider, Contract, Network } from 'nestjs-ethers';
-import * as ABI from './utils/ABI.json';
+import { EthersContract, InjectContractProvider, Contract, Network } from 'nestjs-ethers'
+import * as ABI from './utils/ABI.json'
 
 @Injectable()
 class TestService {
@@ -628,12 +678,9 @@ class TestService {
     private readonly ethersContract: EthersContract,
   ) {}
   async someMethod(): Promise<Network> {
-    const contract: Contract = this.ethersContract.create(
-      '0x012363d61bdc53d0290a0f25e9c89f8257550fb8',
-      ABI,
-    );
+    const contract: Contract = this.ethersContract.create('0x012363d61bdc53d0290a0f25e9c89f8257550fb8', ABI)
 
-    return contract.provider.getNetwork();
+    return contract.provider.getNetwork()
   }
 }
 ```
@@ -648,9 +695,9 @@ import {
   InjectSignerProvider,
   Contract,
   Network,
-  Wallet
-} from 'nestjs-ethers';
-import * as ABI from './utils/ABI.json';
+  Wallet,
+} from 'nestjs-ethers'
+import * as ABI from './utils/ABI.json'
 
 @Injectable()
 class TestService {
@@ -662,15 +709,11 @@ class TestService {
   ) {}
   async someMethod(): Promise<Network> {
     const wallet: Wallet = this.ethersSigner.createWallet(
-      '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
-    );
-    const contract: Contract = this.ethersContract.create(
-      '0x012363d61bdc53d0290a0f25e9c89f8257550fb8',
-      ABI,
-      wallet,
-    );
+      '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb',
+    )
+    const contract: Contract = this.ethersContract.create('0x012363d61bdc53d0290a0f25e9c89f8257550fb8', ABI, wallet)
 
-    return contract.signer.provider.getNetwork();
+    return contract.signer.provider.getNetwork()
   }
 }
 ```
@@ -697,7 +740,7 @@ import {
   RINKEBY_NETWORK,
   MUMBAI_NETWORK,
   BNB_TESTNET_NETWORK,
-} from 'nestjs-ethers';
+} from 'nestjs-ethers'
 
 @Controller('/')
 class TestController {
@@ -768,7 +811,7 @@ import {
   RINKEBY_NETWORK,
   MUMBAI_NETWORK,
   BNB_TESTNET_NETWORK,
-} from 'nestjs-ethers';
+} from 'nestjs-ethers'
 
 @Controller('/')
 class TestController {
@@ -857,53 +900,53 @@ class TestModule {}
 
 ## Testing a class that uses InjectEthersProvider
 
-This package exposes a getEthersToken(token?: string) function that returns a prepared injection token based on the provided context. 
+This package exposes a getEthersToken(token?: string) function that returns a prepared injection token based on the provided context.
 Using this token, you can easily provide a mock implementation of the `BaseProvider` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
 
 ```ts
-  const module: TestingModule = await Test.createTestingModule({
-    providers: [
-      MyService,
-      {
-        provide: getEthersToken(MyService.name),
-        useValue: mockProvider,
-      },
-    ],
-  }).compile();
+const module: TestingModule = await Test.createTestingModule({
+  providers: [
+    MyService,
+    {
+      provide: getEthersToken(MyService.name),
+      useValue: mockProvider,
+    },
+  ],
+}).compile()
 ```
 
 ## Testing a class that uses InjectContractProvider
 
-This package exposes a getContractToken(token?: string) function that returns a prepared injection token based on the contract provided context. 
+This package exposes a getContractToken(token?: string) function that returns a prepared injection token based on the contract provided context.
 Using this token, you can easily provide a mock implementation of the `ethers.Contract` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
 
 ```ts
-  const module: TestingModule = await Test.createTestingModule({
-    providers: [
-      MyService,
-      {
-        provide: getContractToken(MyService.name),
-        useValue: mockContractProvider,
-      },
-    ],
-  }).compile();
+const module: TestingModule = await Test.createTestingModule({
+  providers: [
+    MyService,
+    {
+      provide: getContractToken(MyService.name),
+      useValue: mockContractProvider,
+    },
+  ],
+}).compile()
 ```
 
 ## Testing a class that uses InjectSignerProvider
 
-This package exposes a getSignerToken(token?: string) function that returns a prepared injection token based on the signer provided context. 
+This package exposes a getSignerToken(token?: string) function that returns a prepared injection token based on the signer provided context.
 Using this token, you can easily provide a mock implementation of the `ethers.Signer` using any of the standard custom provider techniques, including useClass, useValue, and useFactory.
 
 ```ts
-  const module: TestingModule = await Test.createTestingModule({
-    providers: [
-      MyService,
-      {
-        provide: getSignerToken(MyService.name),
-        useValue: mockSignerProvider,
-      },
-    ],
-  }).compile();
+const module: TestingModule = await Test.createTestingModule({
+  providers: [
+    MyService,
+    {
+      provide: getSignerToken(MyService.name),
+      useValue: mockSignerProvider,
+    },
+  ],
+}).compile()
 ```
 
 ## Migration
@@ -923,22 +966,22 @@ A new more convenient way to inject the `EthersSigner` and `EthersContract` prov
 
 ```ts
 // v0
-import { EthersSigner, WalletSigner } from 'nestjs-ethers';
+import { EthersSigner, WalletSigner } from 'nestjs-ethers'
 
 @Injectable()
 export class TestService {
   constructor(private readonly ethersSigner: EthersSigner) {}
   async someMethod(): Promise<string> {
     const wallet: WalletSigner = this.ethersSigner.createWallet(
-      '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
-    );
+      '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb',
+    )
 
-    return wallet.getAddress();
+    return wallet.getAddress()
   }
 }
 
 // v1
-import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
+import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers'
 
 @Injectable()
 export class TestService {
@@ -947,12 +990,11 @@ export class TestService {
     private readonly ethersSigner: EthersSigner,
   ) {}
   async someMethod(): Promise<string> {
-    const wallet: Wallet = this.ethersSigner
-    .createWallet(
-      '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
-    );
+    const wallet: Wallet = this.ethersSigner.createWallet(
+      '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb',
+    )
 
-    return wallet.getAddress();
+    return wallet.getAddress()
   }
 }
 ```
@@ -961,25 +1003,22 @@ export class TestService {
 
 ```ts
 // v0
-import { EthersContract, SmartContract } from 'nestjs-ethers';
-import * as ABI from './utils/ABI.json';
+import { EthersContract, SmartContract } from 'nestjs-ethers'
+import * as ABI from './utils/ABI.json'
 
 @Injectable()
 class TestService {
   constructor(private readonly ethersContract: EthersContract) {}
   async someMethod(): Promise<string> {
-    const contract: SmartContract = this.ethersContract.create(
-      '0x012363d61bdc53d0290a0f25e9c89f8257550fb8',
-      ABI,
-    );
+    const contract: SmartContract = this.ethersContract.create('0x012363d61bdc53d0290a0f25e9c89f8257550fb8', ABI)
 
-    return contract.provider.getNetwork();
+    return contract.provider.getNetwork()
   }
 }
 
 // v1
-import { EthersContract, InjectContractProvider, Contract, Network } from 'nestjs-ethers';
-import * as ABI from './utils/ABI.json';
+import { EthersContract, InjectContractProvider, Contract, Network } from 'nestjs-ethers'
+import * as ABI from './utils/ABI.json'
 
 @Injectable()
 class TestService {
@@ -988,12 +1027,9 @@ class TestService {
     private readonly contract: EthersContract,
   ) {}
   async someMethod(): Promise<Network> {
-    const contract: Contract = this.ethersContract.create(
-      '0x012363d61bdc53d0290a0f25e9c89f8257550fb8',
-      ABI,
-    );
+    const contract: Contract = this.ethersContract.create('0x012363d61bdc53d0290a0f25e9c89f8257550fb8', ABI)
 
-    return contract.provider.getNetwork();
+    return contract.provider.getNetwork()
   }
 }
 ```
@@ -1008,7 +1044,7 @@ Contributions welcome! See [Contributing](CONTRIBUTING.md).
 
 ## Collaborators
 
-* [__Jose Ramirez__](https://github.com/0xslipk)
+- [**Jose Ramirez**](https://github.com/0xslipk)
 
 ## License
 
