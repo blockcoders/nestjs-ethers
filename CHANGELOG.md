@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/10/12**
+- [#148](https://github.com/blockcoders/nestjs-ethers/pull/148) Added option to use MulticallProvider instead of StaticJsonRpcProvider when using custom provider by [@0x67](https://github.com/0x67)
+
 ## 2.0.3
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/01/07**
 - Add @ethersproject/* as dependencies
