@@ -1,5 +1,4 @@
 // import { randomBytes } from 'crypto';
-import { providers } from '@0xsequence/multicall'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Network } from '@ethersproject/networks'
 import {
@@ -166,54 +165,6 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should work with alchemy provider with multicall provider', async () => {
-          nock(GOERLI_ALCHEMY_URL)
-            .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
-            ) {}
-            @Get()
-            async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
-
-              return { gasPrice: gasPrice.toString() }
-            }
-          }
-          @Module({
-            imports: [
-              EthersModule.forRoot({
-                network: GOERLI_NETWORK,
-                alchemy: GOERLI_ALCHEMY_API_KEY,
-                useDefaultProvider: false,
-                batched: true,
-              }),
-            ],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
-
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
-        })
-
         it('should work with pocket provider', async () => {
           nock(GOERLI_POCKET_URL)
             .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
@@ -264,57 +215,6 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should work with pocket provider with multicall provider', async () => {
-          nock(GOERLI_POCKET_URL)
-            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
-            ) {}
-            @Get()
-            async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
-
-              return { gasPrice: gasPrice.toString() }
-            }
-          }
-          @Module({
-            imports: [
-              EthersModule.forRoot({
-                network: GOERLI_NETWORK,
-                pocket: {
-                  applicationId: GOERLI_POKT_API_KEY,
-                  applicationSecretKey: GOERLI_POKT_SECRET_KEY,
-                },
-                useDefaultProvider: false,
-                batched: true,
-              }),
-            ],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
-
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
-        })
-
         it('should work with ethereum moralis provider', async () => {
           nock(GOERLI_MORALIS_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
@@ -337,52 +237,6 @@ describe('Ethers Module Initialization', () => {
                 network: GOERLI_NETWORK,
                 moralis: GOERLI_MORALIS_API_KEY,
                 useDefaultProvider: false,
-              }),
-            ],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
-
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
-        })
-
-        it('should work with ethereum moralis provider with multicall provider', async () => {
-          nock(GOERLI_MORALIS_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
-            ) {}
-            @Get()
-            async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
-
-              return { gasPrice: gasPrice.toString() }
-            }
-          }
-          @Module({
-            imports: [
-              EthersModule.forRoot({
-                network: GOERLI_NETWORK,
-                moralis: GOERLI_MORALIS_API_KEY,
-                useDefaultProvider: false,
-                batched: true,
               }),
             ],
             controllers: [TestController],
@@ -453,54 +307,6 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should work with bsc moralis provider with multicall provider', async () => {
-          nock(BINANCE_TESTNET_MORALIS_URL)
-            .post('', PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
-            ) {}
-            @Get()
-            async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
-
-              return { gasPrice: gasPrice.toString() }
-            }
-          }
-          @Module({
-            imports: [
-              EthersModule.forRoot({
-                network: BINANCE_TESTNET_NETWORK,
-                moralis: BINANCE_TESTNET_MORALIS_API_KEY,
-                useDefaultProvider: false,
-                batched: true,
-              }),
-            ],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
-
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
-        })
-
         it('should work with ankr provider', async () => {
           nock(GOERLI_ANKR_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
@@ -523,52 +329,6 @@ describe('Ethers Module Initialization', () => {
                 network: GOERLI_NETWORK,
                 ankr: GOERLI_ANKR_API_KEY,
                 useDefaultProvider: false,
-              }),
-            ],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
-
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
-        })
-
-        it('should work with ankr provider with multicall provider', async () => {
-          nock(GOERLI_ANKR_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
-            ) {}
-            @Get()
-            async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
-
-              return { gasPrice: gasPrice.toString() }
-            }
-          }
-          @Module({
-            imports: [
-              EthersModule.forRoot({
-                network: GOERLI_NETWORK,
-                ankr: GOERLI_ANKR_API_KEY,
-                useDefaultProvider: false,
-                batched: true,
               }),
             ],
             controllers: [TestController],
@@ -619,57 +379,6 @@ describe('Ethers Module Initialization', () => {
                   applicationSecretKey: GOERLI_POKT_SECRET_KEY,
                 },
                 useDefaultProvider: false,
-              }),
-            ],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
-
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
-        })
-
-        it('should work with binance pocket provider with multicall provider', async () => {
-          nock(BSC_POCKET_URL)
-            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
-            ) {}
-            @Get()
-            async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
-
-              return { gasPrice: gasPrice.toString() }
-            }
-          }
-          @Module({
-            imports: [
-              EthersModule.forRoot({
-                network: BINANCE_NETWORK,
-                pocket: {
-                  applicationId: GOERLI_POKT_API_KEY,
-                  applicationSecretKey: GOERLI_POKT_SECRET_KEY,
-                },
-                useDefaultProvider: false,
-                batched: true,
               }),
             ],
             controllers: [TestController],
@@ -950,56 +659,6 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should work when using multicall provider when using bscscan provider', async () => {
-          nock(TESTNET_BSCSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly mutlicallProvider: providers.MulticallProvider,
-            ) {}
-            @Get()
-            async get() {
-              const gasPrice: BigNumber = await this.mutlicallProvider.getGasPrice()
-
-              return { gasPrice: gasPrice.toString() }
-            }
-          }
-
-          @Module({
-            imports: [
-              EthersModule.forRoot({
-                network: BINANCE_TESTNET_NETWORK,
-                bscscan: GOERLI_ETHERSCAN_API_KEY,
-                useDefaultProvider: false,
-                batched: true,
-              }),
-            ],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
-
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
-        })
-
         it('should use the default binance providers without community token', async () => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
@@ -1206,53 +865,6 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should work with one multicall provider', async () => {
-          nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly multicallProvider: providers.MulticallProvider,
-            ) {}
-            @Get()
-            async get() {
-              const gasPrice: BigNumber = await this.multicallProvider.getGasPrice()
-
-              return { gasPrice: gasPrice.toString() }
-            }
-          }
-
-          @Module({
-            imports: [
-              EthersModule.forRoot({
-                network: BINANCE_TESTNET_NETWORK,
-                custom: CUSTOM_BSC_1_URL,
-                useDefaultProvider: false,
-                batched: true,
-              }),
-            ],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
-
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
-        })
-
         it('should work with more than one custom provider', async () => {
           nock(CUSTOM_BSC_1_URL)
             .post('/', PROVIDER_GET_GAS_PRICE_BODY)
@@ -1315,69 +927,6 @@ describe('Ethers Module Initialization', () => {
           await app.close()
         })
 
-        it('should when using multicall provider with more than one custom provider', async () => {
-          nock(CUSTOM_BSC_1_URL)
-            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
-
-          nock(CUSTOM_BSC_2_URL)
-            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
-
-          nock(CUSTOM_BSC_3_URL)
-            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
-
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly multicallProvider: providers.MulticallProvider,
-            ) {}
-            @Get()
-            async get() {
-              const gasPrice: BigNumber = await this.multicallProvider.getGasPrice()
-
-              return { gasPrice: gasPrice.toString() }
-            }
-          }
-
-          @Module({
-            imports: [
-              EthersModule.forRoot({
-                network: BINANCE_TESTNET_NETWORK,
-                custom: [CUSTOM_BSC_1_URL, CUSTOM_BSC_2_URL, CUSTOM_BSC_3_URL],
-                useDefaultProvider: false,
-                batched: true,
-              }),
-            ],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
-
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
-        })
-
         it('should work with multiple instances of ethers provider', async () => {
           nock(GOERLI_POCKET_URL)
             .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
@@ -1387,7 +936,6 @@ describe('Ethers Module Initialization', () => {
             .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
-          nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
           nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -1399,21 +947,17 @@ describe('Ethers Module Initialization', () => {
               private readonly alchemyProvider: AlchemyProvider,
               @InjectEthersProvider('bsc')
               private readonly customProvider: StaticJsonRpcProvider,
-              @InjectEthersProvider('multicall')
-              private readonly multicallProvider: providers.MulticallProvider,
             ) {}
             @Get()
             async get() {
               const pocketGasPrice: BigNumber = await this.pocketProvider.getGasPrice()
               const alchemyGasPrice: BigNumber = await this.alchemyProvider.getGasPrice()
               const bscGasPrice: BigNumber = await this.customProvider.getGasPrice()
-              const multicallBscGasPrice: BigNumber = await this.multicallProvider.getGasPrice()
 
               return {
                 pocketGasPrice: pocketGasPrice.toString(),
                 alchemyGasPrice: alchemyGasPrice.toString(),
                 bscGasPrice: bscGasPrice.toString(),
-                multicallBscGasPrice: multicallBscGasPrice.toString(),
               }
             }
           }
@@ -1440,13 +984,6 @@ describe('Ethers Module Initialization', () => {
                 custom: CUSTOM_BSC_1_URL,
                 useDefaultProvider: false,
               }),
-              EthersModule.forRoot({
-                token: 'multicall',
-                network: BINANCE_TESTNET_NETWORK,
-                custom: CUSTOM_BSC_1_URL,
-                useDefaultProvider: false,
-                batched: true,
-              }),
             ],
             controllers: [TestController],
           })
@@ -1469,7 +1006,6 @@ describe('Ethers Module Initialization', () => {
               expect(res.body).toHaveProperty('pocketGasPrice', '1000000000')
               expect(res.body).toHaveProperty('alchemyGasPrice', '1000000000')
               expect(res.body).toHaveProperty('bscGasPrice', '1000000000')
-              expect(res.body).toHaveProperty('multicallBscGasPrice', '1000000000')
             })
 
           await app.close()

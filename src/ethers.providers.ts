@@ -1,4 +1,3 @@
-import { providers as multicall } from '@0xsequence/multicall'
 import { Logger, LogLevel } from '@ethersproject/logger'
 import {
   Provider as AbstractProvider,
@@ -22,16 +21,13 @@ import {
   BscscanProvider,
   EthereumMoralisProvider,
   getFallbackProvider,
-  getMulticallProvider,
   getNetworkDefaultProvider,
 } from './ethers.custom-rpcs'
 import { EthersModuleOptions, EthersModuleAsyncOptions } from './ethers.interface'
 import { EthersSigner } from './ethers.signer'
 import { getEthersToken, getContractToken, getSignerToken, getNetwork, isBinanceNetwork } from './ethers.utils'
 
-export async function createBaseProvider(
-  options: EthersModuleOptions,
-): Promise<BaseProvider | AbstractProvider | multicall.MulticallProvider> {
+export async function createBaseProvider(options: EthersModuleOptions): Promise<BaseProvider | AbstractProvider> {
   const {
     network = MAINNET_NETWORK,
     quorum = 1,
@@ -47,7 +43,6 @@ export async function createBaseProvider(
     ankr,
     cloudflare = false,
     custom,
-    batched = false,
   } = options
 
   if (disableEthersLogger) {
@@ -111,13 +106,7 @@ export async function createBaseProvider(
       })
     }
 
-    const fallbackProvider = await getFallbackProvider(providers, quorum, waitUntilIsConnected)
-
-    if (batched) {
-      return getMulticallProvider(fallbackProvider)
-    }
-
-    return fallbackProvider
+    return getFallbackProvider(providers, quorum, waitUntilIsConnected)
   }
 
   /**
