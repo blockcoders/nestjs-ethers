@@ -5,6 +5,10 @@ import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
 import * as request from 'supertest'
+import * as ABI from './utils/ABI.json'
+import { ETHERS_ADDRESS, NEST_APP_OPTIONS } from './utils/constants'
+import { extraWait } from './utils/extraWait'
+import { platforms } from './utils/platforms'
 import {
   EthersModule,
   InjectEthersProvider,
@@ -14,10 +18,6 @@ import {
   EthersContract,
   EthersSigner,
 } from '../src'
-import * as ABI from './utils/ABI.json'
-import { ETHERS_ADDRESS, NEST_APP_OPTIONS } from './utils/constants'
-import { extraWait } from './utils/extraWait'
-import { platforms } from './utils/platforms'
 
 describe('InjectEthersProvider', () => {
   beforeEach(() => nock.cleanAll())

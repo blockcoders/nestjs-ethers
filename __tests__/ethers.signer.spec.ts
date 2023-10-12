@@ -2,7 +2,6 @@ import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
 import * as request from 'supertest'
-import { EthersModule, EthersSigner, InjectSignerProvider } from '../src'
 import {
   ETHERS_ADDRESS,
   ETHERS_PRIVATE_KEY,
@@ -13,6 +12,7 @@ import {
 } from './utils/constants'
 import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
+import { EthersModule, EthersSigner, InjectSignerProvider } from '../src'
 
 describe('EthersSigner', () => {
   beforeEach(() => nock.cleanAll())
