@@ -14,18 +14,6 @@ import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
 import * as request from 'supertest'
 import {
-  EthersModule,
-  InjectEthersProvider,
-  MAINNET_NETWORK,
-  GOERLI_NETWORK,
-  BscscanProvider,
-  BINANCE_TESTNET_NETWORK,
-  MUMBAI_NETWORK,
-  BSCSCAN_DEFAULT_API_KEY,
-  BINANCE_POCKET_DEFAULT_APP_ID,
-  BINANCE_NETWORK,
-} from '../src'
-import {
   GOERLI_ALCHEMY_URL,
   GOERLI_ALCHEMY_API_KEY,
   GOERLI_POCKET_URL,
@@ -60,6 +48,18 @@ import {
 } from './utils/constants'
 import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
+import {
+  EthersModule,
+  InjectEthersProvider,
+  MAINNET_NETWORK,
+  GOERLI_NETWORK,
+  BscscanProvider,
+  BINANCE_TESTNET_NETWORK,
+  MUMBAI_NETWORK,
+  BSCSCAN_DEFAULT_API_KEY,
+  BINANCE_POCKET_DEFAULT_APP_ID,
+  BINANCE_NETWORK,
+} from '../src'
 
 describe('Ethers Module Initialization', () => {
   beforeEach(() => nock.cleanAll())
