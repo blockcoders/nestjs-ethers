@@ -41,7 +41,7 @@ jobs:
           name: Run Build
           command: npm run build
       - coveralls/upload:
-          path_to_lcov: coverage/lcov.info
+          path_to_lcov: .tap/report/lcov.info
           verbose: true
 
 workflows:

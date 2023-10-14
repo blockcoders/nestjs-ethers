@@ -1,23 +1,21 @@
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
-import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
-import * as request from 'supertest'
+import t from 'tap'
+import { appRequest } from './utils/appRequest'
 import {
   ETHERS_ADDRESS,
   ETHERS_PRIVATE_KEY,
   ETHERS_MNEMONIC,
   ETHERS_JSON_WALLET_PASSWORD,
   ETHERS_JSON_WALLET,
-  NEST_APP_OPTIONS,
 } from './utils/constants'
-import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
 import { EthersModule, EthersSigner, InjectSignerProvider } from '../src'
 
-describe('EthersSigner', () => {
-  beforeEach(() => nock.cleanAll())
+t.test('EthersSigner', (t) => {
+  t.beforeEach(() => nock.cleanAll())
 
-  beforeAll(() => {
+  t.before(() => {
     if (!nock.isActive()) {
       nock.activate()
     }
@@ -26,14 +24,12 @@ describe('EthersSigner', () => {
     nock.enableNetConnect('127.0.0.1')
   })
 
-  afterAll(() => {
-    nock.restore()
-  })
+  t.after(() => nock.restore())
 
   for (const PlatformAdapter of platforms) {
-    describe(PlatformAdapter.name, () => {
-      describe('forRoot', () => {
-        it('should create a wallet from a private ket with a provider injected', async () => {
+    t.test(PlatformAdapter.name, (t) => {
+      t.test('forRoot', (t) => {
+        t.test('should create a wallet from a private ket with a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -69,22 +65,14 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should create a random wallet With a provider injected', async () => {
+        t.test('should create a random wallet With a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -120,22 +108,14 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.address).toBeDefined()
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'address')
+          t.end()
         })
 
-        it('should create a wallet from an encrypted JSON with a provider injected', async () => {
+        t.test('should create a wallet from an encrypted JSON with a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -174,22 +154,14 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should create a wallet from a mnemonic with a provider injected', async () => {
+        t.test('should create a wallet from a mnemonic with a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -225,22 +197,14 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should create a void signer from an address with a provider injected', async () => {
+        t.test('should create a void signer from an address with a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -276,24 +240,18 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
+
+        t.end()
       })
 
-      describe('forRootAsync', () => {
-        it('should create a wallet from a private ket with a provider injected', async () => {
+      t.test('forRootAsync', (t) => {
+        t.test('should create a wallet from a private ket with a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -337,22 +295,14 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should create a random wallet With a provider injected', async () => {
+        t.test('should create a random wallet With a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -396,22 +346,14 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.address).toBeDefined()
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'address')
+          t.end()
         })
 
-        it('should create a wallet from an encrypted JSON with a provider injected', async () => {
+        t.test('should create a wallet from an encrypted JSON with a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -458,22 +400,14 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should create a wallet from a mnemonic with a provider injected', async () => {
+        t.test('should create a wallet from a mnemonic with a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -517,22 +451,14 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should create a void signer from an address with a provider injected', async () => {
+        t.test('should create a void signer from an address with a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -576,21 +502,19 @@ describe('EthersSigner', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
+
+        t.end()
       })
+
+      t.end()
     })
   }
+
+  t.end()
 })

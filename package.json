@@ -16,9 +16,8 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\" --fix",
     "lint:ci": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\"",
-    "test": "jest --runInBand --detectOpenHandles",
-    "test:watch": "jest --watch --runInBand --detectOpenHandles",
-    "test:cov": "jest --coverage --runInBand --detectOpenHandles",
+    "test": "tap --passes test/*.spec.ts",
+    "test:cov": "tap --show-full-coverage test/*.spec.ts --coverage-report=text --coverage-report=lcov",
     "prepublishOnly": "npm run lint:ci && npm run test"
   },
   "precommit": [
@@ -64,7 +63,6 @@
     "@nestjs/platform-fastify": "^10.2.7",
     "@nestjs/testing": "^10.2.7",
     "@types/express": "^4.17.19",
-    "@types/jest": "^29.5.5",
     "@types/node": "^20.8.4",
     "@types/supertest": "^2.0.14",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
@@ -75,21 +73,20 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-prettier": "^5.0.1",
-    "jest": "^29.7.0",
     "nock": "^13.3.4",
     "pre-commit": "^1.2.2",
     "prettier": "^3.0.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "supertest": "^6.3.3",
-    "ts-jest": "^29.1.1",
+    "tap": "^18.5.0",
     "ts-node": "^10.9.1",
     "tsc-watch": "^6.0.4",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
-    "@nestjs/common": "^9.2.1"
+    "@nestjs/common": "^10.2.7"
   },
   "jest": {
     "verbose": true,
@@ -119,5 +116,9 @@
       }
     },
     "testEnvironment": "node"
+  },
+  "tap": {
+    "diag": true,
+    "timeout": 20000
   }
 }
