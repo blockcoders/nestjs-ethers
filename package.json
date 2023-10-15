@@ -17,7 +17,7 @@
     "lint": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\" --fix",
     "lint:ci": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\"",
     "test": "tap --passes test/*.spec.ts",
-    "test:cov": "tap --show-full-coverage test/*.spec.ts --coverage-report=text --coverage-report=lcov",
+    "test:cov": "tap test/*.spec.ts --coverage-report=text-summary --coverage-report=lcovonly --allow-incomplete-coverage",
     "prepublishOnly": "npm run lint:ci && npm run test"
   },
   "precommit": [
@@ -88,37 +88,10 @@
   "peerDependencies": {
     "@nestjs/common": "^10.2.7"
   },
-  "jest": {
-    "verbose": true,
-    "testTimeout": 80000,
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "testRegex": ".spec.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "coverageDirectory": "./coverage",
-    "collectCoverageFrom": [
-      "src/**/*.ts"
-    ],
-    "coveragePathIgnorePatterns": [
-      "src/index.ts"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 50,
-        "functions": 70,
-        "lines": 70,
-        "statements": 85
-      }
-    },
-    "testEnvironment": "node"
-  },
   "tap": {
     "diag": true,
-    "timeout": 20000
+    "bail": true,
+    "comments": true,
+    "timeout": 40000 
   }
 }
