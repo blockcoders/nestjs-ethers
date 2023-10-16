@@ -50,4 +50,4 @@ workflows:
       - test:
           matrix:
             parameters:
-              node-version: ['20.8', '18.12', '16.18']
+              node-version: ['18.12', '16.18']
