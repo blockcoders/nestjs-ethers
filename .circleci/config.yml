@@ -41,7 +41,7 @@ jobs:
           name: Run Build
           command: npm run build
       - coveralls/upload:
-          path_to_lcov: coverage/lcov.info
+          path_to_lcov: .tap/report/lcov.info
           verbose: true
 
 workflows:
@@ -50,4 +50,4 @@ workflows:
       - test:
           matrix:
             parameters:
-              node-version: ['20.8', '18.12', '16.18']
+              node-version: ['18.12', '16.18']

@@ -2,12 +2,11 @@ import { Contract } from '@ethersproject/contracts'
 import { Network } from '@ethersproject/networks'
 import { BaseProvider } from '@ethersproject/providers'
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
-import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
-import * as request from 'supertest'
+import t from 'tap'
 import * as ABI from './utils/ABI.json'
-import { ETHERS_ADDRESS, NEST_APP_OPTIONS } from './utils/constants'
-import { extraWait } from './utils/extraWait'
+import { appRequest } from './utils/appRequest'
+import { ETHERS_ADDRESS } from './utils/constants'
 import { platforms } from './utils/platforms'
 import {
   EthersModule,
@@ -19,10 +18,10 @@ import {
   EthersSigner,
 } from '../src'
 
-describe('InjectEthersProvider', () => {
-  beforeEach(() => nock.cleanAll())
+t.test('InjectEthersProvider', (t) => {
+  t.beforeEach(() => nock.cleanAll())
 
-  beforeAll(() => {
+  t.before(() => {
     if (!nock.isActive()) {
       nock.activate()
     }
@@ -31,14 +30,12 @@ describe('InjectEthersProvider', () => {
     nock.enableNetConnect('127.0.0.1')
   })
 
-  afterAll(() => {
-    nock.restore()
-  })
+  t.after(() => nock.restore())
 
   for (const PlatformAdapter of platforms) {
-    describe(PlatformAdapter.name, () => {
-      describe('forRoot', () => {
-        it('should inject ethers provider in a service successfully', async () => {
+    t.test(PlatformAdapter.name, (t) => {
+      t.test('forRoot', (t) => {
+        t.test('should inject ethers provider in a service successfully', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -68,25 +65,17 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should inject ethers provider in a controller successfully', async () => {
+        t.test('should inject ethers provider in a controller successfully', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -107,25 +96,17 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should inject contract provider in a service successfully', async () => {
+        t.test('should inject contract provider in a service successfully', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -157,22 +138,14 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should inject contract provider in a controller successfully', async () => {
+        t.test('should inject contract provider in a controller successfully', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -193,22 +166,14 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should inject signer provider in a service successfully', async () => {
+        t.test('should inject signer provider in a service successfully', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -240,22 +205,14 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should inject signer provider in a controller successfully', async () => {
+        t.test('should inject signer provider in a controller successfully', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -276,24 +233,18 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
+
+        t.end()
       })
 
-      describe('forRootAsync', () => {
-        it('should inject ethers provider in a service successfully', async () => {
+      t.test('forRootAsync', (t) => {
+        t.test('should inject ethers provider in a service successfully', async () => {
           @Injectable()
           class TestService {
             constructor(
@@ -331,25 +282,17 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should inject ethers provider in a controller successfully', async () => {
+        t.test('should inject ethers provider in a controller successfully', async () => {
           @Controller('/')
           class TestController {
             constructor(
@@ -378,25 +321,17 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should inject contract provider in a service successfully', async () => {
+        t.test('should inject contract provider in a service successfully', async () => {
           @Injectable()
           class TestService {
             constructor(
@@ -436,22 +371,14 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should inject contract provider in a controller successfully', async () => {
+        t.test('should inject contract provider in a controller successfully', async () => {
           @Controller('/')
           class TestController {
             constructor(
@@ -480,22 +407,14 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should inject signer provider in a service successfully', async () => {
+        t.test('should inject signer provider in a service successfully', async () => {
           @Injectable()
           class TestService {
             constructor(
@@ -535,22 +454,14 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
 
-        it('should inject signer provider in a controller successfully', async () => {
+        t.test('should inject signer provider in a controller successfully', async () => {
           @Controller('/')
           class TestController {
             constructor(
@@ -579,21 +490,19 @@ describe('InjectEthersProvider', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toHaveProperty('address', ETHERS_ADDRESS)
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { address: ETHERS_ADDRESS })
+          t.end()
         })
+
+        t.end()
       })
+
+      t.end()
     })
   }
+
+  t.end()
 })

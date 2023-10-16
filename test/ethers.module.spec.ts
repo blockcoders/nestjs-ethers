@@ -1,4 +1,3 @@
-// import { randomBytes } from 'crypto';
 import { BigNumber } from '@ethersproject/bignumber'
 import { Network } from '@ethersproject/networks'
 import {
@@ -11,7 +10,8 @@ import {
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
-import * as request from 'supertest'
+import t from 'tap'
+import { appRequest } from './utils/appRequest'
 import {
   GOERLI_ALCHEMY_URL,
   GOERLI_ALCHEMY_API_KEY,
@@ -35,7 +35,6 @@ import {
   CUSTOM_BSC_2_URL,
   CUSTOM_BSC_3_URL,
   MUMBAI_ALCHEMY_URL,
-  NEST_APP_OPTIONS,
   TESTNET_BSCPOCKET_URL,
   BSC_POCKET_URL,
   GOERLI_MORALIS_URL,
@@ -45,7 +44,6 @@ import {
   GOERLI_ANKR_URL,
   GOERLI_ANKR_API_KEY,
 } from './utils/constants'
-import { extraWait } from './utils/extraWait'
 import { platforms } from './utils/platforms'
 import {
   EthersModule,
@@ -60,10 +58,10 @@ import {
   BINANCE_NETWORK,
 } from '../src'
 
-describe('Ethers Module Initialization', () => {
-  beforeEach(() => nock.cleanAll())
+t.test('Ethers Module Initialization', (t) => {
+  t.beforeEach(() => nock.cleanAll())
 
-  beforeAll(() => {
+  t.before(() => {
     if (!nock.isActive()) {
       nock.activate()
     }
@@ -72,14 +70,12 @@ describe('Ethers Module Initialization', () => {
     nock.enableNetConnect('127.0.0.1')
   })
 
-  afterAll(() => {
-    nock.restore()
-  })
+  t.after(() => nock.restore())
 
   for (const PlatformAdapter of platforms) {
-    describe(PlatformAdapter.name, () => {
-      describe('forRoot', () => {
-        it('should compile without options', async () => {
+    t.test(PlatformAdapter.name, (t) => {
+      t.test('forRoot', (t) => {
+        t.test('should compile without options', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -99,26 +95,17 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should work with alchemy provider', async () => {
+        t.test('should work with alchemy provider', async (t) => {
           nock(GOERLI_ALCHEMY_URL)
             .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -148,24 +135,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work with pocket provider', async () => {
+        t.test('should work with pocket provider', async (t) => {
           nock(GOERLI_POCKET_URL)
             .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -198,24 +175,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work with ethereum moralis provider', async () => {
+        t.test('should work with ethereum moralis provider', async (t) => {
           nock(GOERLI_MORALIS_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -243,24 +210,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work with bsc moralis provider', async () => {
+        t.test('should work with bsc moralis provider', async (t) => {
           nock(BINANCE_TESTNET_MORALIS_URL)
             .post('', PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -290,24 +247,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work with ankr provider', async () => {
+        t.test('should work with ankr provider', async (t) => {
           nock(GOERLI_ANKR_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -335,24 +282,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work with binance pocket provider', async () => {
+        t.test('should work with binance pocket provider', async (t) => {
           nock(BSC_POCKET_URL)
             .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -385,24 +322,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should compile with network option as number', async () => {
+        t.test('should compile with network option as number', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -422,26 +349,17 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should compile with network option as string', async () => {
+        t.test('should compile with network option as string', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -461,26 +379,17 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should throw an error when network is invalid', async () => {
+        t.test('should throw an error when network is invalid', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -501,12 +410,11 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          await expect(
-            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
-          ).rejects.toThrow(Error)
+          t.rejects(() => NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }))
+          t.end()
         })
 
-        it('should throw an error when useDefaultProvider is false and the providers are invalid', async () => {
+        t.test('should throw an error when useDefaultProvider is false and the providers are invalid', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -527,12 +435,11 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          await expect(
-            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
-          ).rejects.toThrow(Error)
+          t.rejects(() => NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }))
+          t.end()
         })
 
-        it('should not wait until providers are connected', async () => {
+        t.test('should not wait until providers are connected', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -552,26 +459,17 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should disable ethers logger', async () => {
+        t.test('should disable ethers logger', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -591,26 +489,17 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should work with bscscan provider', async () => {
+        t.test('should work with bscscan provider', async (t) => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
@@ -642,24 +531,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should use the default binance providers without community token', async () => {
+        t.test('should use the default binance providers without community token', async (t) => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
@@ -701,27 +580,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), {
-            logger: false,
-            abortOnError: false,
-          })
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should use the default binance providers', async () => {
+        t.test('should use the default binance providers', async (t) => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query({
@@ -767,27 +633,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), {
-            logger: false,
-            abortOnError: false,
-          })
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should throw an error if the network is different to Mainnet with Cloudflare', async () => {
+        t.test('should throw an error if the network is different to Mainnet with Cloudflare', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -814,12 +667,11 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          await expect(
-            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
-          ).rejects.toThrow(Error)
+          t.rejects(() => NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }))
+          t.end()
         })
 
-        it('should work with one custom provider', async () => {
+        t.test('should work with one custom provider', async (t) => {
           nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -848,24 +700,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work with more than one custom provider', async () => {
+        t.test('should work with more than one custom provider', async (t) => {
           nock(CUSTOM_BSC_1_URL)
             .post('/', PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -910,24 +752,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work with multiple instances of ethers provider', async () => {
+        t.test('should work with multiple instances of ethers provider', async (t) => {
           nock(GOERLI_POCKET_URL)
             .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -989,31 +821,22 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), {
-            logger: false,
-            abortOnError: false,
-          })
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('pocketGasPrice', '1000000000')
-              expect(res.body).toHaveProperty('alchemyGasPrice', '1000000000')
-              expect(res.body).toHaveProperty('bscGasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body, ['pocketGasPrice', 'alchemyGasPrice', 'bscGasPrice'])
+          t.equal(res.body.pocketGasPrice, '1000000000')
+          t.equal(res.body.alchemyGasPrice, '1000000000')
+          t.equal(res.body.bscGasPrice, '1000000000')
+          t.end()
         })
+
+        t.end()
       })
 
-      describe('forRootAsync', () => {
-        it('should compile properly with useFactory', async () => {
+      t.test('forRootAsync', (t) => {
+        t.test('should compile properly with useFactory', async (t) => {
           nock(GOERLI_ETHERSCAN_URL)
             .get('')
             .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
@@ -1061,24 +884,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work properly when pass dependencies via providers', async () => {
+        t.test('should work properly when pass dependencies via providers', async (t) => {
           nock(GOERLI_INFURA_URL)
             .post(`/${GOERLI_INFURA_PROJECT_ID}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -1123,24 +936,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work properly when useFactory returns Promise', async () => {
+        t.test('should work properly when useFactory returns Promise', async (t) => {
           nock(CLOUDFLARE_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -1186,24 +989,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work properly when useFactory uses more than one Provider', async () => {
+        t.test('should work properly when useFactory uses more than one Provider', async (t) => {
           nock(GOERLI_INFURA_URL)
             .post(`/${GOERLI_INFURA_PROJECT_ID}`, {
               ...PROVIDER_GET_GAS_PRICE_BODY,
@@ -1271,24 +1064,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should compile with network option as number', async () => {
+        t.test('should compile with network option as number', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -1323,26 +1106,17 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should compile with network option as string', async () => {
+        t.test('should compile with network option as string', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -1377,26 +1151,17 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should throw an error when network is invalid', async () => {
+        t.test('should throw an error when network is invalid', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -1432,12 +1197,11 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          await expect(
-            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
-          ).rejects.toThrow(Error)
+          t.rejects(() => NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }))
+          t.end()
         })
 
-        it('should throw an error when useDefaultProvider is false and the providers are invalid', async () => {
+        t.test('should throw an error when useDefaultProvider is false and the providers are invalid', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -1473,12 +1237,11 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          await expect(
-            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
-          ).rejects.toThrow(Error)
+          t.rejects(() => NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }))
+          t.end()
         })
 
-        it('should not wait until providers are connected', async () => {
+        t.test('should not wait until providers are connected', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -1506,26 +1269,17 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.network).toBeDefined()
-              expect(res.body.network).toHaveProperty('name', MAINNET_NETWORK.name)
-              expect(res.body.network).toHaveProperty('chainId', 1)
-              expect(res.body.network).toHaveProperty('ensAddress')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.equal(res.body.network.name, MAINNET_NETWORK.name)
+          t.equal(res.body.network.chainId, 1)
+          t.end()
         })
 
-        it('should work with bscscan provider', async () => {
+        t.test('should work with bscscan provider', async (t) => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
@@ -1573,24 +1327,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should use the default binance providers without community token', async () => {
+        t.test('should use the default binance providers without community token', async (t) => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
@@ -1650,27 +1394,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), {
-            logger: false,
-            abortOnError: false,
-          })
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should use the default binance providers', async () => {
+        t.test('should use the default binance providers', async (t) => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
             .query({
@@ -1726,27 +1457,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), {
-            logger: false,
-            abortOnError: false,
-          })
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should throw an error if the network is different to Mainnet with Cloudflare', async () => {
+        t.test('should throw an error if the network is different to Mainnet with Cloudflare', async (t) => {
           @Controller('/')
           class TestController {
             constructor(
@@ -1785,12 +1503,11 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          await expect(
-            NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
-          ).rejects.toThrow(Error)
+          t.rejects(() => NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }))
+          t.end()
         })
 
-        it('should work with one custom provider', async () => {
+        t.test('should work with one custom provider', async (t) => {
           nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
 
           @Controller('/')
@@ -1835,24 +1552,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work with more than one custom provider', async () => {
+        t.test('should work with more than one custom provider', async (t) => {
           nock(CUSTOM_BSC_1_URL)
             .post('/', PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -1913,24 +1620,14 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), NEST_APP_OPTIONS)
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('gasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.same(res.body, { gasPrice: '1000000000' })
+          t.end()
         })
 
-        it('should work with multiple instances of ethers provider', async () => {
+        t.test('should work with multiple instances of ethers provider', async (t) => {
           nock(GOERLI_POCKET_URL)
             .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
             .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
@@ -2025,28 +1722,23 @@ describe('Ethers Module Initialization', () => {
           })
           class TestModule {}
 
-          const app = await NestFactory.create(TestModule, new PlatformAdapter(), {
-            logger: false,
-            abortOnError: false,
-          })
-          const server = app.getHttpServer()
+          const res = await appRequest(t, TestModule, PlatformAdapter)
 
-          await app.init()
-          await extraWait(PlatformAdapter, app)
-
-          await request(server)
-            .get('/')
-            .expect(200)
-            .expect((res) => {
-              expect(res.body).toBeDefined()
-              expect(res.body).toHaveProperty('pocketGasPrice', '1000000000')
-              expect(res.body).toHaveProperty('alchemyGasPrice', '1000000000')
-              expect(res.body).toHaveProperty('bscGasPrice', '1000000000')
-            })
-
-          await app.close()
+          t.equal(res.statusCode, 200)
+          t.notHas(res.body, 'network')
+          t.hasOwnProps(res.body, ['pocketGasPrice', 'alchemyGasPrice', 'bscGasPrice'])
+          t.equal(res.body.pocketGasPrice, '1000000000')
+          t.equal(res.body.alchemyGasPrice, '1000000000')
+          t.equal(res.body.bscGasPrice, '1000000000')
+          t.end()
         })
+
+        t.end()
       })
+
+      t.end()
     })
   }
+
+  t.end()
 })

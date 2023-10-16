@@ -19,6 +19,6 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noFallthroughCasesInSwitch": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   }
 }
