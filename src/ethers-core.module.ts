@@ -1,6 +1,6 @@
-import { Provider as AbstractProvider } from '@ethersproject/providers'
 import { DynamicModule, Global, Module, OnApplicationShutdown } from '@nestjs/common'
 import { DiscoveryModule, DiscoveryService } from '@nestjs/core'
+import { AbstractProvider } from 'ethers'
 import { EthersContract } from './ethers.contract'
 import { EthersModuleOptions, EthersModuleAsyncOptions } from './ethers.interface'
 import {

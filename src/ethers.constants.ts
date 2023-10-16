@@ -1,4 +1,4 @@
-import { Network } from '@ethersproject/providers'
+import type { Network } from 'ethers'
 
 export const DECORATED_PREFIX = 'EthersJS'
 export const ETHERS_MODULE_OPTIONS = 'EthersModuleOptions'
