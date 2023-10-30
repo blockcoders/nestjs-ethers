@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "engineStrict": false,
   "engines": {
-    "node": "^16.x || >=18.x || >=20.x"
+    "node": "^16.x || >=18.x"
   },
   "scripts": {
     "build": "rm -rf ./dist && tsc --p tsconfig.build.json",
@@ -16,7 +16,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\" --fix",
     "lint:ci": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\"",
-    "test": "tap --passes test/*.spec.ts",
+    "test": "tap test/*.spec.ts",
     "test:cov": "tap test/*.spec.ts --coverage-report=text-summary --coverage-report=lcovonly --allow-incomplete-coverage",
     "prepublishOnly": "npm run lint:ci && npm run test"
   },
@@ -47,7 +47,7 @@
     "@nestjs/core": "^10.2.7",
     "@nestjs/platform-express": "^10.2.7",
     "@nestjs/platform-fastify": "^10.2.7",
-    "@types/node": "^20.8.4",
+    "@types/node": "^18.11.9",
     "@types/supertest": "^2.0.14",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
@@ -61,7 +61,7 @@
     "prettier": "^3.0.3",
     "rxjs": "^7.8.1",
     "supertest": "^6.3.3",
-    "tap": "^18.5.0",
+    "tap": "^18.5.1",
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
@@ -70,7 +70,7 @@
   },
   "tap": {
     "diag": true,
-    "bail": true,
+    "bail": false,
     "comments": true,
     "timeout": 40000 
   }

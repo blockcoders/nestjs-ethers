@@ -15,13 +15,15 @@ export const CUSTOM_BSC_3_URL = 'https://data-seed-prebsc-2-s2.binance.org:8545'
 export const MUMBAI_ALCHEMY_URL = 'https://polygon-mumbai.g.alchemy.com/v2/'
 export const GOERLI_ETHERSCAN_API_KEY = randomBytes(17).toString('hex')
 export const GOERLI_ALCHEMY_API_KEY = randomBytes(16).toString('hex')
-export const GOERLI_POKT_API_KEY = randomBytes(12).toString('hex')
-export const GOERLI_POKT_SECRET_KEY = randomBytes(16).toString('hex')
+export const GOERLI_POKT_API_KEY = {
+  applicationId: randomBytes(12).toString('hex'),
+  applicationSecretKey: randomBytes(16).toString('hex'),
+}
 export const GOERLI_INFURA_PROJECT_ID = randomBytes(16).toString('hex')
 export const GOERLI_INFURA_PROJECT_SECRET = randomBytes(16).toString('hex')
-export const GOERLI_MORALIS_API_KEY = randomBytes(12).toString('hex')
+export const GOERLI_MORALIS_API_KEY = { apiKey: randomBytes(12).toString('hex') }
 export const GOERLI_MORALIS_URL = `https://speedy-nodes-nyc.moralis.io/${GOERLI_MORALIS_API_KEY}/eth/goerli`
-export const BINANCE_TESTNET_MORALIS_API_KEY = randomBytes(12).toString('hex')
+export const BINANCE_TESTNET_MORALIS_API_KEY = { apiKey: randomBytes(12).toString('hex') }
 export const BINANCE_TESTNET_MORALIS_URL = `https://speedy-nodes-nyc.moralis.io/${BINANCE_TESTNET_MORALIS_API_KEY}/bsc/testnet`
 export const GOERLI_ANKR_API_KEY = randomBytes(12).toString('hex')
 export const GOERLI_ANKR_URL = `https://rpc.ankr.com/eth_goerli/${GOERLI_ANKR_API_KEY}`
@@ -41,9 +43,12 @@ export const ETHERSCAN_GET_GAS_PRICE_QUERY = {
   action: 'eth_gasPrice',
   apikey: GOERLI_ETHERSCAN_API_KEY,
 }
-export const ETHERSCAN_GET_BLOCK_NUMBER_QUERY = {
+export const ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY = {
   module: 'proxy',
   action: 'eth_blockNumber',
+}
+export const ETHERSCAN_GET_BLOCK_NUMBER_QUERY = {
+  ...ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY,
   apikey: GOERLI_ETHERSCAN_API_KEY,
 }
 export const PROVIDER_GET_BLOCK_NUMBER_BODY = {

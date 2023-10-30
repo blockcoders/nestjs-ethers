@@ -1,14 +1,14 @@
-import { BigNumber } from '@ethersproject/bignumber'
-import { Network } from '@ethersproject/networks'
-import {
-  BaseProvider,
-  FallbackProvider,
-  StaticJsonRpcProvider,
-  PocketProvider,
-  AlchemyProvider,
-} from '@ethersproject/providers'
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import {
+  Network,
+  AbstractProvider,
+  FallbackProvider,
+  PocketProvider,
+  AlchemyProvider,
+  JsonRpcProvider,
+  FeeData,
+} from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
 import { appRequest } from './utils/appRequest'
@@ -17,7 +17,6 @@ import {
   GOERLI_ALCHEMY_API_KEY,
   GOERLI_POCKET_URL,
   GOERLI_POKT_API_KEY,
-  GOERLI_POKT_SECRET_KEY,
   GOERLI_ETHERSCAN_URL,
   GOERLI_ETHERSCAN_API_KEY,
   GOERLI_INFURA_URL,
@@ -80,7 +79,7 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
@@ -114,13 +113,13 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+              const data: FeeData = await this.ethersProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
           @Module({
@@ -151,23 +150,20 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+              const data: FeeData = await this.ethersProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
           @Module({
             imports: [
               EthersModule.forRoot({
                 network: GOERLI_NETWORK,
-                pocket: {
-                  applicationId: GOERLI_POKT_API_KEY,
-                  applicationSecretKey: GOERLI_POKT_SECRET_KEY,
-                },
+                pocket: GOERLI_POKT_API_KEY,
                 useDefaultProvider: false,
               }),
             ],
@@ -189,13 +185,13 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+              const data: FeeData = await this.ethersProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
           @Module({
@@ -226,13 +222,13 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+              const data: FeeData = await this.ethersProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
           @Module({
@@ -261,13 +257,13 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+              const data: FeeData = await this.ethersProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
           @Module({
@@ -298,23 +294,20 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+              const data: FeeData = await this.ethersProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
           @Module({
             imports: [
               EthersModule.forRoot({
                 network: BINANCE_NETWORK,
-                pocket: {
-                  applicationId: GOERLI_POKT_API_KEY,
-                  applicationSecretKey: GOERLI_POKT_SECRET_KEY,
-                },
+                pocket: GOERLI_POKT_API_KEY,
                 useDefaultProvider: false,
               }),
             ],
@@ -334,7 +327,7 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
@@ -364,7 +357,7 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
@@ -394,7 +387,7 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
@@ -419,7 +412,7 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
@@ -439,66 +432,6 @@ t.test('Ethers Module Initialization', (t) => {
           t.end()
         })
 
-        t.test('should not wait until providers are connected', async (t) => {
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly ethersProvider: FallbackProvider,
-            ) {}
-            @Get()
-            async get() {
-              const network: Network = await this.ethersProvider.getNetwork()
-
-              return { network }
-            }
-          }
-          @Module({
-            imports: [EthersModule.forRoot({ waitUntilIsConnected: false })],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const res = await appRequest(t, TestModule, PlatformAdapter)
-
-          t.equal(res.statusCode, 200)
-          t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
-          t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
-          t.end()
-        })
-
-        t.test('should disable ethers logger', async (t) => {
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly ethersProvider: FallbackProvider,
-            ) {}
-            @Get()
-            async get() {
-              const network: Network = await this.ethersProvider.getNetwork()
-
-              return { network }
-            }
-          }
-          @Module({
-            imports: [EthersModule.forRoot({ disableEthersLogger: true })],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const res = await appRequest(t, TestModule, PlatformAdapter)
-
-          t.equal(res.statusCode, 200)
-          t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
-          t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
-          t.end()
-        })
-
         t.test('should work with bscscan provider', async (t) => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
@@ -513,9 +446,9 @@ t.test('Ethers Module Initialization', (t) => {
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+              const data: FeeData = await this.bscProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -561,9 +494,9 @@ t.test('Ethers Module Initialization', (t) => {
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+              const data: FeeData = await this.bscProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -616,9 +549,9 @@ t.test('Ethers Module Initialization', (t) => {
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+              const data: FeeData = await this.bscProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -645,7 +578,7 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
@@ -678,13 +611,13 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly customProvider: StaticJsonRpcProvider,
+              private readonly customProvider: JsonRpcProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.customProvider.getGasPrice()
+              const data: FeeData = await this.customProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -734,9 +667,9 @@ t.test('Ethers Module Initialization', (t) => {
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.customProvider.getGasPrice()
+              const data: FeeData = await this.customProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -778,18 +711,18 @@ t.test('Ethers Module Initialization', (t) => {
               @InjectEthersProvider('poly')
               private readonly alchemyProvider: AlchemyProvider,
               @InjectEthersProvider('bsc')
-              private readonly customProvider: StaticJsonRpcProvider,
+              private readonly customProvider: JsonRpcProvider,
             ) {}
             @Get()
             async get() {
-              const pocketGasPrice: BigNumber = await this.pocketProvider.getGasPrice()
-              const alchemyGasPrice: BigNumber = await this.alchemyProvider.getGasPrice()
-              const bscGasPrice: BigNumber = await this.customProvider.getGasPrice()
+              const pocketGasPrice: FeeData = await this.pocketProvider.getFeeData()
+              const alchemyGasPrice: FeeData = await this.alchemyProvider.getFeeData()
+              const bscGasPrice: FeeData = await this.customProvider.getFeeData()
 
               return {
-                pocketGasPrice: pocketGasPrice.toString(),
-                alchemyGasPrice: alchemyGasPrice.toString(),
-                bscGasPrice: bscGasPrice.toString(),
+                pocketGasPrice: pocketGasPrice.gasPrice?.toString(),
+                alchemyGasPrice: alchemyGasPrice.gasPrice?.toString(),
+                bscGasPrice: bscGasPrice.gasPrice?.toString(),
               }
             }
           }
@@ -798,10 +731,7 @@ t.test('Ethers Module Initialization', (t) => {
               EthersModule.forRoot({
                 token: 'eth',
                 network: GOERLI_NETWORK,
-                pocket: {
-                  applicationId: GOERLI_POKT_API_KEY,
-                  applicationSecretKey: GOERLI_POKT_SECRET_KEY,
-                },
+                pocket: GOERLI_POKT_API_KEY,
                 useDefaultProvider: false,
               }),
               EthersModule.forRoot({
@@ -846,13 +776,13 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+              const data: FeeData = await this.ethersProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -900,13 +830,13 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+              const data: FeeData = await this.ethersProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -950,13 +880,13 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+              const data: FeeData = await this.ethersProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -1021,13 +951,13 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.ethersProvider.getGasPrice()
+              const data: FeeData = await this.ethersProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -1076,7 +1006,7 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
@@ -1121,7 +1051,7 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
@@ -1166,7 +1096,7 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
@@ -1206,7 +1136,7 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
@@ -1241,44 +1171,6 @@ t.test('Ethers Module Initialization', (t) => {
           t.end()
         })
 
-        t.test('should not wait until providers are connected', async (t) => {
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly ethersProvider: FallbackProvider,
-            ) {}
-            @Get()
-            async get() {
-              const network: Network = await this.ethersProvider.getNetwork()
-
-              return { network }
-            }
-          }
-          @Module({
-            imports: [
-              EthersModule.forRootAsync({
-                useFactory: () => {
-                  return {
-                    waitUntilIsConnected: false,
-                  }
-                },
-              }),
-            ],
-            controllers: [TestController],
-          })
-          class TestModule {}
-
-          const res = await appRequest(t, TestModule, PlatformAdapter)
-
-          t.equal(res.statusCode, 200)
-          t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
-          t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
-          t.end()
-        })
-
         t.test('should work with bscscan provider', async (t) => {
           nock(TESTNET_BSCSCAN_URL)
             .get('')
@@ -1293,9 +1185,9 @@ t.test('Ethers Module Initialization', (t) => {
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+              const data: FeeData = await this.bscProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -1357,9 +1249,9 @@ t.test('Ethers Module Initialization', (t) => {
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+              const data: FeeData = await this.bscProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -1424,9 +1316,9 @@ t.test('Ethers Module Initialization', (t) => {
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.bscProvider.getGasPrice()
+              const data: FeeData = await this.bscProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -1469,7 +1361,7 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
@@ -1514,13 +1406,13 @@ t.test('Ethers Module Initialization', (t) => {
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly customProvider: StaticJsonRpcProvider,
+              private readonly customProvider: JsonRpcProvider,
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.customProvider.getGasPrice()
+              const data: FeeData = await this.customProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -1586,9 +1478,9 @@ t.test('Ethers Module Initialization', (t) => {
             ) {}
             @Get()
             async get() {
-              const gasPrice: BigNumber = await this.customProvider.getGasPrice()
+              const data: FeeData = await this.customProvider.getFeeData()
 
-              return { gasPrice: gasPrice.toString() }
+              return { gasPrice: data.gasPrice?.toString() }
             }
           }
 
@@ -1646,26 +1538,26 @@ t.test('Ethers Module Initialization', (t) => {
               @InjectEthersProvider('poly')
               private readonly alchemyProvider: AlchemyProvider,
               @InjectEthersProvider('bsc')
-              private readonly customProvider: StaticJsonRpcProvider,
+              private readonly customProvider: JsonRpcProvider,
             ) {}
             @Get()
             async get() {
-              const pocketGasPrice: BigNumber = await this.pocketProvider.getGasPrice()
-              const alchemyGasPrice: BigNumber = await this.alchemyProvider.getGasPrice()
-              const bscGasPrice: BigNumber = await this.customProvider.getGasPrice()
+              const pocketGasPrice: FeeData = await this.pocketProvider.getFeeData()
+              const alchemyGasPrice: FeeData = await this.alchemyProvider.getFeeData()
+              const bscGasPrice: FeeData = await this.customProvider.getFeeData()
 
               return {
-                pocketGasPrice: pocketGasPrice.toString(),
-                alchemyGasPrice: alchemyGasPrice.toString(),
-                bscGasPrice: bscGasPrice.toString(),
+                pocketGasPrice: pocketGasPrice.gasPrice?.toString(),
+                alchemyGasPrice: alchemyGasPrice.gasPrice?.toString(),
+                bscGasPrice: bscGasPrice.gasPrice?.toString(),
               }
             }
           }
 
           @Injectable()
           class ConfigService {
-            public readonly applicationId = GOERLI_POKT_API_KEY
-            public readonly applicationSecretKey = GOERLI_POKT_SECRET_KEY
+            public readonly applicationId = GOERLI_POKT_API_KEY.applicationId
+            public readonly applicationSecretKey = GOERLI_POKT_API_KEY.applicationSecretKey
             public readonly alchemy = GOERLI_ALCHEMY_API_KEY
             public readonly custom = CUSTOM_BSC_1_URL
           }

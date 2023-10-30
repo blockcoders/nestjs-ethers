@@ -1,5 +1,5 @@
-import { Contract } from '@ethersproject/contracts'
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
+import { Contract } from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
 import * as ABI from './utils/ABI.json'
@@ -37,11 +37,11 @@ t.test('EthersContract', (t) => {
               async someMethod(): Promise<string> {
                 const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI)
 
-                if (!contract?.provider?.getNetwork()) {
+                if (!contract?.runner) {
                   throw new Error('No provider injected')
                 }
 
-                return contract.address
+                return contract.getAddress()
               }
             }
 
@@ -84,15 +84,11 @@ t.test('EthersContract', (t) => {
               const wallet = this.signer.createWallet(ETHERS_PRIVATE_KEY)
               const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI, wallet)
 
-              if (!contract?.provider?.getNetwork()) {
+              if (!contract?.runner) {
                 throw new Error('No provider injected')
               }
 
-              if (!contract?.signer.provider?.getNetwork()) {
-                throw new Error('No signer injected')
-              }
-
-              return contract.address
+              return contract.getAddress()
             }
           }
 
@@ -137,11 +133,11 @@ t.test('EthersContract', (t) => {
               async someMethod(): Promise<string> {
                 const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI)
 
-                if (!contract?.provider?.getNetwork()) {
+                if (!contract?.runner) {
                   throw new Error('No provider injected')
                 }
 
-                return contract.address
+                return contract.getAddress()
               }
             }
 
@@ -192,15 +188,11 @@ t.test('EthersContract', (t) => {
               const wallet = this.signer.createWallet(ETHERS_PRIVATE_KEY)
               const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI, wallet)
 
-              if (!contract?.provider?.getNetwork()) {
+              if (!contract?.runner) {
                 throw new Error('No provider injected')
               }
 
-              if (!contract?.signer.provider?.getNetwork()) {
-                throw new Error('No signer injected')
-              }
-
-              return contract.address
+              return contract.getAddress()
             }
           }
 

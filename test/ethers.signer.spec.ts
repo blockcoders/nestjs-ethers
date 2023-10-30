@@ -1,4 +1,5 @@
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
+import { Mnemonic } from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
 import { appRequest } from './utils/appRequest'
@@ -169,7 +170,7 @@ t.test('EthersSigner', (t) => {
               private readonly signer: EthersSigner,
             ) {}
             async someMethod(): Promise<string> {
-              const wallet = this.signer.createWalletfromMnemonic(ETHERS_MNEMONIC)
+              const wallet = this.signer.createWalletfromMnemonic(Mnemonic.fromPhrase(ETHERS_MNEMONIC))
 
               if (!wallet?.provider?.getNetwork()) {
                 throw new Error('No provider injected')
@@ -415,7 +416,7 @@ t.test('EthersSigner', (t) => {
               private readonly signer: EthersSigner,
             ) {}
             async someMethod(): Promise<string> {
-              const wallet = this.signer.createWalletfromMnemonic(ETHERS_MNEMONIC)
+              const wallet = this.signer.createWalletfromMnemonic(Mnemonic.fromPhrase(ETHERS_MNEMONIC))
 
               if (!wallet?.provider?.getNetwork()) {
                 throw new Error('No provider injected')
