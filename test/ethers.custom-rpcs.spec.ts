@@ -228,7 +228,7 @@ t.test('Ethers Custom RPC', (t) => {
     t.test(
       'should return a instance of FallbackProvider wt.testh BscscanProvider and BinancePocketProvider',
       async (t) => {
-        const provider = await getBinanceDefaultProvider(BINANCE_TESTNET_NETWORK)
+        const provider = await getBinanceDefaultProvider(BINANCE_TESTNET_NETWORK, { quorum: 1 })
 
         t.type(provider, FallbackProvider)
         t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
@@ -239,7 +239,10 @@ t.test('Ethers Custom RPC', (t) => {
     )
 
     t.test('should return a instance of FallbackProvider wt.testh BinanceMoralisProvider', async (t) => {
-      const provider = await getBinanceDefaultProvider(BINANCE_TESTNET_NETWORK, { moralis: { apiKey: '1234' } })
+      const provider = await getBinanceDefaultProvider(BINANCE_TESTNET_NETWORK, {
+        quorum: 2,
+        moralis: { apiKey: '1234' },
+      })
 
       t.type(provider, FallbackProvider)
       t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
@@ -256,7 +259,7 @@ t.test('Ethers Custom RPC', (t) => {
     t.test(
       'should return a instance of FallbackProvider wt.testh BscscanProvider and BinancePocketProvider',
       async (t) => {
-        const provider = await getNetworkDefaultProvider(BINANCE_TESTNET_NETWORK)
+        const provider = await getNetworkDefaultProvider(BINANCE_TESTNET_NETWORK, { quorum: 1 })
 
         t.type(provider, FallbackProvider)
         t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
@@ -269,7 +272,7 @@ t.test('Ethers Custom RPC', (t) => {
     t.test(
       'should return a instance of FallbackProvider wt.testh BscscanProvider and BinancePocketProvider',
       async (t) => {
-        const provider = await getNetworkDefaultProvider(GOERLI_NETWORK)
+        const provider = await getNetworkDefaultProvider(GOERLI_NETWORK, { quorum: 1 })
 
         t.type(provider, FallbackProvider)
         t.type((provider as FallbackProvider).providerConfigs[0].provider, AlchemyProvider)
