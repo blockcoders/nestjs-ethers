@@ -1,21 +1,25 @@
-import { Contract } from '@ethersproject/contracts'
-import { Network } from '@ethersproject/networks'
-import { BaseProvider } from '@ethersproject/providers'
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
+import { Contract, AbstractProvider, Network, FallbackProvider } from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
 import * as ABI from './utils/ABI.json'
 import { appRequest } from './utils/appRequest'
-import { ETHERS_ADDRESS } from './utils/constants'
+import {
+  ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY,
+  ETHERS_ADDRESS,
+  GOERLI_ETHERSCAN_API_KEY,
+  GOERLI_ETHERSCAN_URL,
+  PROVIDER_GET_BLOCK_NUMBER_RESPONSE,
+} from './utils/constants'
 import { platforms } from './utils/platforms'
 import {
   EthersModule,
   InjectEthersProvider,
   InjectContractProvider,
   InjectSignerProvider,
-  MAINNET_NETWORK,
   EthersContract,
   EthersSigner,
+  GOERLI_NETWORK,
 } from '../src'
 
 t.test('InjectEthersProvider', (t) => {
@@ -36,14 +40,21 @@ t.test('InjectEthersProvider', (t) => {
     t.test(PlatformAdapter.name, (t) => {
       t.test('forRoot', (t) => {
         t.test('should inject ethers provider in a service successfully', async (t) => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Injectable()
           class TestService {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: FallbackProvider,
             ) {}
             async someMethod(): Promise<Network> {
-              return this.ethersProvider.getNetwork()
+              const data = await this.ethersProvider.getNetwork()
+
+              return data
             }
           }
 
@@ -54,12 +65,18 @@ t.test('InjectEthersProvider', (t) => {
             async get() {
               const network = await this.service.someMethod()
 
-              return { network }
+              return { name: network.name, chainId: Number(network.chainId) }
             }
           }
 
           @Module({
-            imports: [EthersModule.forRoot()],
+            imports: [
+              EthersModule.forRoot({
+                network: GOERLI_NETWORK,
+                etherscan: GOERLI_ETHERSCAN_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -69,29 +86,40 @@ t.test('InjectEthersProvider', (t) => {
 
           t.equal(res.statusCode, 200)
           t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
-          t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
+          t.hasOwnProps(res.body, ['name', 'chainId'])
+          t.equal(res.body.name, GOERLI_NETWORK.name)
+          t.equal(res.body.chainId, Number(GOERLI_NETWORK.chainId))
           t.end()
         })
 
         t.test('should inject ethers provider in a controller successfully', async (t) => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Controller('/')
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
               const network = await this.ethersProvider.getNetwork()
 
-              return { network }
+              return { name: network.name, chainId: Number(network.chainId) }
             }
           }
 
           @Module({
-            imports: [EthersModule.forRoot()],
+            imports: [
+              EthersModule.forRoot({
+                network: GOERLI_NETWORK,
+                etherscan: GOERLI_ETHERSCAN_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
             controllers: [TestController],
           })
           class TestModule {}
@@ -100,13 +128,18 @@ t.test('InjectEthersProvider', (t) => {
 
           t.equal(res.statusCode, 200)
           t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
-          t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
+          t.hasOwnProps(res.body, ['name', 'chainId'])
+          t.equal(res.body.name, GOERLI_NETWORK.name)
+          t.equal(res.body.chainId, Number(GOERLI_NETWORK.chainId))
           t.end()
         })
 
         t.test('should inject contract provider in a service successfully', async (t) => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Injectable()
           class TestService {
             constructor(
@@ -116,7 +149,7 @@ t.test('InjectEthersProvider', (t) => {
             async someMethod(): Promise<string> {
               const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI)
 
-              return contract.address
+              return contract.getAddress()
             }
           }
 
@@ -132,7 +165,13 @@ t.test('InjectEthersProvider', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot()],
+            imports: [
+              EthersModule.forRoot({
+                network: GOERLI_NETWORK,
+                etherscan: GOERLI_ETHERSCAN_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -146,6 +185,11 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject contract provider in a controller successfully', async (t) => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Controller('/')
           class TestController {
             constructor(
@@ -155,13 +199,20 @@ t.test('InjectEthersProvider', (t) => {
             @Get()
             async get() {
               const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI)
+              const address = await contract.getAddress()
 
-              return { address: contract.address.toLowerCase() }
+              return { address: address.toLowerCase() }
             }
           }
 
           @Module({
-            imports: [EthersModule.forRoot()],
+            imports: [
+              EthersModule.forRoot({
+                network: GOERLI_NETWORK,
+                etherscan: GOERLI_ETHERSCAN_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
             controllers: [TestController],
           })
           class TestModule {}
@@ -174,6 +225,11 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject signer provider in a service successfully', async (t) => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Injectable()
           class TestService {
             constructor(
@@ -199,7 +255,13 @@ t.test('InjectEthersProvider', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot()],
+            imports: [
+              EthersModule.forRoot({
+                network: GOERLI_NETWORK,
+                etherscan: GOERLI_ETHERSCAN_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -213,6 +275,11 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject signer provider in a controller successfully', async (t) => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Controller('/')
           class TestController {
             constructor(
@@ -228,7 +295,13 @@ t.test('InjectEthersProvider', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot()],
+            imports: [
+              EthersModule.forRoot({
+                network: GOERLI_NETWORK,
+                etherscan: GOERLI_ETHERSCAN_API_KEY,
+                useDefaultProvider: false,
+              }),
+            ],
             controllers: [TestController],
           })
           class TestModule {}
@@ -245,14 +318,21 @@ t.test('InjectEthersProvider', (t) => {
 
       t.test('forRootAsync', (t) => {
         t.test('should inject ethers provider in a service successfully', async () => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Injectable()
           class TestService {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: FallbackProvider,
             ) {}
             async someMethod(): Promise<Network> {
-              return this.ethersProvider.getNetwork()
+              const data = await this.ethersProvider.getNetwork()
+
+              return data
             }
           }
 
@@ -263,7 +343,7 @@ t.test('InjectEthersProvider', (t) => {
             async get() {
               const network = await this.service.someMethod()
 
-              return { network }
+              return { name: network.name, chainId: Number(network.chainId) }
             }
           }
 
@@ -272,7 +352,9 @@ t.test('InjectEthersProvider', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    useDefaultProvider: true,
+                    network: GOERLI_NETWORK,
+                    etherscan: GOERLI_ETHERSCAN_API_KEY,
+                    useDefaultProvider: false,
                   }
                 },
               }),
@@ -286,24 +368,29 @@ t.test('InjectEthersProvider', (t) => {
 
           t.equal(res.statusCode, 200)
           t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
-          t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
+          t.hasOwnProps(res.body, ['name', 'chainId'])
+          t.equal(res.body.name, GOERLI_NETWORK.name)
+          t.equal(res.body.chainId, Number(GOERLI_NETWORK.chainId))
           t.end()
         })
 
         t.test('should inject ethers provider in a controller successfully', async () => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Controller('/')
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly ethersProvider: BaseProvider,
+              private readonly ethersProvider: AbstractProvider,
             ) {}
             @Get()
             async get() {
               const network = await this.ethersProvider.getNetwork()
 
-              return { network }
+              return { name: network.name, chainId: Number(network.chainId) }
             }
           }
 
@@ -312,7 +399,9 @@ t.test('InjectEthersProvider', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    useDefaultProvider: true,
+                    network: GOERLI_NETWORK,
+                    etherscan: GOERLI_ETHERSCAN_API_KEY,
+                    useDefaultProvider: false,
                   }
                 },
               }),
@@ -325,13 +414,18 @@ t.test('InjectEthersProvider', (t) => {
 
           t.equal(res.statusCode, 200)
           t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
-          t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
+          t.hasOwnProps(res.body, ['name', 'chainId'])
+          t.equal(res.body.name, GOERLI_NETWORK.name)
+          t.equal(res.body.chainId, Number(GOERLI_NETWORK.chainId))
           t.end()
         })
 
         t.test('should inject contract provider in a service successfully', async () => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Injectable()
           class TestService {
             constructor(
@@ -341,7 +435,7 @@ t.test('InjectEthersProvider', (t) => {
             async someMethod(): Promise<string> {
               const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI)
 
-              return contract.address
+              return contract.getAddress()
             }
           }
 
@@ -361,7 +455,9 @@ t.test('InjectEthersProvider', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    useDefaultProvider: true,
+                    network: GOERLI_NETWORK,
+                    etherscan: GOERLI_ETHERSCAN_API_KEY,
+                    useDefaultProvider: false,
                   }
                 },
               }),
@@ -379,6 +475,11 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject contract provider in a controller successfully', async () => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Controller('/')
           class TestController {
             constructor(
@@ -388,8 +489,9 @@ t.test('InjectEthersProvider', (t) => {
             @Get()
             async get() {
               const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI)
+              const address = await contract.getAddress()
 
-              return { address: contract.address.toLowerCase() }
+              return { address: address.toLowerCase() }
             }
           }
 
@@ -398,7 +500,9 @@ t.test('InjectEthersProvider', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    useDefaultProvider: true,
+                    network: GOERLI_NETWORK,
+                    etherscan: GOERLI_ETHERSCAN_API_KEY,
+                    useDefaultProvider: false,
                   }
                 },
               }),
@@ -415,6 +519,11 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject signer provider in a service successfully', async () => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Injectable()
           class TestService {
             constructor(
@@ -444,7 +553,9 @@ t.test('InjectEthersProvider', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    useDefaultProvider: true,
+                    network: GOERLI_NETWORK,
+                    etherscan: GOERLI_ETHERSCAN_API_KEY,
+                    useDefaultProvider: false,
                   }
                 },
               }),
@@ -462,6 +573,11 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject signer provider in a controller successfully', async () => {
+          nock(GOERLI_ETHERSCAN_URL)
+            .get('')
+            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
+            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+
           @Controller('/')
           class TestController {
             constructor(
@@ -481,7 +597,9 @@ t.test('InjectEthersProvider', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    useDefaultProvider: true,
+                    network: GOERLI_NETWORK,
+                    etherscan: GOERLI_ETHERSCAN_API_KEY,
+                    useDefaultProvider: false,
                   }
                 },
               }),

@@ -1,14 +1,13 @@
 import {
-  BaseProvider,
+  AbstractProvider,
   EtherscanProvider,
   FallbackProvider,
   getDefaultProvider,
   Network,
   Networkish,
-  PocketProvider,
-  UrlJsonRpcProvider,
-} from '@ethersproject/providers'
-import { ConnectionInfo } from '@ethersproject/web'
+  JsonRpcProvider,
+  FetchRequest,
+} from 'ethers'
 import {
   BINANCE_NETWORK,
   BINANCE_POCKET_DEFAULT_APP_ID,
@@ -18,7 +17,7 @@ import {
   MAINNET_NETWORK,
   SEPOLIA_NETWORK,
 } from './ethers.constants'
-import { MoralisProviderOptions, PocketProviderOptions, ProviderOptions } from './ethers.interface'
+import { ProviderOptions } from './ethers.interface'
 import { getNetwork, isBinanceNetwork } from './ethers.utils'
 
 export class BscscanProvider extends EtherscanProvider {
@@ -29,10 +28,10 @@ export class BscscanProvider extends EtherscanProvider {
   }
 
   getBaseUrl(): string {
-    switch (this.network.chainId) {
-      case BINANCE_NETWORK.chainId:
+    switch (this.network.name) {
+      case BINANCE_NETWORK.name:
         return 'https://api.bscscan.com'
-      case BINANCE_TESTNET_NETWORK.chainId:
+      case BINANCE_TESTNET_NETWORK.name:
         return 'https://api-testnet.bscscan.com'
     }
 
@@ -44,38 +43,61 @@ export class BscscanProvider extends EtherscanProvider {
   }
 }
 
-export class BinancePocketProvider extends PocketProvider {
-  constructor(_network: Networkish, apiKey?: PocketProviderOptions | string) {
-    const network = getNetwork(_network)
+export class BinancePocketProvider extends JsonRpcProvider {
+  readonly applicationId!: string
+  readonly applicationSecret!: null | string
 
-    super(network.chainId, apiKey || { applicationId: BINANCE_POCKET_DEFAULT_APP_ID, loadBalancer: true })
+  constructor(_network?: Networkish, applicationId?: null | string, applicationSecret?: null | string) {
+    const network = Network.from(_network)
+
+    if (applicationId == null) {
+      applicationId = BINANCE_POCKET_DEFAULT_APP_ID
+    }
+
+    if (applicationSecret == null) {
+      applicationSecret = null
+    }
+
+    const options = { staticNetwork: network }
+
+    const request = BinancePocketProvider.getRequest(network, applicationId, applicationSecret)
+    super(request, network, options)
+
+    this.applicationId = applicationId
+    this.applicationSecret = applicationSecret
   }
 
-  static getUrl(network: Network, apiKey: PocketProviderOptions): ConnectionInfo {
-    let host: string | null = null
-    switch (network.chainId) {
-      case BINANCE_NETWORK.chainId:
-        host = 'bsc-mainnet.gateway.pokt.network'
-        break
-      // Binance Testnet Claimed RelayChain
-      case BINANCE_TESTNET_NETWORK.chainId:
-        host = 'bsc-testnet.gateway.pokt.network'
-        break
+  static getHost(name: string): string {
+    switch (name) {
+      case BINANCE_NETWORK.name:
+        return 'bsc-mainnet.gateway.pokt.network'
+      case BINANCE_TESTNET_NETWORK.name:
+        return 'bsc-testnet.gateway.pokt.network'
       default:
-        throw new Error(`unsupported network ${network.name}`)
+        throw new Error(`unsupported network ${name}`)
+    }
+  }
+
+  _getProvider(chainId: number): AbstractProvider {
+    try {
+      return new BinancePocketProvider(chainId, this.applicationId, this.applicationSecret)
+    } catch (error) {}
+    return super._getProvider(chainId)
+  }
+
+  static getRequest(network: Network, applicationId?: null | string, applicationSecret?: null | string): FetchRequest {
+    if (applicationId == null) {
+      applicationId = BINANCE_POCKET_DEFAULT_APP_ID
     }
 
-    const url = `https:/\/${host}/v1/lb/${apiKey.applicationId}`
+    const request = new FetchRequest(`https:/\/${BinancePocketProvider.getHost(network.name)}/v1/lb/${applicationId}`)
+    request.allowGzip = true
 
-    const connection: ConnectionInfo = { url, headers: {} }
-
-    // Apply application secret key
-    if (apiKey.applicationSecretKey != null) {
-      connection.user = ''
-      connection.password = apiKey.applicationSecretKey
+    if (applicationSecret) {
+      request.setCredentials('', applicationSecret)
     }
 
-    return connection
+    return request
   }
 
   isCommunityResource(): boolean {
@@ -83,93 +105,80 @@ export class BinancePocketProvider extends PocketProvider {
   }
 }
 
-export class MoralisProvider extends UrlJsonRpcProvider {
-  static getApiKey(apiKey: MoralisProviderOptions | string): MoralisProviderOptions {
-    const options: MoralisProviderOptions = {
-      apiKey: typeof apiKey === 'string' ? apiKey : apiKey.apiKey,
-      region: typeof apiKey === 'string' ? 'nyc' : apiKey.region ?? 'nyc',
-    }
+export class MoralisProvider extends JsonRpcProvider {
+  public readonly applicationId: string
+  public readonly region: string
 
-    if (!options.apiKey) {
+  constructor(_network?: Networkish, applicationId?: string, region?: string) {
+    if (!_network) {
+      _network = 'mainnet'
+    }
+    const network = Network.from(_network)
+
+    if (!applicationId) {
       throw new Error('Invalid moralis apiKey')
     }
 
-    return options
-  }
-
-  static getConnectionInfo(options: MoralisProviderOptions, endpoint: string): ConnectionInfo {
-    return {
-      url: `https://speedy-nodes-${options.region}.moralis.io/${options.apiKey}/${endpoint}`,
-      headers: {},
+    if (!region) {
+      region = 'nyc'
     }
+
+    const options = { staticNetwork: network }
+
+    const request = MoralisProvider.getRequest(network, applicationId, region)
+
+    super(request, network, options)
+
+    this.applicationId = applicationId
+    this.region = region
   }
-}
 
-export class BinanceMoralisProvider extends MoralisProvider {
-  constructor(_network: Networkish, apiKey?: MoralisProviderOptions | string) {
-    const network = getNetwork(_network)
-
-    super(network, apiKey)
+  _getProvider(chainId: number): AbstractProvider {
+    try {
+      return new MoralisProvider(chainId, this.applicationId, this.region)
+    } catch (error) {}
+    return super._getProvider(chainId)
   }
 
-  static getUrl(network: Network, apiKey: MoralisProviderOptions): ConnectionInfo {
+  static getRequest(network: Network, applicationId: string, region: string): FetchRequest {
     let endpoint: string
-    switch (network.chainId) {
-      case BINANCE_NETWORK.chainId:
+
+    switch (network.name) {
+      case BINANCE_NETWORK.name:
         endpoint = 'bsc/mainnet'
         break
-      case BINANCE_TESTNET_NETWORK.chainId:
+      case BINANCE_TESTNET_NETWORK.name:
         endpoint = 'bsc/testnet'
         break
-      default:
-        throw new Error(`unsupported network ${network.name}`)
-    }
-
-    return MoralisProvider.getConnectionInfo(MoralisProvider.getApiKey(apiKey), endpoint)
-  }
-}
-
-export class EthereumMoralisProvider extends MoralisProvider {
-  constructor(_network: Networkish, apiKey?: MoralisProviderOptions | string) {
-    const network = getNetwork(_network)
-
-    super(network, apiKey)
-  }
-
-  static getUrl(network: Network, apiKey: MoralisProviderOptions): ConnectionInfo {
-    let endpoint: string
-    switch (network.chainId) {
-      case MAINNET_NETWORK.chainId:
+      case MAINNET_NETWORK.name:
         endpoint = 'eth/mainnet'
         break
-      case GOERLI_NETWORK.chainId:
+      case GOERLI_NETWORK.name:
         endpoint = 'eth/goerli'
         break
-      case SEPOLIA_NETWORK.chainId:
+      case SEPOLIA_NETWORK.name:
         endpoint = 'eth/sepolia'
         break
       default:
         throw new Error(`unsupported network ${network.name}`)
     }
 
-    return MoralisProvider.getConnectionInfo(MoralisProvider.getApiKey(apiKey), endpoint)
+    const request = new FetchRequest(`https://speedy-nodes-${region}.moralis.io/${applicationId}/${endpoint}`)
+
+    request.allowGzip = true
+
+    return request
   }
 }
 
 export async function getFallbackProvider(
-  providers: BaseProvider[] = [],
+  providers: AbstractProvider[] = [],
   quorum = 1,
-  waitUntilIsConnected = true,
-): Promise<FallbackProvider | BaseProvider> {
+): Promise<FallbackProvider | AbstractProvider> {
   if (providers.length < 1) {
     throw new Error(
       'Error in provider creation. The property "useDefaultProvider" is false and the providers supplied are invalid.',
     )
-  }
-
-  if (waitUntilIsConnected) {
-    // wait until the node is up and running smoothly.
-    await Promise.all(providers.map((provider) => provider.ready))
   }
 
   if (providers.length > 1) {
@@ -177,7 +186,7 @@ export async function getFallbackProvider(
      * FallbackProvider with selected providers.
      * @see {@link https://docs.ethers.io/v5/api/providers/other/#FallbackProvider}
      */
-    return new FallbackProvider(providers, quorum)
+    return new FallbackProvider(providers, undefined, { quorum })
   }
 
   return providers[0]
@@ -187,16 +196,16 @@ export async function getBinanceDefaultProvider(
   network: Network,
   options?: Pick<ProviderOptions, 'bscscan' | 'pocket' | 'moralis' | 'quorum'>,
 ) {
-  const providers: Array<BaseProvider> = [
+  const providers: Array<AbstractProvider> = [
     new BscscanProvider(network, options?.bscscan),
-    new BinancePocketProvider(network, options?.pocket),
+    new BinancePocketProvider(network, options?.pocket?.applicationId, options?.pocket?.applicationSecretKey),
   ]
 
   if (options?.moralis) {
-    providers.push(new BinanceMoralisProvider(network, options.moralis))
+    providers.push(new MoralisProvider(network, options?.moralis?.apiKey, options?.moralis?.region))
   }
 
-  return getFallbackProvider(providers, options?.quorum ?? Math.min(providers.length, 2), true)
+  return getFallbackProvider(providers, options?.quorum ?? Math.min(providers.length, 2))
 }
 
 export async function getNetworkDefaultProvider(network: Network, options: ProviderOptions = {}) {

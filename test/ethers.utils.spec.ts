@@ -68,7 +68,7 @@ t.test('getNetwork', (t) => {
   })
 
   t.test('should throw an error if the network is not defined', (t) => {
-    t.throws(() => getNetwork(null))
+    t.throws(() => getNetwork())
     t.end()
   })
 
@@ -81,15 +81,14 @@ t.test('getNetwork', (t) => {
 
   t.test('should return a valid network for a name', (t) => {
     const network = getNetwork('sepolia')
-
-    t.equal(network, SEPOLIA_NETWORK)
+    t.equal(network.name, SEPOLIA_NETWORK.name)
     t.end()
   })
 
   t.test('should return a valid network for a Network object', (t) => {
     const network = getNetwork(SEPOLIA_NETWORK)
 
-    t.equal(network, SEPOLIA_NETWORK)
+    t.equal(network.name, SEPOLIA_NETWORK.name)
     t.end()
   })
 
