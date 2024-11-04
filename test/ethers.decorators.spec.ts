@@ -1,5 +1,5 @@
-import { Module, Controller, Get, Injectable } from '@nestjs/common'
-import { Contract, AbstractProvider, Network, FallbackProvider } from 'ethers'
+import { Controller, Get, Injectable, Module } from '@nestjs/common'
+import { AbstractProvider, Contract, FallbackProvider, Network } from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
 import * as ABI from './utils/ABI.json'
@@ -13,13 +13,13 @@ import {
 } from './utils/constants'
 import { platforms } from './utils/platforms'
 import {
-  EthersModule,
-  InjectEthersProvider,
-  InjectContractProvider,
-  InjectSignerProvider,
   EthersContract,
+  EthersModule,
   EthersSigner,
   GOERLI_NETWORK,
+  InjectContractProvider,
+  InjectEthersProvider,
+  InjectSignerProvider,
 } from '../src'
 
 t.test('InjectEthersProvider', (t) => {

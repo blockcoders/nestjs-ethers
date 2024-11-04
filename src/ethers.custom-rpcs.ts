@@ -2,11 +2,11 @@ import {
   AbstractProvider,
   EtherscanProvider,
   FallbackProvider,
+  FetchRequest,
   getDefaultProvider,
+  JsonRpcProvider,
   Network,
   Networkish,
-  JsonRpcProvider,
-  FetchRequest,
 } from 'ethers'
 import {
   BINANCE_NETWORK,
