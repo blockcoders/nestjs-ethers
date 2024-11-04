@@ -2,11 +2,11 @@ import { Contract } from '@ethersproject/contracts'
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import * as nock from 'nock'
 import t from 'tap'
+import { EthersModule, EthersContract, EthersSigner, InjectContractProvider, InjectSignerProvider } from '../src'
 import * as ABI from './utils/ABI.json'
 import { appRequest } from './utils/appRequest'
 import { ETHERS_ADDRESS, ETHERS_PRIVATE_KEY } from './utils/constants'
 import { platforms } from './utils/platforms'
-import { EthersModule, EthersContract, EthersSigner, InjectContractProvider, InjectSignerProvider } from '../src'
 
 t.test('EthersContract', (t) => {
   t.beforeEach(() => nock.cleanAll())

@@ -87,7 +87,7 @@ export class MoralisProvider extends UrlJsonRpcProvider {
   static getApiKey(apiKey: MoralisProviderOptions | string): MoralisProviderOptions {
     const options: MoralisProviderOptions = {
       apiKey: typeof apiKey === 'string' ? apiKey : apiKey.apiKey,
-      region: typeof apiKey === 'string' ? 'nyc' : apiKey.region ?? 'nyc',
+      region: typeof apiKey === 'string' ? 'nyc' : (apiKey.region ?? 'nyc'),
     }
 
     if (!options.apiKey) {

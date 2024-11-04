@@ -1,6 +1,7 @@
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import * as nock from 'nock'
 import t from 'tap'
+import { EthersModule, EthersSigner, InjectSignerProvider } from '../src'
 import { appRequest } from './utils/appRequest'
 import {
   ETHERS_ADDRESS,
@@ -10,7 +11,6 @@ import {
   ETHERS_JSON_WALLET,
 } from './utils/constants'
 import { platforms } from './utils/platforms'
-import { EthersModule, EthersSigner, InjectSignerProvider } from '../src'
 
 t.test('EthersSigner', (t) => {
   t.beforeEach(() => nock.cleanAll())
