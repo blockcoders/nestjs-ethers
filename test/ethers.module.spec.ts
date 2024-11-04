@@ -11,6 +11,18 @@ import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as nock from 'nock'
 import t from 'tap'
+import {
+  EthersModule,
+  InjectEthersProvider,
+  MAINNET_NETWORK,
+  GOERLI_NETWORK,
+  BscscanProvider,
+  BINANCE_TESTNET_NETWORK,
+  MUMBAI_NETWORK,
+  BSCSCAN_DEFAULT_API_KEY,
+  BINANCE_POCKET_DEFAULT_APP_ID,
+  BINANCE_NETWORK,
+} from '../src'
 import { appRequest } from './utils/appRequest'
 import {
   GOERLI_ALCHEMY_URL,
@@ -45,18 +57,6 @@ import {
   GOERLI_ANKR_API_KEY,
 } from './utils/constants'
 import { platforms } from './utils/platforms'
-import {
-  EthersModule,
-  InjectEthersProvider,
-  MAINNET_NETWORK,
-  GOERLI_NETWORK,
-  BscscanProvider,
-  BINANCE_TESTNET_NETWORK,
-  MUMBAI_NETWORK,
-  BSCSCAN_DEFAULT_API_KEY,
-  BINANCE_POCKET_DEFAULT_APP_ID,
-  BINANCE_NETWORK,
-} from '../src'
 
 t.test('Ethers Module Initialization', (t) => {
   t.beforeEach(() => nock.cleanAll())

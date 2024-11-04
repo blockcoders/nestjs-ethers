@@ -4,10 +4,6 @@ import { BaseProvider } from '@ethersproject/providers'
 import { Module, Controller, Get, Injectable } from '@nestjs/common'
 import * as nock from 'nock'
 import t from 'tap'
-import * as ABI from './utils/ABI.json'
-import { appRequest } from './utils/appRequest'
-import { ETHERS_ADDRESS } from './utils/constants'
-import { platforms } from './utils/platforms'
 import {
   EthersModule,
   InjectEthersProvider,
@@ -17,6 +13,10 @@ import {
   EthersContract,
   EthersSigner,
 } from '../src'
+import * as ABI from './utils/ABI.json'
+import { appRequest } from './utils/appRequest'
+import { ETHERS_ADDRESS } from './utils/constants'
+import { platforms } from './utils/platforms'
 
 t.test('InjectEthersProvider', (t) => {
   t.beforeEach(() => nock.cleanAll())
