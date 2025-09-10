@@ -984,6 +984,12 @@ class TestService {
 }
 ```
 
+### v3
+
+- Migrated to ethers.js v6 from v5, introduced breaking changes, see the [migration guide](https://docs.ethers.org/v6/migrating/#migrating) for comprehensive list of changes
+- `BigNumber` was replaced with the standard `bigint`
+- `StaticJsonRpcProvider` was merged to `JsonRpcProvider` with `staticNetwork` option.
+
 ## Change Log
 
 See [Changelog](CHANGELOG.md) for more information.
