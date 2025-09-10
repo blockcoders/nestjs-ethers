@@ -27,17 +27,6 @@ export class BscscanProvider extends EtherscanProvider {
     super(network.chainId, apiKey || BSCSCAN_DEFAULT_API_KEY)
   }
 
-  getBaseUrl(): string {
-    switch (this.network.name) {
-      case BINANCE_NETWORK.name:
-        return 'https://api.bscscan.com'
-      case BINANCE_TESTNET_NETWORK.name:
-        return 'https://api-testnet.bscscan.com'
-    }
-
-    throw new Error(`unsupported network ${this.network.name}`)
-  }
-
   isCommunityResource(): boolean {
     return this.apiKey === BSCSCAN_DEFAULT_API_KEY
   }
