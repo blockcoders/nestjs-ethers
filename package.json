@@ -16,7 +16,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\" --fix",
     "lint:ci": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\"",
-    "test": "tap test/ethers.{contract,custom-rpcs,decorators}.spec.ts",
+    "test": "tap test/ethers.*.spec.ts --debug",
     "test:cov": "tap test/*.spec.ts --coverage-report=text-summary --coverage-report=lcovonly --allow-incomplete-coverage",
     "prepublishOnly": "npm run lint:ci && npm run test"
   },
@@ -56,7 +56,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prettier": "^5.0.1",
-    "ethers": "^6.8.0",
+    "ethers": "^6.15.0",
     "nock": "^13.3.7",
     "pre-commit": "^1.2.2",
     "prettier": "^3.3.3",
@@ -71,7 +71,7 @@
   },
   "tap": {
     "diag": true,
-    "bail": false,
+    "bail": true,
     "comments": true,
     "timeout": 40000
   }

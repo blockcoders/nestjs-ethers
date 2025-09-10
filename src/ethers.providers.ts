@@ -2,26 +2,27 @@ import { Provider } from '@nestjs/common'
 import {
   AbstractProvider,
   AlchemyProvider,
+  AnkrProvider,
   CloudflareProvider,
   EtherscanProvider,
+  FetchRequest,
   InfuraProvider,
-  PocketProvider,
   JsonRpcProvider,
-  AnkrProvider,
+  PocketProvider,
 } from 'ethers'
 import { defer, lastValueFrom } from 'rxjs'
 import { ETHERS_MODULE_OPTIONS, MAINNET_NETWORK } from './ethers.constants'
 import { EthersContract } from './ethers.contract'
 import {
-  MoralisProvider,
   BinancePocketProvider,
   BscscanProvider,
   getFallbackProvider,
   getNetworkDefaultProvider,
+  MoralisProvider,
 } from './ethers.custom-rpcs'
-import { EthersModuleOptions, EthersModuleAsyncOptions } from './ethers.interface'
+import { EthersModuleAsyncOptions, EthersModuleOptions } from './ethers.interface'
 import { EthersSigner } from './ethers.signer'
-import { getEthersToken, getContractToken, getSignerToken, getNetwork, isBinanceNetwork } from './ethers.utils'
+import { getContractToken, getEthersToken, getNetwork, getSignerToken, isBinanceNetwork } from './ethers.utils'
 
 export async function createAbstractProvider(
   options: EthersModuleOptions,
@@ -87,7 +88,7 @@ export async function createAbstractProvider(
     }
 
     if (custom) {
-      const customInfos: string[] = !Array.isArray(custom) ? [custom] : custom
+      const customInfos: (string | FetchRequest)[] = !Array.isArray(custom) ? [custom] : custom
 
       customInfos.forEach((customInfo) => {
         providers.push(new JsonRpcProvider(customInfo, providerNetwork))
@@ -100,7 +101,7 @@ export async function createAbstractProvider(
   /**
    * The default provider is the safest, easiest way to begin developing on Ethereum
    * It creates a FallbackProvider connected to as many backend services as possible.
-   * @see {@link https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider}
+   * @see {@link https://docs.ethers.org/v6/api/providers/#getDefaultProvider}
    */
   return getNetworkDefaultProvider(providerNetwork, {
     alchemy,

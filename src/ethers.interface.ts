@@ -1,5 +1,5 @@
 import { ModuleMetadata } from '@nestjs/common/interfaces'
-import type { Networkish } from 'ethers'
+import type { FetchRequest, Networkish } from 'ethers'
 
 export interface InfuraProviderOptions {
   projectId?: string
@@ -25,7 +25,7 @@ export interface ProviderOptions {
   pocket?: PocketProviderOptions | undefined
   moralis?: MoralisProviderOptions | undefined
   ankr?: string | undefined
-  custom?: string | string[] | undefined
+  custom?: (string | FetchRequest) | (string | FetchRequest)[] | undefined
   quorum?: number | undefined
 }
 

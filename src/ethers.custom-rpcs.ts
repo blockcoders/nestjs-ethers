@@ -184,7 +184,7 @@ export async function getFallbackProvider(
   if (providers.length > 1) {
     /**
      * FallbackProvider with selected providers.
-     * @see {@link https://docs.ethers.io/v5/api/providers/other/#FallbackProvider}
+     * @see {@link https://docs.ethers.org/v6/api/providers/fallback-provider/}
      */
     return new FallbackProvider(providers, undefined, { quorum })
   }
