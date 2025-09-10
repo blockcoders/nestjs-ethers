@@ -4,13 +4,8 @@ import * as nock from 'nock'
 import t from 'tap'
 import * as ABI from './utils/ABI.json'
 import { appRequest } from './utils/appRequest'
-import {
-  ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY,
-  ETHERS_ADDRESS,
-  GOERLI_ETHERSCAN_API_KEY,
-  GOERLI_ETHERSCAN_URL,
-  PROVIDER_GET_BLOCK_NUMBER_RESPONSE,
-} from './utils/constants'
+import { ETHERS_ADDRESS, ETHERSCAN_V2_URL, GOERLI_ETHERSCAN_API_KEY } from './utils/constants'
+import { generateMethodQuery, RPC_RESPONSES } from './utils/mockResponses'
 import { platforms } from './utils/platforms'
 import {
   EthersContract,
@@ -40,10 +35,18 @@ t.test('InjectEthersProvider', (t) => {
     t.test(PlatformAdapter.name, (t) => {
       t.test('forRoot', (t) => {
         t.test('should inject ethers provider in a service successfully', async (t) => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Injectable()
           class TestService {
@@ -93,10 +96,18 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject ethers provider in a controller successfully', async (t) => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Controller('/')
           class TestController {
@@ -135,10 +146,18 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject contract provider in a service successfully', async (t) => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Injectable()
           class TestService {
@@ -185,10 +204,18 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject contract provider in a controller successfully', async (t) => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Controller('/')
           class TestController {
@@ -225,10 +252,18 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject signer provider in a service successfully', async (t) => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Injectable()
           class TestService {
@@ -275,10 +310,18 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject signer provider in a controller successfully', async (t) => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Controller('/')
           class TestController {
@@ -318,10 +361,18 @@ t.test('InjectEthersProvider', (t) => {
 
       t.test('forRootAsync', (t) => {
         t.test('should inject ethers provider in a service successfully', async () => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Injectable()
           class TestService {
@@ -375,10 +426,18 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject ethers provider in a controller successfully', async () => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Controller('/')
           class TestController {
@@ -421,10 +480,18 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject contract provider in a service successfully', async () => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Injectable()
           class TestService {
@@ -475,10 +542,18 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject contract provider in a controller successfully', async () => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Controller('/')
           class TestController {
@@ -519,10 +594,18 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject signer provider in a service successfully', async () => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Injectable()
           class TestService {
@@ -573,10 +656,18 @@ t.test('InjectEthersProvider', (t) => {
         })
 
         t.test('should inject signer provider in a controller successfully', async () => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY_COMMUNITY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
 
           @Controller('/')
           class TestController {

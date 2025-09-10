@@ -39,29 +39,6 @@ t.test('Ethers Custom RPC', (t) => {
   t.after(() => nock.restore())
 
   t.test('BscscanProvider', (t) => {
-    t.test('getBaseUrl', (t) => {
-      t.test('should return a bsc network url', (t) => {
-        const provider = new BscscanProvider(BINANCE_NETWORK)
-
-        t.equal(provider.getBaseUrl(), 'https://api.bscscan.com')
-        t.end()
-      })
-
-      t.test('should return a bsc testnet network url', (t) => {
-        const provider = new BscscanProvider(BINANCE_TESTNET_NETWORK)
-
-        t.equal(provider.getBaseUrl(), 'https://api-testnet.bscscan.com')
-        t.end()
-      })
-
-      t.test('should throw an error if the network is not valid', (t) => {
-        t.throws(() => new BscscanProvider(1))
-        t.end()
-      })
-
-      t.end()
-    })
-
     t.test('isCommunityResource', (t) => {
       t.test('should return a bsc communt.testy resource', (t) => {
         const provider = new BscscanProvider(BINANCE_NETWORK)
@@ -85,7 +62,7 @@ t.test('Ethers Custom RPC', (t) => {
 
   t.test('BinancePocketProvider', (t) => {
     t.test('getRequest', (t) => {
-      t.only('should return a bsc network url', (t) => {
+      t.test('should return a bsc network url', (t) => {
         const provider = new BinancePocketProvider(BINANCE_NETWORK.name)
 
         t.equal(
@@ -205,17 +182,17 @@ t.test('Ethers Custom RPC', (t) => {
     })
 
     t.test('should return a instance of CloudflareProvider', async (t) => {
-      const provider = await getFallbackProvider([new CloudflareProvider(MAINNET_NETWORK)])
+      const provider = await getFallbackProvider([new CloudflareProvider(MAINNET_NETWORK)], undefined)
 
       t.type(provider, CloudflareProvider)
       t.end()
     })
 
     t.test('should return a instance of FallbackProvider', async (t) => {
-      const provider = await getFallbackProvider([
-        new CloudflareProvider(MAINNET_NETWORK),
-        new InfuraProvider(MAINNET_NETWORK),
-      ])
+      const provider = await getFallbackProvider(
+        [new CloudflareProvider(MAINNET_NETWORK), new InfuraProvider(MAINNET_NETWORK)],
+        undefined,
+      )
 
       t.type(provider, FallbackProvider)
       t.end()

@@ -16,7 +16,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\" --fix",
     "lint:ci": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\"",
-    "test": "tap test/ethers.*.spec.ts --debug",
+    "test": "tap test/*.spec.ts",
     "test:cov": "tap test/*.spec.ts --coverage-report=text-summary --coverage-report=lcovonly --allow-incomplete-coverage",
     "prepublishOnly": "npm run lint:ci && npm run test"
   },
@@ -71,7 +71,7 @@
   },
   "tap": {
     "diag": true,
-    "bail": true,
+    "bail": false,
     "comments": true,
     "timeout": 40000
   }

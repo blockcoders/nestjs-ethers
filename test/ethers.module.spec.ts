@@ -1,60 +1,58 @@
-import { Module, Controller, Get, Injectable } from '@nestjs/common'
+import { Controller, Get, Injectable, Module } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import {
-  Network,
   AbstractProvider,
-  FallbackProvider,
-  PocketProvider,
   AlchemyProvider,
-  JsonRpcProvider,
+  encodeBase64,
+  EtherscanProvider,
+  FallbackProvider,
   FeeData,
+  JsonRpcProvider,
+  Network,
+  PocketProvider,
+  toUtf8Bytes,
 } from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
 import { appRequest } from './utils/appRequest'
 import {
-  GOERLI_ALCHEMY_URL,
-  GOERLI_ALCHEMY_API_KEY,
-  GOERLI_POCKET_URL,
-  GOERLI_POKT_API_KEY,
-  GOERLI_ETHERSCAN_URL,
-  GOERLI_ETHERSCAN_API_KEY,
-  GOERLI_INFURA_URL,
+  BINANCE_TESTNET_MORALIS_API_KEY,
+  BINANCE_TESTNET_MORALIS_URL,
+  BSC_POCKET_URL,
   CLOUDFLARE_URL,
-  GOERLI_INFURA_PROJECT_ID,
-  GOERLI_INFURA_PROJECT_SECRET,
-  ETHERSCAN_GET_GAS_PRICE_QUERY,
-  PROVIDER_GET_GAS_PRICE_BODY,
-  PROVIDER_GET_GAS_PRICE_RESPONSE,
-  ETHERSCAN_GET_BLOCK_NUMBER_QUERY,
-  PROVIDER_GET_BLOCK_NUMBER_BODY,
-  PROVIDER_GET_BLOCK_NUMBER_RESPONSE,
-  TESTNET_BSCSCAN_URL,
   CUSTOM_BSC_1_URL,
   CUSTOM_BSC_2_URL,
   CUSTOM_BSC_3_URL,
-  MUMBAI_ALCHEMY_URL,
-  TESTNET_BSCPOCKET_URL,
-  BSC_POCKET_URL,
-  GOERLI_MORALIS_URL,
-  GOERLI_MORALIS_API_KEY,
-  BINANCE_TESTNET_MORALIS_URL,
-  BINANCE_TESTNET_MORALIS_API_KEY,
-  GOERLI_ANKR_URL,
+  ETHERSCAN_V2_URL,
+  GOERLI_ALCHEMY_API_KEY,
+  GOERLI_ALCHEMY_URL,
   GOERLI_ANKR_API_KEY,
+  GOERLI_ANKR_URL,
+  GOERLI_ETHERSCAN_API_KEY,
+  GOERLI_INFURA_PROJECT_ID,
+  GOERLI_INFURA_PROJECT_SECRET,
+  GOERLI_INFURA_URL,
+  GOERLI_MORALIS_API_KEY,
+  GOERLI_MORALIS_URL,
+  GOERLI_POCKET_URL,
+  GOERLI_POKT_API_KEY,
+  MUMBAI_ALCHEMY_URL,
+  POLYGON_TESTNET_GASSTATION_URL,
+  TESTNET_BSCPOCKET_URL,
 } from './utils/constants'
+import { GAS_STATION_RESPONSE, generateMethodQuery, matchResponses, RPC_RESPONSES } from './utils/mockResponses'
 import { platforms } from './utils/platforms'
 import {
+  BINANCE_NETWORK,
+  BINANCE_POCKET_DEFAULT_APP_ID,
+  BINANCE_TESTNET_NETWORK,
+  BSCSCAN_DEFAULT_API_KEY,
+  BscscanProvider,
   EthersModule,
+  GOERLI_NETWORK,
   InjectEthersProvider,
   MAINNET_NETWORK,
-  GOERLI_NETWORK,
-  BscscanProvider,
-  BINANCE_TESTNET_NETWORK,
   MUMBAI_NETWORK,
-  BSCSCAN_DEFAULT_API_KEY,
-  BINANCE_POCKET_DEFAULT_APP_ID,
-  BINANCE_NETWORK,
 } from '../src'
 
 t.test('Ethers Module Initialization', (t) => {
@@ -84,7 +82,6 @@ t.test('Ethers Module Initialization', (t) => {
             @Get()
             async get() {
               const network: Network = await this.ethersProvider.getNetwork()
-
               return { network }
             }
           }
@@ -98,16 +95,14 @@ t.test('Ethers Module Initialization', (t) => {
 
           t.equal(res.statusCode, 200)
           t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.hasOwnProps(res.body.network, ['name', 'chainId'])
           t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
+          t.equal(res.body.network.chainId, '1')
           t.end()
         })
 
         t.test('should work with alchemy provider', async (t) => {
-          nock(GOERLI_ALCHEMY_URL)
-            .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(GOERLI_ALCHEMY_URL).persist().post(`/v2/${GOERLI_ALCHEMY_API_KEY}`).reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -143,8 +138,13 @@ t.test('Ethers Module Initialization', (t) => {
 
         t.test('should work with pocket provider', async (t) => {
           nock(GOERLI_POCKET_URL)
-            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .persist()
+            .post(`/${GOERLI_POKT_API_KEY.applicationId}`)
+            .matchHeader(
+              'authorization',
+              'Basic ' + encodeBase64(toUtf8Bytes(`:${GOERLI_POKT_API_KEY.applicationSecretKey}`)),
+            )
+            .reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -179,7 +179,7 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work with ethereum moralis provider', async (t) => {
-          nock(GOERLI_MORALIS_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(GOERLI_MORALIS_URL).persist().post('').reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -214,9 +214,7 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work with bsc moralis provider', async (t) => {
-          nock(BINANCE_TESTNET_MORALIS_URL)
-            .post('', PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(BINANCE_TESTNET_MORALIS_URL).persist().post('').reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -251,7 +249,7 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work with ankr provider', async (t) => {
-          nock(GOERLI_ANKR_URL).post('', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(GOERLI_ANKR_URL).persist().post('').reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -287,8 +285,13 @@ t.test('Ethers Module Initialization', (t) => {
 
         t.test('should work with binance pocket provider', async (t) => {
           nock(BSC_POCKET_URL)
-            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+            .persist()
+            .post(`/${GOERLI_POKT_API_KEY.applicationId}`)
+            .matchHeader(
+              'authorization',
+              'Basic ' + encodeBase64(toUtf8Bytes(`:${GOERLI_POKT_API_KEY.applicationSecretKey}`)),
+            )
+            .reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -346,9 +349,9 @@ t.test('Ethers Module Initialization', (t) => {
 
           t.equal(res.statusCode, 200)
           t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.hasOwnProps(res.body.network, ['name', 'chainId'])
           t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
+          t.equal(res.body.network.chainId, '1')
           t.end()
         })
 
@@ -367,7 +370,7 @@ t.test('Ethers Module Initialization', (t) => {
             }
           }
           @Module({
-            imports: [EthersModule.forRoot({ network: 'homestead' })],
+            imports: [EthersModule.forRoot({ network: 'mainnet' })],
             controllers: [TestController],
           })
           class TestModule {}
@@ -376,9 +379,9 @@ t.test('Ethers Module Initialization', (t) => {
 
           t.equal(res.statusCode, 200)
           t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.hasOwnProps(res.body.network, ['name', 'chainId'])
           t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
+          t.equal(res.body.network.chainId, '1')
           t.end()
         })
 
@@ -398,7 +401,7 @@ t.test('Ethers Module Initialization', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot({ network: 'sarasa' })],
+            imports: [EthersModule.forRoot({ network: 'sarasa', useDefaultProvider: false })],
             controllers: [TestController],
           })
           class TestModule {}
@@ -407,47 +410,82 @@ t.test('Ethers Module Initialization', (t) => {
           t.end()
         })
 
-        t.test('should throw an error when useDefaultProvider is false and the providers are invalid', async (t) => {
-          @Controller('/')
-          class TestController {
-            constructor(
-              @InjectEthersProvider()
-              private readonly ethersProvider: AbstractProvider,
-            ) {}
-            @Get()
-            async get() {
-              const network: Network = await this.ethersProvider.getNetwork()
+        t.test(
+          'should throw an error when useDefaultProvider is false and no explicit provider is provided',
+          async (t) => {
+            @Controller('/')
+            class TestController {
+              constructor(
+                @InjectEthersProvider()
+                private readonly ethersProvider: AbstractProvider,
+              ) {}
+              @Get()
+              async get() {
+                const network: Network = await this.ethersProvider.getNetwork()
 
-              return { network }
+                return { network }
+              }
             }
-          }
 
-          @Module({
-            imports: [EthersModule.forRoot({ useDefaultProvider: false })],
-            controllers: [TestController],
-          })
-          class TestModule {}
+            @Module({
+              imports: [EthersModule.forRoot({ useDefaultProvider: false })],
+              controllers: [TestController],
+            })
+            class TestModule {}
 
-          t.rejects(() => NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }))
-          t.end()
-        })
+            t.rejects(() =>
+              NestFactory.create(TestModule, new PlatformAdapter(), { logger: false, abortOnError: false }),
+            )
+            t.end()
+          },
+        )
 
         t.test('should work with bscscan provider', async (t) => {
-          nock(TESTNET_BSCSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_getBlockByNumber',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                {
+                  tag: 'latest',
+                  boolean: false,
+                },
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_getBlockByNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_gasPrice',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_gasPrice'])
 
           @Controller('/')
           class TestController {
             constructor(
               @InjectEthersProvider()
-              private readonly bscProvider: BscscanProvider,
+              private readonly bscProvider: EtherscanProvider,
             ) {}
             @Get()
             async get() {
               const data: FeeData = await this.bscProvider.getFeeData()
-
               return { gasPrice: data.gasPrice?.toString() }
             }
           }
@@ -472,19 +510,43 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should use the default binance providers without community token', async (t) => {
-          nock(TESTNET_BSCSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_getBlockByNumber',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                {
+                  tag: 'latest',
+                  boolean: false,
+                },
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_getBlockByNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_gasPrice',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_gasPrice'])
 
-          nock(TESTNET_BSCPOCKET_URL)
-            .post(`/${GOERLI_POKT_API_KEY}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(TESTNET_BSCPOCKET_URL).persist().post(`/${GOERLI_POKT_API_KEY.applicationId}`).reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -521,25 +583,43 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should use the default binance providers', async (t) => {
-          nock(TESTNET_BSCSCAN_URL)
-            .get('')
-            .query({
-              ...ETHERSCAN_GET_GAS_PRICE_QUERY,
-              apikey: BSCSCAN_DEFAULT_API_KEY,
-            })
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .get('')
-            .query({
-              ...ETHERSCAN_GET_BLOCK_NUMBER_QUERY,
-              apikey: BSCSCAN_DEFAULT_API_KEY,
-            })
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                undefined,
+                BSCSCAN_DEFAULT_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_getBlockByNumber',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                {
+                  tag: 'latest',
+                  boolean: false,
+                },
+                BSCSCAN_DEFAULT_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_getBlockByNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_gasPrice',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                undefined,
+                BSCSCAN_DEFAULT_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_gasPrice'])
 
-          nock(TESTNET_BSCPOCKET_URL)
-            .post(`/${BINANCE_POCKET_DEFAULT_APP_ID}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post(`/${BINANCE_POCKET_DEFAULT_APP_ID}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(TESTNET_BSCPOCKET_URL).persist().post(`/${BINANCE_POCKET_DEFAULT_APP_ID}`).reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -605,7 +685,7 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work with one custom provider', async (t) => {
-          nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(CUSTOM_BSC_1_URL).persist().post('/').reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -641,23 +721,9 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work with more than one custom provider', async (t) => {
-          nock(CUSTOM_BSC_1_URL)
-            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
-
-          nock(CUSTOM_BSC_2_URL)
-            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
-
-          nock(CUSTOM_BSC_3_URL)
-            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(CUSTOM_BSC_1_URL).persist().post('/').reply(200, matchResponses)
+          nock(CUSTOM_BSC_2_URL).persist().post('/').reply(200, matchResponses)
+          nock(CUSTOM_BSC_3_URL).persist().post('/').reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -693,15 +759,10 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work with multiple instances of ethers provider', async (t) => {
-          nock(GOERLI_POCKET_URL)
-            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          nock(MUMBAI_ALCHEMY_URL)
-            .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(GOERLI_POCKET_URL).persist().post(`/${GOERLI_POKT_API_KEY.applicationId}`).reply(200, matchResponses)
+          nock(POLYGON_TESTNET_GASSTATION_URL).persist().get('/v2').reply(200, GAS_STATION_RESPONSE)
+          nock(MUMBAI_ALCHEMY_URL).persist().post(`/${GOERLI_ALCHEMY_API_KEY}`).reply(200, matchResponses)
+          nock(CUSTOM_BSC_1_URL).persist().post('/').reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -767,10 +828,41 @@ t.test('Ethers Module Initialization', (t) => {
 
       t.test('forRootAsync', (t) => {
         t.test('should compile properly with useFactory', async (t) => {
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_getBlockByNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                {
+                  tag: 'latest',
+                  boolean: false,
+                },
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_getBlockByNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_gasPrice',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_gasPrice'])
 
           @Controller('/')
           class TestController {
@@ -822,9 +914,7 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work properly when pass dependencies via providers', async (t) => {
-          nock(GOERLI_INFURA_URL)
-            .post(`/${GOERLI_INFURA_PROJECT_ID}`, PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(GOERLI_INFURA_URL).persist().post(`/${GOERLI_INFURA_PROJECT_ID}`).reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -874,7 +964,7 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work properly when useFactory returns Promise', async (t) => {
-          nock(CLOUDFLARE_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(CLOUDFLARE_URL).persist().post('/').reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -927,25 +1017,43 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work properly when useFactory uses more than one Provider', async (t) => {
-          nock(GOERLI_INFURA_URL)
-            .post(`/${GOERLI_INFURA_PROJECT_ID}`, {
-              ...PROVIDER_GET_GAS_PRICE_BODY,
-              id: 43,
-            })
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post(`/${GOERLI_INFURA_PROJECT_ID}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(GOERLI_INFURA_URL).persist().post(`/${GOERLI_INFURA_PROJECT_ID}`).reply(200, matchResponses)
 
-          nock(GOERLI_ETHERSCAN_URL)
-            .get('/')
-            .query({
-              ...ETHERSCAN_GET_GAS_PRICE_QUERY,
-              id: 43,
-            })
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .get('/')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_getBlockByNumber',
+                GOERLI_NETWORK.chainId.toString(),
+                {
+                  tag: 'latest',
+                  boolean: false,
+                },
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_getBlockByNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_gasPrice',
+                GOERLI_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_gasPrice'])
 
           @Controller('/')
           class TestController {
@@ -1040,9 +1148,9 @@ t.test('Ethers Module Initialization', (t) => {
 
           t.equal(res.statusCode, 200)
           t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.hasOwnProps(res.body.network, ['name', 'chainId'])
           t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
+          t.equal(res.body.network.chainId, '1')
           t.end()
         })
 
@@ -1062,7 +1170,7 @@ t.test('Ethers Module Initialization', (t) => {
           }
           @Injectable()
           class ConfigService {
-            public readonly network = 'homestead'
+            public readonly network = 'mainnet'
           }
 
           @Module({
@@ -1085,9 +1193,9 @@ t.test('Ethers Module Initialization', (t) => {
 
           t.equal(res.statusCode, 200)
           t.notHas(res.body, 'network')
-          t.hasOwnProps(res.body.network, ['name', 'chainId', 'ensAddress'])
+          t.hasOwnProps(res.body.network, ['name', 'chainId'])
           t.equal(res.body.network.name, MAINNET_NETWORK.name)
-          t.equal(res.body.network.chainId, 1)
+          t.equal(res.body.network.chainId, '1')
           t.end()
         })
 
@@ -1119,6 +1227,7 @@ t.test('Ethers Module Initialization', (t) => {
                 useFactory: (config: ConfigService) => {
                   return {
                     network: config.network,
+                    useDefaultProvider: false,
                   }
                 },
               }),
@@ -1172,10 +1281,31 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work with bscscan provider', async (t) => {
-          nock(TESTNET_BSCSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_getBlockByNumber',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                {
+                  tag: 'latest',
+                  boolean: false,
+                },
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_getBlockByNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_gasPrice',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_gasPrice'])
 
           @Controller('/')
           class TestController {
@@ -1227,19 +1357,43 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should use the default binance providers without community token', async (t) => {
-          nock(TESTNET_BSCSCAN_URL)
-            .get('')
-            .query(ETHERSCAN_GET_GAS_PRICE_QUERY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .get('')
-            .query(ETHERSCAN_GET_BLOCK_NUMBER_QUERY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_getBlockByNumber',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                {
+                  tag: 'latest',
+                  boolean: false,
+                },
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_getBlockByNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_gasPrice',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                undefined,
+                GOERLI_ETHERSCAN_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_gasPrice'])
 
-          nock(TESTNET_BSCPOCKET_URL)
-            .post(`/${GOERLI_POKT_API_KEY}`, { ...PROVIDER_GET_GAS_PRICE_BODY, id: 43 })
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(TESTNET_BSCPOCKET_URL).persist().post(`/${GOERLI_POKT_API_KEY.applicationId}`).reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -1294,19 +1448,43 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should use the default binance providers', async (t) => {
-          nock(TESTNET_BSCSCAN_URL)
-            .get('')
-            .query({
-              ...ETHERSCAN_GET_GAS_PRICE_QUERY,
-              apikey: BSCSCAN_DEFAULT_API_KEY,
-            })
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .get('')
-            .query({
-              ...ETHERSCAN_GET_BLOCK_NUMBER_QUERY,
-              apikey: BSCSCAN_DEFAULT_API_KEY,
-            })
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(ETHERSCAN_V2_URL)
+            .persist()
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_blockNumber',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                undefined,
+                BSCSCAN_DEFAULT_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_blockNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_getBlockByNumber',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                {
+                  tag: 'latest',
+                  boolean: false,
+                },
+                BSCSCAN_DEFAULT_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_getBlockByNumber'])
+            .get('/v2/api')
+            .query(
+              generateMethodQuery(
+                'eth_gasPrice',
+                BINANCE_TESTNET_NETWORK.chainId.toString(),
+                undefined,
+                BSCSCAN_DEFAULT_API_KEY,
+              ),
+            )
+            .reply(200, RPC_RESPONSES['eth_gasPrice'])
+
+          nock(TESTNET_BSCPOCKET_URL).persist().post(`/${BINANCE_POCKET_DEFAULT_APP_ID}`).reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -1400,7 +1578,7 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work with one custom provider', async (t) => {
-          nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(CUSTOM_BSC_1_URL).persist().post('/').reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -1452,23 +1630,9 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work with more than one custom provider', async (t) => {
-          nock(CUSTOM_BSC_1_URL)
-            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
-
-          nock(CUSTOM_BSC_2_URL)
-            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
-
-          nock(CUSTOM_BSC_3_URL)
-            .post('/', PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-            .post('/', PROVIDER_GET_BLOCK_NUMBER_BODY)
-            .reply(200, PROVIDER_GET_BLOCK_NUMBER_RESPONSE)
+          nock(CUSTOM_BSC_1_URL).persist().post('/').reply(200, matchResponses)
+          nock(CUSTOM_BSC_2_URL).persist().post('/').reply(200, matchResponses)
+          nock(CUSTOM_BSC_3_URL).persist().post('/').reply(200, matchResponses)
 
           @Controller('/')
           class TestController {
@@ -1520,15 +1684,10 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should work with multiple instances of ethers provider', async (t) => {
-          nock(GOERLI_POCKET_URL)
-            .post(`/${GOERLI_POKT_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          nock(MUMBAI_ALCHEMY_URL)
-            .post(`/${GOERLI_ALCHEMY_API_KEY}`, PROVIDER_GET_GAS_PRICE_BODY)
-            .reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
-
-          nock(CUSTOM_BSC_1_URL).post('/', PROVIDER_GET_GAS_PRICE_BODY).reply(200, PROVIDER_GET_GAS_PRICE_RESPONSE)
+          nock(GOERLI_POCKET_URL).persist().post(`/${GOERLI_POKT_API_KEY.applicationId}`).reply(200, matchResponses)
+          nock(POLYGON_TESTNET_GASSTATION_URL).persist().get('/v2').reply(200, GAS_STATION_RESPONSE)
+          nock(MUMBAI_ALCHEMY_URL).persist().post(`/${GOERLI_ALCHEMY_API_KEY}`).reply(200, matchResponses)
+          nock(CUSTOM_BSC_1_URL).persist().post('/').reply(200, matchResponses)
 
           @Controller('/')
           class TestController {

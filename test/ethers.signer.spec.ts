@@ -1,14 +1,15 @@
-import { Module, Controller, Get, Injectable } from '@nestjs/common'
+import { Controller, Get, Injectable, Module } from '@nestjs/common'
 import { Mnemonic } from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
 import { appRequest } from './utils/appRequest'
 import {
   ETHERS_ADDRESS,
-  ETHERS_PRIVATE_KEY,
-  ETHERS_MNEMONIC,
-  ETHERS_JSON_WALLET_PASSWORD,
   ETHERS_JSON_WALLET,
+  ETHERS_JSON_WALLET_PASSWORD,
+  ETHERS_MNEMONIC,
+  ETHERS_PRIVATE_KEY,
+  GOERLI_ALCHEMY_API_KEY,
 } from './utils/constants'
 import { platforms } from './utils/platforms'
 import { EthersModule, EthersSigner, InjectSignerProvider } from '../src'
@@ -60,7 +61,7 @@ t.test('EthersSigner', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot()],
+            imports: [EthersModule.forRoot({ alchemy: GOERLI_ALCHEMY_API_KEY })],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -103,7 +104,7 @@ t.test('EthersSigner', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot()],
+            imports: [EthersModule.forRoot({ alchemy: GOERLI_ALCHEMY_API_KEY })],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -149,7 +150,7 @@ t.test('EthersSigner', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot()],
+            imports: [EthersModule.forRoot({ alchemy: GOERLI_ALCHEMY_API_KEY })],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -192,7 +193,7 @@ t.test('EthersSigner', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot()],
+            imports: [EthersModule.forRoot({ alchemy: GOERLI_ALCHEMY_API_KEY })],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -235,7 +236,7 @@ t.test('EthersSigner', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot()],
+            imports: [EthersModule.forRoot({ alchemy: GOERLI_ALCHEMY_API_KEY })],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -286,7 +287,7 @@ t.test('EthersSigner', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    useDefaultProvider: true,
+                    alchemy: GOERLI_ALCHEMY_API_KEY,
                   }
                 },
               }),
@@ -337,7 +338,7 @@ t.test('EthersSigner', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    useDefaultProvider: true,
+                    alchemy: GOERLI_ALCHEMY_API_KEY,
                   }
                 },
               }),
@@ -391,7 +392,7 @@ t.test('EthersSigner', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    useDefaultProvider: true,
+                    alchemy: GOERLI_ALCHEMY_API_KEY,
                   }
                 },
               }),
@@ -442,7 +443,7 @@ t.test('EthersSigner', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    useDefaultProvider: true,
+                    alchemy: GOERLI_ALCHEMY_API_KEY,
                   }
                 },
               }),
@@ -493,7 +494,7 @@ t.test('EthersSigner', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    useDefaultProvider: true,
+                    alchemy: GOERLI_ALCHEMY_API_KEY,
                   }
                 },
               }),
