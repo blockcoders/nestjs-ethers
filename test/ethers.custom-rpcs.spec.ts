@@ -9,7 +9,9 @@ import {
 import * as nock from 'nock'
 import t from 'tap'
 import {
+  ARBITRUM_NETWORK,
   BINANCE_NETWORK,
+  BINANCE_POCKET_DEFAULT_APP_ID,
   BINANCE_TESTNET_NETWORK,
   GOERLI_NETWORK,
   MAINNET_NETWORK,
@@ -96,6 +98,34 @@ t.test('Ethers Custom RPC', (t) => {
         t.end()
       })
 
+      t.test('should handle null applicationId in getRequest', (t) => {
+        const request = BinancePocketProvider.getRequest(BINANCE_NETWORK, null, null)
+
+        t.equal(
+          request.url,
+          `https://${BinancePocketProvider.getHost(BINANCE_NETWORK.name)}/v1/lb/${BINANCE_POCKET_DEFAULT_APP_ID}`,
+        )
+        t.end()
+      })
+
+      t.end()
+    })
+
+    t.test('_getProvider', (t) => {
+      t.test('should return new BinancePocketProvider for valid chainId', (t) => {
+        const provider = new BinancePocketProvider(BINANCE_NETWORK.name, '1234')
+        const newProvider = provider._getProvider(Number(BINANCE_NETWORK.chainId))
+
+        t.type(newProvider, BinancePocketProvider)
+        t.end()
+      })
+
+      t.test('should fallback to super._getProvider for any unsupported network', (t) => {
+        const provider = new BinancePocketProvider(BINANCE_NETWORK.name, '1234')
+        t.throws(() => provider._getProvider(Number(MAINNET_NETWORK.chainId)))
+        t.end()
+      })
+
       t.end()
     })
 
@@ -169,6 +199,36 @@ t.test('Ethers Custom RPC', (t) => {
         t.end()
       })
 
+      t.test('should use mainnet network when none provided', (t) => {
+        const provider = new MoralisProvider(undefined, '1234')
+
+        t.equal(provider._network.chainId, MAINNET_NETWORK.chainId)
+        t.end()
+      })
+
+      t.test('should throw error when no apiKey provided', (t) => {
+        t.throws(() => new MoralisProvider(BINANCE_NETWORK, undefined), 'Invalid moralis apiKey')
+        t.end()
+      })
+
+      t.end()
+    })
+
+    t.test('_getProvider', (t) => {
+      t.test('should return new MoralisProvider for valid chainId', (t) => {
+        const provider = new MoralisProvider(BINANCE_NETWORK, '1234')
+        const newProvider = provider._getProvider(Number(BINANCE_NETWORK.chainId))
+
+        t.type(newProvider, MoralisProvider)
+        t.end()
+      })
+
+      t.test('should fallback to super._getProvider for any unsupported network', (t) => {
+        const provider = new MoralisProvider(BINANCE_NETWORK, '1234')
+        t.throws(() => provider._getProvider(Number(ARBITRUM_NETWORK.chainId)))
+        t.end()
+      })
+
       t.end()
     })
 
@@ -202,20 +262,17 @@ t.test('Ethers Custom RPC', (t) => {
   })
 
   t.test('getBinanceDefaultProvider', (t) => {
-    t.test(
-      'should return a instance of FallbackProvider wt.testh BscscanProvider and BinancePocketProvider',
-      async (t) => {
-        const provider = await getBinanceDefaultProvider(BINANCE_TESTNET_NETWORK, { quorum: 1 })
+    t.test('should return a instance of FallbackProvider with BscscanProvider and BinancePocketProvider', async (t) => {
+      const provider = await getBinanceDefaultProvider(BINANCE_TESTNET_NETWORK, { quorum: 1 })
 
-        t.type(provider, FallbackProvider)
-        t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
-        t.type((provider as FallbackProvider).providerConfigs[1].provider, BinancePocketProvider)
-        t.equal((provider as FallbackProvider).quorum, 1)
-        t.end()
-      },
-    )
+      t.type(provider, FallbackProvider)
+      t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
+      t.type((provider as FallbackProvider).providerConfigs[1].provider, BinancePocketProvider)
+      t.equal((provider as FallbackProvider).quorum, 1)
+      t.end()
+    })
 
-    t.test('should return a instance of FallbackProvider wt.testh BinanceMoralisProvider', async (t) => {
+    t.test('should return a instance of FallbackProvider with BinanceMoralisProvider', async (t) => {
       const provider = await getBinanceDefaultProvider(BINANCE_TESTNET_NETWORK, {
         quorum: 2,
         moralis: { apiKey: '1234' },
@@ -233,33 +290,27 @@ t.test('Ethers Custom RPC', (t) => {
   })
 
   t.test('getNetworkDefaultProvider', (t) => {
-    t.test(
-      'should return a instance of FallbackProvider wt.testh BscscanProvider and BinancePocketProvider',
-      async (t) => {
-        const provider = await getNetworkDefaultProvider(BINANCE_TESTNET_NETWORK, { quorum: 1 })
+    t.test('should return a instance of FallbackProvider with BscscanProvider and BinancePocketProvider', async (t) => {
+      const provider = await getNetworkDefaultProvider(BINANCE_TESTNET_NETWORK, { quorum: 1 })
 
-        t.type(provider, FallbackProvider)
-        t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
-        t.type((provider as FallbackProvider).providerConfigs[1].provider, BinancePocketProvider)
-        t.equal((provider as FallbackProvider).quorum, 1)
-        t.end()
-      },
-    )
+      t.type(provider, FallbackProvider)
+      t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
+      t.type((provider as FallbackProvider).providerConfigs[1].provider, BinancePocketProvider)
+      t.equal((provider as FallbackProvider).quorum, 1)
+      t.end()
+    })
 
-    t.test(
-      'should return a instance of FallbackProvider wt.testh BscscanProvider and BinancePocketProvider',
-      async (t) => {
-        const provider = await getNetworkDefaultProvider(GOERLI_NETWORK, { quorum: 1 })
+    t.test('should return a instance of FallbackProvider with BscscanProvider and BinancePocketProvider', async (t) => {
+      const provider = await getNetworkDefaultProvider(GOERLI_NETWORK, { quorum: 1 })
 
-        t.type(provider, FallbackProvider)
-        t.type((provider as FallbackProvider).providerConfigs[0].provider, AlchemyProvider)
-        t.type((provider as FallbackProvider).providerConfigs[1].provider, EtherscanProvider)
-        t.type((provider as FallbackProvider).providerConfigs[2].provider, InfuraProvider)
-        t.type((provider as FallbackProvider).providerConfigs[3].provider, QuickNodeProvider)
-        t.equal((provider as FallbackProvider).quorum, 1)
-        t.end()
-      },
-    )
+      t.type(provider, FallbackProvider)
+      t.type((provider as FallbackProvider).providerConfigs[0].provider, AlchemyProvider)
+      t.type((provider as FallbackProvider).providerConfigs[1].provider, EtherscanProvider)
+      t.type((provider as FallbackProvider).providerConfigs[2].provider, InfuraProvider)
+      t.type((provider as FallbackProvider).providerConfigs[3].provider, QuickNodeProvider)
+      t.equal((provider as FallbackProvider).quorum, 1)
+      t.end()
+    })
 
     t.end()
   })
