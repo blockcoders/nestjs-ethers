@@ -5,11 +5,15 @@ import t from 'tap'
 import * as ABI from './utils/ABI.json'
 import { appRequest } from './utils/appRequest'
 import { ETHERS_ADDRESS, ETHERS_PRIVATE_KEY } from './utils/constants'
+import { nockAllRPCRequests } from './utils/mockResponses'
 import { platforms } from './utils/platforms'
 import { EthersContract, EthersModule, EthersSigner, InjectContractProvider, InjectSignerProvider } from '../src'
 
 t.test('EthersContract', (t) => {
-  t.beforeEach(() => nock.cleanAll())
+  t.beforeEach(() => {
+    nock.cleanAll()
+    nockAllRPCRequests()
+  })
 
   t.before(() => {
     if (!nock.isActive()) {
@@ -37,7 +41,7 @@ t.test('EthersContract', (t) => {
               async someMethod(): Promise<string> {
                 const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI)
 
-                if (!contract?.runner) {
+                if (!(await contract?.runner?.provider?.getNetwork())) {
                   throw new Error('No provider injected')
                 }
 
@@ -84,7 +88,7 @@ t.test('EthersContract', (t) => {
               const wallet = this.signer.createWallet(ETHERS_PRIVATE_KEY)
               const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI, wallet)
 
-              if (!contract?.runner) {
+              if (!(await contract?.runner?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 
@@ -133,7 +137,7 @@ t.test('EthersContract', (t) => {
               async someMethod(): Promise<string> {
                 const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI)
 
-                if (!contract?.runner) {
+                if (!(await contract?.runner?.provider?.getNetwork())) {
                   throw new Error('No provider injected')
                 }
 
@@ -188,7 +192,7 @@ t.test('EthersContract', (t) => {
               const wallet = this.signer.createWallet(ETHERS_PRIVATE_KEY)
               const contract: Contract = this.contract.create(ETHERS_ADDRESS, ABI, wallet)
 
-              if (!contract?.runner) {
+              if (!(await contract?.runner?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 

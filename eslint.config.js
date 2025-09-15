@@ -1,7 +1,6 @@
 const { fixupPluginRules } = require('@eslint/compat')
 const { FlatCompat } = require('@eslint/eslintrc')
 const js = require('@eslint/js')
-const typescriptEslintEslintPlugin = require('@typescript-eslint/eslint-plugin')
 const tsParser = require('@typescript-eslint/parser')
 const _import = require('eslint-plugin-import')
 const globals = require('globals')
@@ -14,12 +13,11 @@ const compat = new FlatCompat({
 
 module.exports = [
   {
-    ignores: ['**/eslint.config.js'],
+    ignores: ['**/eslint.config.js', '**/dist/**', '**/node_modules/**'],
   },
   ...compat.extends('plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'),
   {
     plugins: {
-      '@typescript-eslint': typescriptEslintEslintPlugin,
       import: fixupPluginRules(_import),
     },
 

@@ -2,12 +2,12 @@ import { DynamicModule, Global, Module, OnApplicationShutdown } from '@nestjs/co
 import { DiscoveryModule, DiscoveryService } from '@nestjs/core'
 import { AbstractProvider } from 'ethers'
 import { EthersContract } from './ethers.contract'
-import { EthersModuleOptions, EthersModuleAsyncOptions } from './ethers.interface'
+import { EthersModuleAsyncOptions, EthersModuleOptions } from './ethers.interface'
 import {
-  createEthersProvider,
-  createEthersAsyncProvider,
   createAsyncOptionsProvider,
   createContractProvider,
+  createEthersAsyncProvider,
+  createEthersProvider,
   createSignerProvider,
 } from './ethers.providers'
 import { EthersSigner } from './ethers.signer'

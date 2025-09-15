@@ -2,7 +2,6 @@ import { Controller, Get, Injectable, Module } from '@nestjs/common'
 import { Mnemonic } from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
-import { EthersModule, EthersSigner, InjectSignerProvider } from '../src'
 import { appRequest } from './utils/appRequest'
 import {
   ETHERS_ADDRESS,
@@ -10,12 +9,16 @@ import {
   ETHERS_JSON_WALLET_PASSWORD,
   ETHERS_MNEMONIC,
   ETHERS_PRIVATE_KEY,
-  GOERLI_ALCHEMY_API_KEY,
 } from './utils/constants'
+import { nockAllRPCRequests } from './utils/mockResponses'
 import { platforms } from './utils/platforms'
+import { EthersModule, EthersSigner, InjectSignerProvider } from '../src'
 
 t.test('EthersSigner', (t) => {
-  t.beforeEach(() => nock.cleanAll())
+  t.beforeEach(() => {
+    nock.cleanAll()
+    nockAllRPCRequests()
+  })
 
   t.before(() => {
     if (!nock.isActive()) {
@@ -31,7 +34,7 @@ t.test('EthersSigner', (t) => {
   for (const PlatformAdapter of platforms) {
     t.test(PlatformAdapter.name, (t) => {
       t.test('forRoot', (t) => {
-        t.test('should create a wallet from a private ket with a provider injected', async (t) => {
+        t.test('should create a wallet from a private key with a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -41,7 +44,7 @@ t.test('EthersSigner', (t) => {
             async someMethod(): Promise<string> {
               const wallet = this.signer.createWallet(ETHERS_PRIVATE_KEY)
 
-              if (!wallet?.provider?.getNetwork()) {
+              if (!(await wallet?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 
@@ -61,7 +64,7 @@ t.test('EthersSigner', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot({ alchemy: GOERLI_ALCHEMY_API_KEY })],
+            imports: [EthersModule.forRoot()],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -84,7 +87,7 @@ t.test('EthersSigner', (t) => {
             async someMethod(): Promise<string> {
               const wallet = this.signer.createRandomWallet()
 
-              if (!wallet?.provider?.getNetwork()) {
+              if (!(await wallet?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 
@@ -104,7 +107,7 @@ t.test('EthersSigner', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot({ alchemy: GOERLI_ALCHEMY_API_KEY })],
+            imports: [EthersModule.forRoot()],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -130,7 +133,7 @@ t.test('EthersSigner', (t) => {
                 ETHERS_JSON_WALLET_PASSWORD,
               )
 
-              if (!wallet?.provider?.getNetwork()) {
+              if (!(await wallet?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 
@@ -150,7 +153,7 @@ t.test('EthersSigner', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot({ alchemy: GOERLI_ALCHEMY_API_KEY })],
+            imports: [EthersModule.forRoot()],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -173,7 +176,7 @@ t.test('EthersSigner', (t) => {
             async someMethod(): Promise<string> {
               const wallet = this.signer.createWalletfromMnemonic(Mnemonic.fromPhrase(ETHERS_MNEMONIC))
 
-              if (!wallet?.provider?.getNetwork()) {
+              if (!(await wallet?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 
@@ -193,7 +196,7 @@ t.test('EthersSigner', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot({ alchemy: GOERLI_ALCHEMY_API_KEY })],
+            imports: [EthersModule.forRoot()],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -216,7 +219,7 @@ t.test('EthersSigner', (t) => {
             async someMethod(): Promise<string> {
               const wallet = this.signer.createVoidSigner(ETHERS_ADDRESS)
 
-              if (!wallet?.provider?.getNetwork()) {
+              if (!(await wallet?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 
@@ -236,7 +239,7 @@ t.test('EthersSigner', (t) => {
           }
 
           @Module({
-            imports: [EthersModule.forRoot({ alchemy: GOERLI_ALCHEMY_API_KEY })],
+            imports: [EthersModule.forRoot()],
             controllers: [TestController],
             providers: [TestService],
           })
@@ -253,7 +256,7 @@ t.test('EthersSigner', (t) => {
       })
 
       t.test('forRootAsync', (t) => {
-        t.test('should create a wallet from a private ket with a provider injected', async (t) => {
+        t.test('should create a wallet from a private key with a provider injected', async (t) => {
           @Injectable()
           class TestService {
             constructor(
@@ -263,7 +266,7 @@ t.test('EthersSigner', (t) => {
             async someMethod(): Promise<string> {
               const wallet = this.signer.createWallet(ETHERS_PRIVATE_KEY)
 
-              if (!wallet?.provider?.getNetwork()) {
+              if (!(await wallet?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 
@@ -287,7 +290,7 @@ t.test('EthersSigner', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    alchemy: GOERLI_ALCHEMY_API_KEY,
+                    useDefaultProvider: true,
                   }
                 },
               }),
@@ -314,7 +317,7 @@ t.test('EthersSigner', (t) => {
             async someMethod(): Promise<string> {
               const wallet = this.signer.createRandomWallet()
 
-              if (!wallet?.provider?.getNetwork()) {
+              if (!(await wallet?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 
@@ -338,7 +341,7 @@ t.test('EthersSigner', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    alchemy: GOERLI_ALCHEMY_API_KEY,
+                    useDefaultProvider: true,
                   }
                 },
               }),
@@ -368,7 +371,7 @@ t.test('EthersSigner', (t) => {
                 ETHERS_JSON_WALLET_PASSWORD,
               )
 
-              if (!wallet?.provider?.getNetwork()) {
+              if (!(await wallet?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 
@@ -392,7 +395,7 @@ t.test('EthersSigner', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    alchemy: GOERLI_ALCHEMY_API_KEY,
+                    useDefaultProvider: true,
                   }
                 },
               }),
@@ -419,7 +422,7 @@ t.test('EthersSigner', (t) => {
             async someMethod(): Promise<string> {
               const wallet = this.signer.createWalletfromMnemonic(Mnemonic.fromPhrase(ETHERS_MNEMONIC))
 
-              if (!wallet?.provider?.getNetwork()) {
+              if (!(await wallet?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 
@@ -443,7 +446,7 @@ t.test('EthersSigner', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    alchemy: GOERLI_ALCHEMY_API_KEY,
+                    useDefaultProvider: true,
                   }
                 },
               }),
@@ -470,7 +473,7 @@ t.test('EthersSigner', (t) => {
             async someMethod(): Promise<string> {
               const wallet = this.signer.createVoidSigner(ETHERS_ADDRESS)
 
-              if (!wallet?.provider?.getNetwork()) {
+              if (!(await wallet?.provider?.getNetwork())) {
                 throw new Error('No provider injected')
               }
 
@@ -494,7 +497,7 @@ t.test('EthersSigner', (t) => {
               EthersModule.forRootAsync({
                 useFactory: () => {
                   return {
-                    alchemy: GOERLI_ALCHEMY_API_KEY,
+                    useDefaultProvider: true,
                   }
                 },
               }),

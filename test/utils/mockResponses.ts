@@ -1,4 +1,6 @@
+import * as nock from 'nock'
 import { Body, ReplyBody, ReplyFnContext } from 'nock'
+import { ETHERSCAN_V2_URL } from './constants'
 
 export const GAS_STATION_RESPONSE = {
   safeLow: {
@@ -97,4 +99,40 @@ export function matchResponses(this: ReplyFnContext, uri: string, requestBody: B
     ...RPC_RESPONSES[req.method],
     id: req.id,
   }))
+}
+export function nockAllRPCRequests() {
+  nock('http://www.whatever-here.com', {
+    filteringScope: function (scope) {
+      const isPostRequestEndpoint = !scope.includes('127.0.0.1') && !scope.includes(ETHERSCAN_V2_URL)
+      return isPostRequestEndpoint
+    },
+  })
+    .persist()
+    .post(/.*/)
+    .reply(200, matchResponses)
+  nock(ETHERSCAN_V2_URL)
+    .persist()
+    .get('/v2/api')
+    .query((query) => query.action === 'eth_blockNumber')
+    .reply(200, RPC_RESPONSES['eth_blockNumber'])
+  nock(ETHERSCAN_V2_URL)
+    .persist()
+    .get('/v2/api')
+    .query((query) => query.action === 'eth_getBlockByNumber')
+    .reply(200, RPC_RESPONSES['eth_getBlockByNumber'])
+  nock(ETHERSCAN_V2_URL)
+    .persist()
+    .get('/v2/api')
+    .query((query) => query.action === 'eth_gasPrice')
+    .reply(200, RPC_RESPONSES['eth_gasPrice'])
+  nock(ETHERSCAN_V2_URL)
+    .persist()
+    .get('/v2/api')
+    .query((query) => query.action === 'eth_chainId')
+    .reply(200, RPC_RESPONSES['eth_chainId'])
+  nock(ETHERSCAN_V2_URL)
+    .persist()
+    .get('/v2/api')
+    .query((query) => query.action === 'eth_maxPriorityFeePerGas')
+    .reply(200, RPC_RESPONSES['eth_maxPriorityFeePerGas'])
 }

@@ -16,7 +16,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\" --fix",
     "lint:ci": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\"",
-    "test": "tap test/*.spec.ts",
+    "test": "tap --passes test/*.spec.ts",
     "test:cov": "tap test/*.spec.ts --coverage-report=text-summary --coverage-report=lcovonly --allow-incomplete-coverage",
     "prepublishOnly": "npm run lint:ci && npm run test"
   },
@@ -67,11 +67,11 @@
   },
   "peerDependencies": {
     "@nestjs/common": "^10.2.7",
-    "ethers": "^6.8.0"
+    "ethers": "^6.15.0"
   },
   "tap": {
     "diag": true,
-    "bail": false,
+    "bail": true,
     "comments": true,
     "timeout": 40000
   }

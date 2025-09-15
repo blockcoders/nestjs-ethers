@@ -3,14 +3,12 @@ import { NestFactory } from '@nestjs/core'
 import {
   AbstractProvider,
   AlchemyProvider,
-  encodeBase64,
   EtherscanProvider,
   FallbackProvider,
   FeeData,
   JsonRpcProvider,
   Network,
   PocketProvider,
-  toUtf8Bytes,
 } from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
@@ -40,7 +38,13 @@ import {
   POLYGON_TESTNET_GASSTATION_URL,
   TESTNET_BSCPOCKET_URL,
 } from './utils/constants'
-import { GAS_STATION_RESPONSE, generateMethodQuery, matchResponses, RPC_RESPONSES } from './utils/mockResponses'
+import {
+  GAS_STATION_RESPONSE,
+  generateMethodQuery,
+  matchResponses,
+  nockAllRPCRequests,
+  RPC_RESPONSES,
+} from './utils/mockResponses'
 import { platforms } from './utils/platforms'
 import {
   BINANCE_NETWORK,
@@ -73,6 +77,8 @@ t.test('Ethers Module Initialization', (t) => {
     t.test(PlatformAdapter.name, (t) => {
       t.test('forRoot', (t) => {
         t.test('should compile without options', async (t) => {
+          nockAllRPCRequests()
+
           @Controller('/')
           class TestController {
             constructor(
@@ -140,10 +146,7 @@ t.test('Ethers Module Initialization', (t) => {
           nock(GOERLI_POCKET_URL)
             .persist()
             .post(`/${GOERLI_POKT_API_KEY.applicationId}`)
-            .matchHeader(
-              'authorization',
-              'Basic ' + encodeBase64(toUtf8Bytes(`:${GOERLI_POKT_API_KEY.applicationSecretKey}`)),
-            )
+            .basicAuth({ user: '', pass: GOERLI_POKT_API_KEY.applicationSecretKey })
             .reply(200, matchResponses)
 
           @Controller('/')
@@ -287,10 +290,7 @@ t.test('Ethers Module Initialization', (t) => {
           nock(BSC_POCKET_URL)
             .persist()
             .post(`/${GOERLI_POKT_API_KEY.applicationId}`)
-            .matchHeader(
-              'authorization',
-              'Basic ' + encodeBase64(toUtf8Bytes(`:${GOERLI_POKT_API_KEY.applicationSecretKey}`)),
-            )
+            .basicAuth({ user: '', pass: GOERLI_POKT_API_KEY.applicationSecretKey })
             .reply(200, matchResponses)
 
           @Controller('/')
@@ -326,6 +326,7 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should compile with network option as number', async (t) => {
+          nockAllRPCRequests()
           @Controller('/')
           class TestController {
             constructor(
@@ -356,6 +357,7 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should compile with network option as string', async (t) => {
+          nockAllRPCRequests()
           @Controller('/')
           class TestController {
             constructor(
@@ -1110,6 +1112,8 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should compile with network option as number', async (t) => {
+          nockAllRPCRequests()
+
           @Controller('/')
           class TestController {
             constructor(
@@ -1155,6 +1159,7 @@ t.test('Ethers Module Initialization', (t) => {
         })
 
         t.test('should compile with network option as string', async (t) => {
+          nockAllRPCRequests()
           @Controller('/')
           class TestController {
             constructor(
