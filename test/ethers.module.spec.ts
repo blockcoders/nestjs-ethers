@@ -12,6 +12,18 @@ import {
 } from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
+import {
+  BINANCE_NETWORK,
+  BINANCE_POCKET_DEFAULT_APP_ID,
+  BINANCE_TESTNET_NETWORK,
+  BSCSCAN_DEFAULT_API_KEY,
+  BscscanProvider,
+  EthersModule,
+  GOERLI_NETWORK,
+  InjectEthersProvider,
+  MAINNET_NETWORK,
+  MUMBAI_NETWORK,
+} from '../src'
 import { appRequest } from './utils/appRequest'
 import {
   BINANCE_TESTNET_MORALIS_API_KEY,
@@ -46,18 +58,6 @@ import {
   RPC_RESPONSES,
 } from './utils/mockResponses'
 import { platforms } from './utils/platforms'
-import {
-  BINANCE_NETWORK,
-  BINANCE_POCKET_DEFAULT_APP_ID,
-  BINANCE_TESTNET_NETWORK,
-  BSCSCAN_DEFAULT_API_KEY,
-  BscscanProvider,
-  EthersModule,
-  GOERLI_NETWORK,
-  InjectEthersProvider,
-  MAINNET_NETWORK,
-  MUMBAI_NETWORK,
-} from '../src'
 
 t.test('Ethers Module Initialization', (t) => {
   t.beforeEach(() => nock.cleanAll())

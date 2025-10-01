@@ -2,11 +2,6 @@ import { Controller, Get, Injectable, Module } from '@nestjs/common'
 import { AbstractProvider, Contract, FallbackProvider, Network } from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
-import * as ABI from './utils/ABI.json'
-import { appRequest } from './utils/appRequest'
-import { ETHERS_ADDRESS, ETHERSCAN_V2_URL, GOERLI_ETHERSCAN_API_KEY } from './utils/constants'
-import { generateMethodQuery, RPC_RESPONSES } from './utils/mockResponses'
-import { platforms } from './utils/platforms'
 import {
   EthersContract,
   EthersModule,
@@ -16,6 +11,11 @@ import {
   InjectEthersProvider,
   InjectSignerProvider,
 } from '../src'
+import * as ABI from './utils/ABI.json'
+import { appRequest } from './utils/appRequest'
+import { ETHERS_ADDRESS, ETHERSCAN_V2_URL, GOERLI_ETHERSCAN_API_KEY } from './utils/constants'
+import { generateMethodQuery, RPC_RESPONSES } from './utils/mockResponses'
+import { platforms } from './utils/platforms'
 
 t.test('InjectEthersProvider', (t) => {
   t.beforeEach(() => nock.cleanAll())

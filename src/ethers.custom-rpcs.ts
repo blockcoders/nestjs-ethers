@@ -70,7 +70,7 @@ export class BinancePocketProvider extends JsonRpcProvider {
   _getProvider(chainId: number): AbstractProvider {
     try {
       return new BinancePocketProvider(chainId, this.applicationId, this.applicationSecret)
-    } catch (error) {}
+    } catch {}
     return super._getProvider(chainId)
   }
 
@@ -125,7 +125,7 @@ export class MoralisProvider extends JsonRpcProvider {
   _getProvider(chainId: number): AbstractProvider {
     try {
       return new MoralisProvider(chainId, this.applicationId, this.region)
-    } catch (error) {}
+    } catch {}
     return super._getProvider(chainId)
   }
 

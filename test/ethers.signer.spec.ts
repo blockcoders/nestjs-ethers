@@ -2,6 +2,7 @@ import { Controller, Get, Injectable, Module } from '@nestjs/common'
 import { Mnemonic } from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
+import { EthersModule, EthersSigner, InjectSignerProvider } from '../src'
 import { appRequest } from './utils/appRequest'
 import {
   ETHERS_ADDRESS,
@@ -12,7 +13,6 @@ import {
 } from './utils/constants'
 import { nockAllRPCRequests } from './utils/mockResponses'
 import { platforms } from './utils/platforms'
-import { EthersModule, EthersSigner, InjectSignerProvider } from '../src'
 
 t.test('EthersSigner', (t) => {
   t.beforeEach(() => {
