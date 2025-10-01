@@ -1,25 +1,25 @@
 import {
   AlchemyProvider,
-  AnkrProvider,
   CloudflareProvider,
   EtherscanProvider,
   FallbackProvider,
   InfuraProvider,
-} from '@ethersproject/providers'
+  QuickNodeProvider,
+} from 'ethers'
 import * as nock from 'nock'
 import t from 'tap'
 import {
+  ARBITRUM_NETWORK,
   BINANCE_NETWORK,
+  BINANCE_POCKET_DEFAULT_APP_ID,
   BINANCE_TESTNET_NETWORK,
   GOERLI_NETWORK,
   MAINNET_NETWORK,
   SEPOLIA_NETWORK,
 } from '../src/ethers.constants'
 import {
-  BinanceMoralisProvider,
   BinancePocketProvider,
   BscscanProvider,
-  EthereumMoralisProvider,
   getBinanceDefaultProvider,
   getFallbackProvider,
   getNetworkDefaultProvider,
@@ -41,29 +41,6 @@ t.test('Ethers Custom RPC', (t) => {
   t.after(() => nock.restore())
 
   t.test('BscscanProvider', (t) => {
-    t.test('getBaseUrl', (t) => {
-      t.test('should return a bsc network url', (t) => {
-        const provider = new BscscanProvider(BINANCE_NETWORK)
-
-        t.equal(provider.getBaseUrl(), 'https://api.bscscan.com')
-        t.end()
-      })
-
-      t.test('should return a bsc testnet network url', (t) => {
-        const provider = new BscscanProvider(BINANCE_TESTNET_NETWORK)
-
-        t.equal(provider.getBaseUrl(), 'https://api-testnet.bscscan.com')
-        t.end()
-      })
-
-      t.test('should throw an error if the network is not valid', (t) => {
-        t.throws(() => new BscscanProvider(1))
-        t.end()
-      })
-
-      t.end()
-    })
-
     t.test('isCommunityResource', (t) => {
       t.test('should return a bsc communt.testy resource', (t) => {
         const provider = new BscscanProvider(BINANCE_NETWORK)
@@ -86,18 +63,24 @@ t.test('Ethers Custom RPC', (t) => {
   })
 
   t.test('BinancePocketProvider', (t) => {
-    t.test('getUrl', (t) => {
+    t.test('getRequest', (t) => {
       t.test('should return a bsc network url', (t) => {
-        const provider = new BinancePocketProvider(BINANCE_NETWORK)
+        const provider = new BinancePocketProvider(BINANCE_NETWORK.name)
 
-        t.equal(provider.connection.url, 'https://bsc-mainnet.gateway.pokt.network/v1/lb/6136201a7bad1500343e248d')
+        t.equal(
+          provider._getConnection().url,
+          'https://bsc-mainnet.gateway.pokt.network/v1/lb/6136201a7bad1500343e248d',
+        )
         t.end()
       })
 
       t.test('should return a bsc testnet network url', (t) => {
-        const provider = new BinancePocketProvider(BINANCE_TESTNET_NETWORK)
+        const provider = new BinancePocketProvider(BINANCE_TESTNET_NETWORK.name)
 
-        t.equal(provider.connection.url, 'https://bsc-testnet.gateway.pokt.network/v1/lb/6136201a7bad1500343e248d')
+        t.equal(
+          provider._getConnection().url,
+          'https://bsc-testnet.gateway.pokt.network/v1/lb/6136201a7bad1500343e248d',
+        )
         t.end()
       })
 
@@ -107,14 +90,39 @@ t.test('Ethers Custom RPC', (t) => {
       })
 
       t.test('should use an applicationSecretKey', (t) => {
-        const provider = new BinancePocketProvider(BINANCE_TESTNET_NETWORK, {
-          applicationId: '1234',
-          applicationSecretKey: '4321',
-        })
+        const provider = new BinancePocketProvider(BINANCE_TESTNET_NETWORK.name, '1234', '4321')
+        const credentials = provider._getConnection().credentials
 
-        t.equal(provider.connection.url, 'https://bsc-testnet.gateway.pokt.network/v1/lb/1234')
-        t.equal(provider.connection.user, '')
-        t.equal(provider.connection.password, '4321')
+        t.equal(provider._getConnection().url, 'https://bsc-testnet.gateway.pokt.network/v1/lb/1234')
+        t.equal(credentials, ':4321')
+        t.end()
+      })
+
+      t.test('should handle null applicationId in getRequest', (t) => {
+        const request = BinancePocketProvider.getRequest(BINANCE_NETWORK, null, null)
+
+        t.equal(
+          request.url,
+          `https://${BinancePocketProvider.getHost(BINANCE_NETWORK.name)}/v1/lb/${BINANCE_POCKET_DEFAULT_APP_ID}`,
+        )
+        t.end()
+      })
+
+      t.end()
+    })
+
+    t.test('_getProvider', (t) => {
+      t.test('should return new BinancePocketProvider for valid chainId', (t) => {
+        const provider = new BinancePocketProvider(BINANCE_NETWORK.name, '1234')
+        const newProvider = provider._getProvider(Number(BINANCE_NETWORK.chainId))
+
+        t.type(newProvider, BinancePocketProvider)
+        t.end()
+      })
+
+      t.test('should fallback to super._getProvider for any unsupported network', (t) => {
+        const provider = new BinancePocketProvider(BINANCE_NETWORK.name, '1234')
+        t.throws(() => provider._getProvider(Number(MAINNET_NETWORK.chainId)))
         t.end()
       })
 
@@ -143,94 +151,81 @@ t.test('Ethers Custom RPC', (t) => {
   })
 
   t.test('MoralisProvider', (t) => {
-    t.test('getApiKey', (t) => {
-      t.test('should return the provider options for a string key', (t) => {
-        t.same(MoralisProvider.getApiKey('1234'), { apiKey: '1234', region: 'nyc' })
-        t.end()
-      })
-
-      t.test('should return the provider options for a non string key', (t) => {
-        t.same(MoralisProvider.getApiKey({ apiKey: '1234', region: 'caba' }), {
-          apiKey: '1234',
-          region: 'caba',
-        })
-        t.end()
-      })
-
-      t.test('should throw an error if the api key is not valid', (t) => {
-        t.throws(() => MoralisProvider.getApiKey(''))
-        t.end()
-      })
-
-      t.end()
-    })
-    t.test('getConnectionInfo', (t) => {
+    t.test('getRequest', (t) => {
       t.test('should return the connection info', (t) => {
-        t.same(MoralisProvider.getConnectionInfo({ apiKey: '1234', region: 'caba' }, 'test'), {
-          url: 'https://speedy-nodes-caba.moralis.io/1234/test',
-          headers: {},
-        })
+        const provider = new MoralisProvider(BINANCE_NETWORK, '1234', 'caba')
+
+        t.equal(provider._getConnection().url, 'https://speedy-nodes-caba.moralis.io/1234/bsc/mainnet')
         t.end()
       })
 
-      t.end()
-    })
-
-    t.end()
-  })
-
-  t.test('BinanceMoralisProvider', (t) => {
-    t.test('getUrl', (t) => {
       t.test('should return a bsc network url', (t) => {
-        const provider = new BinanceMoralisProvider(BINANCE_NETWORK, { apiKey: '1234' })
+        const provider = new MoralisProvider(BINANCE_NETWORK, '1234')
 
-        t.equal(provider.connection.url, 'https://speedy-nodes-nyc.moralis.io/1234/bsc/mainnet')
+        t.equal(provider._getConnection().url, 'https://speedy-nodes-nyc.moralis.io/1234/bsc/mainnet')
         t.end()
       })
 
       t.test('should return a bsc testnet network url', (t) => {
-        const provider = new BinanceMoralisProvider(BINANCE_TESTNET_NETWORK, { apiKey: '1234' })
+        const provider = new MoralisProvider(BINANCE_TESTNET_NETWORK, '1234')
 
-        t.equal(provider.connection.url, 'https://speedy-nodes-nyc.moralis.io/1234/bsc/testnet')
+        t.equal(provider._getConnection().url, 'https://speedy-nodes-nyc.moralis.io/1234/bsc/testnet')
+        t.end()
+      })
+
+      t.test('should return a mainnet network url', (t) => {
+        const provider = new MoralisProvider(MAINNET_NETWORK, '1234')
+
+        t.equal(provider._getConnection().url, 'https://speedy-nodes-nyc.moralis.io/1234/eth/mainnet')
+        t.end()
+      })
+
+      t.test('should return a goerli network url', (t) => {
+        const provider = new MoralisProvider(GOERLI_NETWORK, '1234')
+
+        t.equal(provider._getConnection().url, 'https://speedy-nodes-nyc.moralis.io/1234/eth/goerli')
+        t.end()
+      })
+
+      t.test('should return a sepolia network url', (t) => {
+        const provider = new MoralisProvider(SEPOLIA_NETWORK, '1234')
+
+        t.equal(provider._getConnection().url, 'https://speedy-nodes-nyc.moralis.io/1234/eth/sepolia')
         t.end()
       })
 
       t.test('should throw an error if the network is not valid', (t) => {
-        t.throws(() => new BinanceMoralisProvider(1, { apiKey: '1234' }))
+        t.throws(() => new MoralisProvider(69, '1234'))
+        t.end()
+      })
+
+      t.test('should use mainnet network when none provided', (t) => {
+        const provider = new MoralisProvider(undefined, '1234')
+
+        t.equal(provider._network.chainId, MAINNET_NETWORK.chainId)
+        t.end()
+      })
+
+      t.test('should throw error when no apiKey provided', (t) => {
+        t.throws(() => new MoralisProvider(BINANCE_NETWORK, undefined), 'Invalid moralis apiKey')
         t.end()
       })
 
       t.end()
     })
 
-    t.end()
-  })
+    t.test('_getProvider', (t) => {
+      t.test('should return new MoralisProvider for valid chainId', (t) => {
+        const provider = new MoralisProvider(BINANCE_NETWORK, '1234')
+        const newProvider = provider._getProvider(Number(BINANCE_NETWORK.chainId))
 
-  t.test('EthereumMoralisProvider', (t) => {
-    t.test('getUrl', (t) => {
-      t.test('should return a mainnet network url', (t) => {
-        const provider = new EthereumMoralisProvider(MAINNET_NETWORK, { apiKey: '1234' })
-
-        t.equal(provider.connection.url, 'https://speedy-nodes-nyc.moralis.io/1234/eth/mainnet')
+        t.type(newProvider, MoralisProvider)
         t.end()
       })
 
-      t.test('should return a goerli network url', (t) => {
-        const provider = new EthereumMoralisProvider(GOERLI_NETWORK, { apiKey: '1234' })
-
-        t.equal(provider.connection.url, 'https://speedy-nodes-nyc.moralis.io/1234/eth/goerli')
-        t.end()
-      })
-
-      t.test('should return a sepolia network url', (t) => {
-        const provider = new EthereumMoralisProvider(SEPOLIA_NETWORK, { apiKey: '1234' })
-
-        t.equal(provider.connection.url, 'https://speedy-nodes-nyc.moralis.io/1234/eth/sepolia')
-        t.end()
-      })
-
-      t.test('should throw an error if the network is not valid', (t) => {
-        t.throws(() => new EthereumMoralisProvider(97, { apiKey: '1234' }))
+      t.test('should fallback to super._getProvider for any unsupported network', (t) => {
+        const provider = new MoralisProvider(BINANCE_NETWORK, '1234')
+        t.throws(() => provider._getProvider(Number(ARBITRUM_NETWORK.chainId)))
         t.end()
       })
 
@@ -247,17 +242,17 @@ t.test('Ethers Custom RPC', (t) => {
     })
 
     t.test('should return a instance of CloudflareProvider', async (t) => {
-      const provider = await getFallbackProvider([new CloudflareProvider(MAINNET_NETWORK)])
+      const provider = await getFallbackProvider([new CloudflareProvider(MAINNET_NETWORK)], undefined)
 
       t.type(provider, CloudflareProvider)
       t.end()
     })
 
     t.test('should return a instance of FallbackProvider', async (t) => {
-      const provider = await getFallbackProvider([
-        new CloudflareProvider(MAINNET_NETWORK),
-        new InfuraProvider(MAINNET_NETWORK),
-      ])
+      const provider = await getFallbackProvider(
+        [new CloudflareProvider(MAINNET_NETWORK), new InfuraProvider(MAINNET_NETWORK)],
+        undefined,
+      )
 
       t.type(provider, FallbackProvider)
       t.end()
@@ -267,26 +262,26 @@ t.test('Ethers Custom RPC', (t) => {
   })
 
   t.test('getBinanceDefaultProvider', (t) => {
-    t.test(
-      'should return a instance of FallbackProvider wt.testh BscscanProvider and BinancePocketProvider',
-      async (t) => {
-        const provider = await getBinanceDefaultProvider(BINANCE_TESTNET_NETWORK)
-
-        t.type(provider, FallbackProvider)
-        t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
-        t.type((provider as FallbackProvider).providerConfigs[1].provider, BinancePocketProvider)
-        t.equal((provider as FallbackProvider).quorum, 2)
-        t.end()
-      },
-    )
-
-    t.test('should return a instance of FallbackProvider wt.testh BinanceMoralisProvider', async (t) => {
-      const provider = await getBinanceDefaultProvider(BINANCE_TESTNET_NETWORK, { moralis: { apiKey: '1234' } })
+    t.test('should return a instance of FallbackProvider with BscscanProvider and BinancePocketProvider', async (t) => {
+      const provider = await getBinanceDefaultProvider(BINANCE_TESTNET_NETWORK, { quorum: 1 })
 
       t.type(provider, FallbackProvider)
       t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
       t.type((provider as FallbackProvider).providerConfigs[1].provider, BinancePocketProvider)
-      t.type((provider as FallbackProvider).providerConfigs[2].provider, BinanceMoralisProvider)
+      t.equal((provider as FallbackProvider).quorum, 1)
+      t.end()
+    })
+
+    t.test('should return a instance of FallbackProvider with BinanceMoralisProvider', async (t) => {
+      const provider = await getBinanceDefaultProvider(BINANCE_TESTNET_NETWORK, {
+        quorum: 2,
+        moralis: { apiKey: '1234' },
+      })
+
+      t.type(provider, FallbackProvider)
+      t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
+      t.type((provider as FallbackProvider).providerConfigs[1].provider, BinancePocketProvider)
+      t.type((provider as FallbackProvider).providerConfigs[2].provider, MoralisProvider)
       t.equal((provider as FallbackProvider).quorum, 2)
       t.end()
     })
@@ -295,33 +290,27 @@ t.test('Ethers Custom RPC', (t) => {
   })
 
   t.test('getNetworkDefaultProvider', (t) => {
-    t.test(
-      'should return a instance of FallbackProvider wt.testh BscscanProvider and BinancePocketProvider',
-      async (t) => {
-        const provider = await getNetworkDefaultProvider(BINANCE_TESTNET_NETWORK)
+    t.test('should return a instance of FallbackProvider with BscscanProvider and BinancePocketProvider', async (t) => {
+      const provider = await getNetworkDefaultProvider(BINANCE_TESTNET_NETWORK, { quorum: 1 })
 
-        t.type(provider, FallbackProvider)
-        t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
-        t.type((provider as FallbackProvider).providerConfigs[1].provider, BinancePocketProvider)
-        t.equal((provider as FallbackProvider).quorum, 2)
-        t.end()
-      },
-    )
+      t.type(provider, FallbackProvider)
+      t.type((provider as FallbackProvider).providerConfigs[0].provider, BscscanProvider)
+      t.type((provider as FallbackProvider).providerConfigs[1].provider, BinancePocketProvider)
+      t.equal((provider as FallbackProvider).quorum, 1)
+      t.end()
+    })
 
-    t.test(
-      'should return a instance of FallbackProvider wt.testh BscscanProvider and BinancePocketProvider',
-      async (t) => {
-        const provider = await getNetworkDefaultProvider(GOERLI_NETWORK)
+    t.test('should return a instance of FallbackProvider with BscscanProvider and BinancePocketProvider', async (t) => {
+      const provider = await getNetworkDefaultProvider(GOERLI_NETWORK, { quorum: 1 })
 
-        t.type(provider, FallbackProvider)
-        t.type((provider as FallbackProvider).providerConfigs[0].provider, InfuraProvider)
-        t.type((provider as FallbackProvider).providerConfigs[1].provider, EtherscanProvider)
-        t.type((provider as FallbackProvider).providerConfigs[2].provider, AlchemyProvider)
-        t.type((provider as FallbackProvider).providerConfigs[3].provider, AnkrProvider)
-        t.equal((provider as FallbackProvider).quorum, 1)
-        t.end()
-      },
-    )
+      t.type(provider, FallbackProvider)
+      t.type((provider as FallbackProvider).providerConfigs[0].provider, AlchemyProvider)
+      t.type((provider as FallbackProvider).providerConfigs[1].provider, EtherscanProvider)
+      t.type((provider as FallbackProvider).providerConfigs[2].provider, InfuraProvider)
+      t.type((provider as FallbackProvider).providerConfigs[3].provider, QuickNodeProvider)
+      t.equal((provider as FallbackProvider).quorum, 1)
+      t.end()
+    })
 
     t.end()
   })

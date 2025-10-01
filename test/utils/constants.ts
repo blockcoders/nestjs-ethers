@@ -1,62 +1,34 @@
 import { NestApplicationOptions } from '@nestjs/common'
 import { randomBytes } from 'crypto'
 
-export const GOERLI_ALCHEMY_URL = 'https://eth-goerli.g.alchemy.com/v2/'
-export const GOERLI_POCKET_URL = 'https://eth-goerli.gateway.pokt.network/v1/lb'
+export const GOERLI_ALCHEMY_URL = 'https://eth-goerli.g.alchemy.com'
+export const GOERLI_POCKET_URL = 'https://eth-goerli.gateway.pokt.network/v1/lb/'
 export const BSC_POCKET_URL = 'https://bsc-mainnet.gateway.pokt.network/v1/lb'
-export const GOERLI_ETHERSCAN_URL = 'https://api-goerli.etherscan.io/api'
 export const GOERLI_INFURA_URL = 'https://goerli.infura.io/v3'
 export const CLOUDFLARE_URL = 'https://cloudflare-eth.com'
-export const TESTNET_BSCSCAN_URL = 'https://api-testnet.bscscan.com/api'
+export const ETHERSCAN_V2_URL = 'https://api.etherscan.io'
 export const TESTNET_BSCPOCKET_URL = 'https://bsc-testnet.gateway.pokt.network/v1/lb'
 export const CUSTOM_BSC_1_URL = 'https://data-seed-prebsc-1-s1.binance.org:8545'
 export const CUSTOM_BSC_2_URL = 'https://data-seed-prebsc-1-s3.binance.org:8545'
 export const CUSTOM_BSC_3_URL = 'https://data-seed-prebsc-2-s2.binance.org:8545'
 export const MUMBAI_ALCHEMY_URL = 'https://polygon-mumbai.g.alchemy.com/v2/'
+export const POLYGON_TESTNET_GASSTATION_URL = 'https://gasstation-testnet.polygon.technology'
+export const GOERLI_QUICKNODE_URL = 'https://ethers.ethereum-goerli.quiknode.pro'
+export const GOERLI_QUICKNODE_TOKEN = '919b412a057b5e9c9b6dce193c5a60242d6efadb'
 export const GOERLI_ETHERSCAN_API_KEY = randomBytes(17).toString('hex')
 export const GOERLI_ALCHEMY_API_KEY = randomBytes(16).toString('hex')
-export const GOERLI_POKT_API_KEY = randomBytes(12).toString('hex')
-export const GOERLI_POKT_SECRET_KEY = randomBytes(16).toString('hex')
+export const GOERLI_POKT_API_KEY = {
+  applicationId: randomBytes(12).toString('hex'),
+  applicationSecretKey: randomBytes(16).toString('hex'),
+}
 export const GOERLI_INFURA_PROJECT_ID = randomBytes(16).toString('hex')
 export const GOERLI_INFURA_PROJECT_SECRET = randomBytes(16).toString('hex')
-export const GOERLI_MORALIS_API_KEY = randomBytes(12).toString('hex')
-export const GOERLI_MORALIS_URL = `https://speedy-nodes-nyc.moralis.io/${GOERLI_MORALIS_API_KEY}/eth/goerli`
-export const BINANCE_TESTNET_MORALIS_API_KEY = randomBytes(12).toString('hex')
-export const BINANCE_TESTNET_MORALIS_URL = `https://speedy-nodes-nyc.moralis.io/${BINANCE_TESTNET_MORALIS_API_KEY}/bsc/testnet`
+export const GOERLI_MORALIS_API_KEY = { apiKey: randomBytes(12).toString('hex') }
+export const GOERLI_MORALIS_URL = `https://speedy-nodes-nyc.moralis.io/${GOERLI_MORALIS_API_KEY.apiKey}/eth/goerli`
+export const BINANCE_TESTNET_MORALIS_API_KEY = { apiKey: randomBytes(12).toString('hex') }
+export const BINANCE_TESTNET_MORALIS_URL = `https://speedy-nodes-nyc.moralis.io/${BINANCE_TESTNET_MORALIS_API_KEY.apiKey}/bsc/testnet`
 export const GOERLI_ANKR_API_KEY = randomBytes(12).toString('hex')
 export const GOERLI_ANKR_URL = `https://rpc.ankr.com/eth_goerli/${GOERLI_ANKR_API_KEY}`
-export const PROVIDER_GET_GAS_PRICE_BODY = {
-  method: 'eth_gasPrice',
-  params: [],
-  id: 42,
-  jsonrpc: '2.0',
-}
-export const PROVIDER_GET_GAS_PRICE_RESPONSE = {
-  jsonrpc: '2.0',
-  id: 42,
-  result: '0x3b9aca00',
-}
-export const ETHERSCAN_GET_GAS_PRICE_QUERY = {
-  module: 'proxy',
-  action: 'eth_gasPrice',
-  apikey: GOERLI_ETHERSCAN_API_KEY,
-}
-export const ETHERSCAN_GET_BLOCK_NUMBER_QUERY = {
-  module: 'proxy',
-  action: 'eth_blockNumber',
-  apikey: GOERLI_ETHERSCAN_API_KEY,
-}
-export const PROVIDER_GET_BLOCK_NUMBER_BODY = {
-  method: 'eth_blockNumber',
-  params: [],
-  id: 42,
-  jsonrpc: '2.0',
-}
-export const PROVIDER_GET_BLOCK_NUMBER_RESPONSE = {
-  jsonrpc: '2.0',
-  id: 42,
-  result: '0x802f1c',
-}
 export const ETHERS_ADDRESS = '0x012363d61bdc53d0290a0f25e9c89f8257550fb8'
 export const ETHERS_PRIVATE_KEY = '0x4c94faa2c558a998d10ee8b2b9b8eb1fbcb8a6ac5fd085c6f95535604fc1bffb'
 export const ETHERS_MNEMONIC = 'service basket parent alcohol fault similar survey twelve hockey cloud walk panel'

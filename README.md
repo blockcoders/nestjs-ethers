@@ -33,7 +33,7 @@ import { EthersModule } from 'nestjs-ethers';
 class MyModule {}
 ```
 
-**NOTE:** *By default `EthersModule` will try to connect using [getDefaultProvider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider). It's the safest, easiest way to begin developing on Ethereum. It creates a [FallbackProvider](https://docs.ethers.io/v5/api/providers/other/#FallbackProvider) connected to as many backend services as possible.* 
+**NOTE:** *By default `EthersModule` will try to connect using [getDefaultProvider](https://docs.ethers.org/v6/api/providers/#getDefaultProvider). It's the safest, easiest way to begin developing on Ethereum. It creates a [FallbackProvider](https://docs.ethers.org/v6/api/providers/fallback-provider/) connected to as many backend services as possible.* 
 
 ### Configuration params
 
@@ -47,9 +47,9 @@ interface EthersModuleOptions {
    * If no network is provided, homestead (i.e. mainnet) is used.
    * The network may also be a URL to connect to,
    * such as http://localhost:8545 or wss://example.com.
-   * @see {@link https://docs.ethers.io/v5/api/providers/types/#providers-Networkish}
+   * @see {@link https://docs.ethers.org/v6/api/providers/#Networkish}
    */
-  network?: Network | string;
+  network?: Networkish;
 
   /**
    * Optional parameter for Alchemy API Token
@@ -104,12 +104,12 @@ interface EthersModuleOptions {
   ankr?: AnkrProviderOptions | string;
   
   /**
-   * Optional parameter for a custom StaticJsonRpcProvider
-   * You can connect using an URL, ConnectionInfo or an array of both.
-   * @see {@link https://docs.ethers.io/v5/api/providers/jsonrpc-provider/#StaticJsonRpcProvider}
-   * @ses {@link https://docs.ethers.io/v5/api/utils/web/#ConnectionInfo}
+   * Optional parameter for a custom JsonRpcProvider
+   * You can connect using an URL, FetchRequest or an array of both.
+   * @see {@link https://docs.ethers.org/v6/api/providers/jsonrpc/}
+   * @ses {@link https://docs.ethers.org/v6/api/utils/fetching/#FetchRequest}
    */
-  custom?: ConnectionInfo | string | (ConnectionInfo | string)[]
+  custom?: string | FetchRequest | (string | FetchRequest)[] 
 
   /**
    * Optional parameter the number of backends that must agree
@@ -118,25 +118,11 @@ interface EthersModuleOptions {
   quorum?: number;
 
   /**
-   * Optional parameter if this option is false, EthersModule won't wait until
-   * the providers are ready. If this option is true, EthersModule  will wait 
-   * until the network has heen established for all the providers.
-   * @see {@link https://docs.ethers.io/v5/api/providers/provider/#Provider-ready}
-   */
-  waitUntilIsConnected?: boolean;
-
-  /**
    * Optional parameter if this option is false, EthersModule will try to connect
    * with the credentials provided in options. If you define more than one provider,
    * EthersModule will use the FallbackProvider to send multiple requests simultaneously.
    */
   useDefaultProvider?: boolean;
-
-  /**
-   * Optional parameter if this option is true, EthersModule will disable 
-   * the console.log in the ethers.js library.
-   */
-  disableEthersLogger?: boolean
   
   /**
    * Optional parameter to associate a token name to EthersProvider,
@@ -301,7 +287,7 @@ class TestModule {}
 
 ## BaseProvider
 
-`BaseProvider` implements standard [Ether.js Provider](https://docs.ethers.io/v5/api/providers/provider/). So if you are familiar with it, you are ready to go.
+`BaseProvider` implements standard [Ether.js Provider](https://docs.ethers.org/v6/api/providers/#Provider). So if you are familiar with it, you are ready to go.
 
 ```ts
 import { InjectEthersProvider, BaseProvider } from 'nestjs-ethers';
@@ -397,9 +383,9 @@ class TestController {
 }
 ```
 
-## Custom StaticJsonRpcProvider
+## Custom JsonRpcProvider
 
-if you are familiar with [StaticJsonRpcProvider](https://docs.ethers.io/v5/api/providers/jsonrpc-provider/#StaticJsonRpcProvider), you are ready to go. The custom provider is very helpful when you want to use a RPC that is not defined in [ethers](https://github.com/ethers-io/ethers.js/). This is the case for Binance Smart Chain public [RPCs](https://docs.binance.org/smart-chain/developer/rpc.html).
+if you are familiar with [JsonRpcProvider](https://docs.ethers.org/v6/api/providers/jsonrpc/), you are ready to go. The custom provider is very helpful when you want to use a RPC that is not defined in [ethers](https://github.com/ethers-io/ethers.js/). This is the case for Binance Smart Chain public [RPCs](https://docs.binance.org/smart-chain/developer/rpc.html).
 
 ```ts
 import {
@@ -479,7 +465,7 @@ class TestController {
 
 ## EthersSigner 
 
-`EthersSigner` implements methods to create a [Wallet](https://docs.ethers.io/v5/api/signer/#Wallet) or [VoidSigner](https://docs.ethers.io/v5/api/signer/#VoidSigner). A `Signer` in ethers is an abstraction of an Ethereum Account, which can be used to sign messages and transactions and send signed transactions to the Ethereum Network. This service will also inject the `BaseProvider` into the wallet.
+`EthersSigner` implements methods to create a [Wallet](https://docs.ethers.org/v6/api/wallet/#Wallet) or [VoidSigner](https://docs.ethers.org/v6/api/providers/abstract-signer/#VoidSigner). A `Signer` in ethers is an abstraction of an Ethereum Account, which can be used to sign messages and transactions and send signed transactions to the Ethereum Network. This service will also inject the `BaseProvider` into the wallet.
 
 Create a `Wallet` from a private key:
 
@@ -502,7 +488,7 @@ export class TestService {
 }
 ```
 
-Create a random [Wallet](https://docs.ethers.io/v5/api/signer/#Wallet-createRandom):
+Create a random [Wallet](https://docs.ethers.org/v6/api/wallet/#Wallet_createRandom):
 
 ```ts
 import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
@@ -521,7 +507,7 @@ export class TestService {
 }
 ```
 
-Create a [Wallet](https://docs.ethers.io/v5/api/signer/#Wallet-fromEncryptedJson) from an encrypted JSON:
+Create a [Wallet](https://docs.ethers.org/v6/api/wallet/#Wallet_fromEncryptedJson) from an encrypted JSON:
 
 ```ts
 import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
@@ -569,7 +555,7 @@ export class TestService {
 }
 ```
 
-Create a [Wallet](https://docs.ethers.io/v5/api/signer/#Wallet.fromMnemonic) from a mnemonic:
+Create a [Wallet](https://docs.ethers.org/v6/api/wallet/#Wallet_fromPhrase) from a mnemonic:
 
 ```ts
 import { EthersSigner, InjectSignerProvider, Wallet } from 'nestjs-ethers';
@@ -590,7 +576,7 @@ export class TestService {
 }
 ```
 
-Create a [VoidSigner](https://docs.ethers.io/v5/api/signer/ from an address:
+Create a [VoidSigner](https://docs.ethers.org/v6/api/providers/#Signer) from an address:
 
 ```ts
 import { EthersSigner, InjectSignerProvider, VoidSigner } from 'nestjs-ethers';
@@ -613,7 +599,7 @@ export class TestService {
 
 ## EthersContract
 
-`EthersContract` implements a method for the creation of a [Contract](https://docs.ethers.io/v5/api/contract/) instance. This service will also inject the a `BaseProvider` into the contract.
+`EthersContract` implements a method for the creation of a [Contract](https://docs.ethers.org/v6/api/contract/) instance. This service will also inject the a `BaseProvider` into the contract.
 
 Create a `SmartContract` attached to an address:
 
@@ -638,7 +624,7 @@ class TestService {
 }
 ```
 
-Create a [Contract](https://docs.ethers.io/v5/api/contract/) with a Wallet:
+Create a [Contract](https://docs.ethers.org/v6/api/contract/) with a Wallet:
 
 ```ts
 import {
@@ -997,6 +983,12 @@ class TestService {
   }
 }
 ```
+
+### v3
+
+- Migrated to ethers.js v6 from v5, introduced breaking changes, see the [migration guide](https://docs.ethers.org/v6/migrating/#migrating) for comprehensive list of changes
+- `BigNumber` was replaced with the standard `bigint`
+- `StaticJsonRpcProvider` was merged to `JsonRpcProvider` with `staticNetwork` option.
 
 ## Change Log
 
