@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.2.1
+Published by **[blockcoders](https://github.com/blockcoders)** on **2025/12/16**
+- Update peer dependency @nestjs/common to ^11.1.6
+
+## 2.2.0
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/10/17**
+- [#154](https://github.com/blockcoders/nestjs-ethers/pull/154) Update nestjs to 10.x
+- [#160](https://github.com/blockcoders/nestjs-ethers/pull/160) fixes
+- [#155](https://github.com/blockcoders/nestjs-ethers/pull/155) Remove jest in order to use tap
+
+## 2.1.0
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/10/17**
+- [#148](https://github.com/blockcoders/nestjs-ethers/pull/148) Added option to use MulticallProvider instead of StaticJsonRpcProvider when using custom provider by [@0x67](https://github.com/0x67)
+
 ## 2.0.3
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/01/07**
 - Add @ethersproject/* as dependencies
