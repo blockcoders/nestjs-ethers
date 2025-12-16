@@ -17,8 +17,7 @@
     "lint": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\" --fix",
     "lint:ci": "eslint \"{src,apps,libs,test,__tests__}/**/*.ts\"",
     "test": "tap --passes test/*.spec.ts",
-    "test:cov": "tap test/*.spec.ts --coverage-report=text-summary --coverage-report=lcovonly --allow-incomplete-coverage",
-    "prepublishOnly": "npm run lint:ci && npm run test"
+    "test:cov": "tap test/*.spec.ts --coverage-report=text-summary --coverage-report=lcovonly --allow-incomplete-coverage"
   },
   "pre-commit": [
     "lint:ci",
